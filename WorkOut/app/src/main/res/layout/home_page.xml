@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageButton
+        android:id="@+id/profile_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/profile_icon"
+        android:contentDescription="@string/profile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <!-- Calendar Button -->
+    <ImageButton
+        android:id="@+id/calendar_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/generated_calendar_image_button_transparent_smaller"
+        android:contentDescription="@string/calendar"
+        android:layout_marginTop="350dp"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/map_button"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Map Button -->
+    <ImageButton
+        android:id="@+id/map_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/map_icon_transparent"
+        android:contentDescription="@string/map"
+        app:layout_constraintEnd_toStartOf="@+id/history_button"
+        app:layout_constraintStart_toEndOf="@id/calendar_button"
+        app:layout_constraintTop_toTopOf="@id/calendar_button" />
+
+    <!-- History Button -->
+    <ImageButton
+        android:id="@+id/history_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/history_icon"
+        android:contentDescription="@string/history"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        app:layout_constraintStart_toEndOf="@id/map_button"
+        app:layout_constraintEnd_toStartOf="@+id/messages_button"
+        app:layout_constraintTop_toTopOf="@id/calendar_button"/>
+
+    <!-- Messages Button -->
+    <ImageButton
+        android:id="@+id/messages_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/messages_icon"
+        android:contentDescription="@string/messages"
+        android:layout_marginStart="0dp"
+        app:layout_constraintStart_toEndOf="@id/history_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/calendar_button"/>
+
+    <!-- Define the horizontal chain over the buttons -->
+    <!-- You only need to specify the chain style on one of the buttons in the chain -->
+    <!-- For example, adding the following attribute to the map button converts the group into a packed chain -->
+    <!-- app:layout_constraintHorizontal_chainStyle="packed" -->
+
+    <!-- Alternatively, if you want to specify the chain style on the first button, you can adjust as follows -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/welcome"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_button" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="@string/workout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

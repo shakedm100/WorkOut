@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">WorkOut</string>
+    <string name="calendar">Calendar</string>
+    <string name="map">Map</string>
+    <string name="profile">Profile</string>
+    <string name="history">History</string>
+    <string name="messages">Messages</string>
+    <string name="welcome">Hello! Today\'s schedule is:</string>
+    <string name="workout">WorkOut</string>
+</resources>
