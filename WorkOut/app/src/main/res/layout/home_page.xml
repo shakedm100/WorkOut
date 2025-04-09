@@ -16,62 +16,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!-- Calendar Button -->
     <ImageButton
-        android:id="@+id/calendar_button"
+        android:id="@+id/mapButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:background="@drawable/generated_calendar_image_button_transparent_smaller"
-        android:contentDescription="@string/calendar"
-        android:layout_marginTop="350dp"
-        android:layout_marginEnd="2dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/map_button"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <!-- Map Button -->
-    <ImageButton
-        android:id="@+id/map_button"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/map_icon_transparent"
         android:contentDescription="@string/map"
-        app:layout_constraintEnd_toStartOf="@+id/history_button"
-        app:layout_constraintStart_toEndOf="@id/calendar_button"
-        app:layout_constraintTop_toTopOf="@id/calendar_button" />
+        app:layout_constraintEnd_toStartOf="@+id/searchButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendarButton" />
 
-    <!-- History Button -->
     <ImageButton
-        android:id="@+id/history_button"
+        android:id="@+id/messagesButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="90dp"
+        android:background="@drawable/messages_icon"
+        android:contentDescription="@string/messages"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/historyButton"
+        app:layout_constraintTop_toTopOf="@id/calendarButton" />
+
+    <ImageButton
+        android:id="@+id/calendarButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="90dp"
+        android:layout_marginTop="500dp"
+        android:background="@drawable/generated_calendar_image_button_transparent_smaller"
+        android:contentDescription="@string/calendar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/historyButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:background="@drawable/history_icon"
         android:contentDescription="@string/history"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        app:layout_constraintStart_toEndOf="@id/map_button"
-        app:layout_constraintEnd_toStartOf="@+id/messages_button"
-        app:layout_constraintTop_toTopOf="@id/calendar_button"/>
+        app:layout_constraintEnd_toStartOf="@+id/messagesButton"
+        app:layout_constraintStart_toEndOf="@+id/calendarButton"
+        app:layout_constraintTop_toTopOf="@+id/calendarButton" />
 
-    <!-- Messages Button -->
-    <ImageButton
-        android:id="@+id/messages_button"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:background="@drawable/messages_icon"
-        android:contentDescription="@string/messages"
-        android:layout_marginStart="0dp"
-        app:layout_constraintStart_toEndOf="@id/history_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/calendar_button"/>
-
-    <!-- Define the horizontal chain over the buttons -->
-    <!-- You only need to specify the chain style on one of the buttons in the chain -->
-    <!-- For example, adding the following attribute to the map button converts the group into a packed chain -->
-    <!-- app:layout_constraintHorizontal_chainStyle="packed" -->
-
-    <!-- Alternatively, if you want to specify the chain style on the first button, you can adjust as follows -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horizontal_center"
         android:layout_width="wrap_content"
@@ -95,6 +83,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/searchButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="120dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/mapButton"
+        app:layout_constraintTop_toTopOf="@+id/mapButton"
+        android:contentDescription="@string/search_button"
+        app:srcCompat="@drawable/search_icon" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
