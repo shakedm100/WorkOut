@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/userNameTextView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="110dp"
+        android:text="Username:"
+        android:textSize="20sp"
+        android:labelFor="@id/usernameTextLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/usernameTextLogin"
+        android:layout_width="200dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="40dp"
+        android:autofillHints="username"
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginView" />
+
+    <EditText
+        android:id="@+id/passwordTextLogin"
+        android:layout_width="200dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:autofillHints="password"
+        android:ems="10"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextLogin" />
+
+    <TextView
+        android:id="@+id/passwordTextView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="40dp"
+        android:labelFor="@id/passwordTextLogin"
+        android:text="Password:"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userNameTextView2" />
+
+    <TextView
+        android:id="@+id/loginView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Login"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/googleOptionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="30dp"
+        android:text="Or sign in with google:"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passwordTextView2" />
+
+    <ImageButton
+        android:id="@+id/googleRegisterButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"
+        android:autofillHints="google register"
+        android:background="@drawable/google_logo"
+        android:contentDescription="google sign in"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/googleOptionLabel" />
+
+    <TextView
+        android:id="@+id/noHaveAnAccountLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="45dp"
+        android:text="Don't have an account?"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/googleRegisterButton" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-15dp"
+        android:layout_marginTop="-14dp"
+        android:backgroundTint="#00A3A3A3"
+        android:text="Click here to register"
+        android:textColor="#000000"
+        android:textColorLink="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/noHaveAnAccountLabel"
+        app:layout_constraintTop_toTopOf="@+id/noHaveAnAccountLabel" />
+</androidx.constraintlayout.widget.ConstraintLayout>
