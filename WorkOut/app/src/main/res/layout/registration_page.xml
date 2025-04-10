@@ -62,9 +62,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="48dp"
-        android:text="Gender:"
+        android:layout_marginTop="40dp"
         android:labelFor="@id/radioGrp"
+        android:text="Gender:"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/birthDateTextView" />
@@ -74,9 +74,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="40dp"
-        android:text="Email:"
+        android:layout_marginTop="45dp"
         android:labelFor="@id/emailText"
+        android:text="Email:"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lastNameTextView" />
@@ -284,8 +284,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="40dp"
-        android:text="Country:"
         android:labelFor="@id/countrySpinner"
+        android:text="Country:"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/genderTextView" />
