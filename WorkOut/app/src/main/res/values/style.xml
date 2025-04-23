@@ -4,4 +4,8 @@
         <item name="backgroundTint">@null</item>
         <item name="rippleColor">@android:color/transparent</item>
     </style>
+
+    <style name="businessButtons">
+        <item name="backgroundTint">#A8A5A5</item>
+    </style>
 </resources>
