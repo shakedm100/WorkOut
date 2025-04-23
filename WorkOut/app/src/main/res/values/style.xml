@@ -6,6 +6,6 @@
     </style>
 
     <style name="businessButtons">
-        <item name="backgroundTint">#A8A5A5</item>
+        <item name="backgroundTint">#003eff</item>
     </style>
 </resources>
