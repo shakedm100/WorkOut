@@ -2,42 +2,49 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.view.MenuItem;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-
-    ImageButton goToMapButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.home_page);
-        /*ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });*/
+        setContentView(R.layout.home_page); // בחר את ה־XML המתאים
 
-        goToMapButton = findViewById(R.id.mapButton); // Match the ID in your layout
+        // מציאת ה־BottomNavigationView
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        goToMapButton.setOnClickListener(new View.OnClickListener() {
+        // הגדרת מאזין ללחיצות על הכפתורים
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                // Navigate to MapActivity
-                Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                startActivity(intent);
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.nav_home:
+                        // טיפול בלחיצה על בית
+                        return true;
+                    case R.id.nav_profile:
+                        // מעבר לפרופיל
+                        startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                        return true;
+                    case R.id.nav_search:
+                        // חיפוש
+                        startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                        return true;
+                    case R.id.nav_ratings:
+                        // דירוגים
+                        startActivity(new Intent(MainActivity.this, RatingsActivity.class));
+                        return true;
+                    case R.id.nav_messages:
+                        // הודעות
+                        startActivity(new Intent(MainActivity.this, MessagesActivity.class));
+                        return true;
+                    default:
+                        return false;
+                }
             }
         });
-
-
     }
 }

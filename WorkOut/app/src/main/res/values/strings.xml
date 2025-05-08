@@ -5,8 +5,9 @@
     <string name="profile">Profile</string>
     <string name="history">History</string>
     <string name="messages">Messages</string>
-    <string name="welcome">Hello! Today\'s schedule is:</string>
+    <string name="welcome">Hello!</string>
     <string name="workout">WorkOut</string>
     <string name="usernameTextDescription">Enter your new username</string>
     <string name="search_button">Search By Category</string>
+    <string name="back_image" />
 </resources>
