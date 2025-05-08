@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,93 +6,83 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageButton
-        android:id="@+id/profile_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/profile_icon"
-        android:contentDescription="@string/profile"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/mapButton"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/map_icon_transparent"
-        android:contentDescription="@string/map"
-        app:layout_constraintEnd_toStartOf="@+id/searchButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calendarButton" />
-
-    <ImageButton
-        android:id="@+id/messagesButton"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_marginEnd="90dp"
-        android:background="@drawable/messages_icon"
-        android:contentDescription="@string/messages"
+    <ImageView
+        android:id="@+id/myImageView"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:contentDescription="@string/back_image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sport"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/historyButton"
-        app:layout_constraintTop_toTopOf="@id/calendarButton" />
-
-    <ImageButton
-        android:id="@+id/calendarButton"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_marginStart="90dp"
-        android:layout_marginTop="500dp"
-        android:background="@drawable/generated_calendar_image_button_transparent_smaller"
-        android:contentDescription="@string/calendar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@+id/historyButton"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:background="@drawable/history_icon"
-        android:contentDescription="@string/history"
-        app:layout_constraintEnd_toStartOf="@+id/messagesButton"
-        app:layout_constraintStart_toEndOf="@+id/calendarButton"
-        app:layout_constraintTop_toTopOf="@+id/calendarButton" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horizontal_center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/welcome"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_button" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginStart="180dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="serif"
         android:text="@string/workout"
+        android:textColor="@color/black"
+        android:textSize="50sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="@+id/myImageView"
+        app:layout_constraintEnd_toEndOf="@+id/myImageView"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/myImageView"
+        app:layout_constraintStart_toStartOf="@+id/myImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <ScrollView
+        android:id="@+id/messageScroll"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/material_dynamic_primary95"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/myImageView">
 
-    <ImageView
-        android:id="@+id/searchButton"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_marginEnd="120dp"
+        <TextView
+            android:id="@+id/messagesBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start|top"
+            android:padding="8dp"
+            android:text="messages"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </ScrollView>
+
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="@id/messageScroll"
+        app:layout_constraintStart_toStartOf="@id/messageScroll"
+        app:layout_constraintTop_toBottomOf="@+id/messageScroll" />
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/mapButton"
-        app:layout_constraintTop_toTopOf="@+id/mapButton"
-        android:contentDescription="@string/search_button"
-        app:srcCompat="@drawable/search_icon" />
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
