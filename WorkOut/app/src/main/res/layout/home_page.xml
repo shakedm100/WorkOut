@@ -95,5 +95,14 @@
         android:contentDescription="@string/search_button"
         app:srcCompat="@drawable/search_icon" />
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        android:textColorLink="#F6BE00"
+        tools:layout_editor_absoluteX="100dp"
+        tools:layout_editor_absoluteY="312dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

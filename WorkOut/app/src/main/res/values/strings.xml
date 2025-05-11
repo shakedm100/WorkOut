@@ -9,4 +9,5 @@
     <string name="workout">WorkOut</string>
     <string name="usernameTextDescription">Enter your new username</string>
     <string name="search_button">Search By Category</string>
+    <string name="register">Register</string>
 </resources>
