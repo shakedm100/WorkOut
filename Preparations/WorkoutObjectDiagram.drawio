@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0" version="27.0.3">
+  <diagram name="Page-1" id="5dHloc85HKuwJjZ4fcBV">
+    <mxGraphModel dx="1295" dy="693" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;startFill=0;" edge="1" parent="1" source="1vqfvMEIsQ65eC-vyrc4-2" target="1vqfvMEIsQ65eC-vyrc4-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-2" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline;&quot;&gt;&lt;b&gt;client:Client&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ID = 5&lt;br&gt;username = client example&lt;br&gt;password = supersecret123&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;phone = 0553548743&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;email = example@gmail.com&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;firstname = John&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;lastname = Generic&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;address = Dizengoff St 89, Tel Aviv-Yafo&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;gender =&amp;nbsp; Male&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="230" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-3" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline;&quot;&gt;&lt;b&gt;business:Business&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ID = 6&lt;br&gt;username = business example&lt;br&gt;password = supersecret123&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;phone = 072315484&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;email = businessExample@gmail.com&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;name = weightLess&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;location = &lt;code&gt;-77.0364,38.8951&lt;/code&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;address = 1600 Pennsylvania Avenue NW, Washington, DC 20500, USA&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ratings = [5, &quot;Best place ever&quot;], [1, &quot;Worst Place Ever&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;followers = [client:&quot;Donald Trump&quot;], [client:&quot;Joe Biden&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;Policy = &quot;Aborts allowed until 24 hours before the class begins&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="700" y="90" width="270" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startFill=0;" edge="1" parent="1" source="1vqfvMEIsQ65eC-vyrc4-4" target="1vqfvMEIsQ65eC-vyrc4-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-4" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline;&quot;&gt;&lt;b&gt;client:Client&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ID = 7&lt;br&gt;username = client example2&lt;br&gt;password = supersecret123&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;phone = 0544561237&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;email = example2@gmail.com&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;firstname = Snow&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;lastname = Generic&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;address = Ha&#39;Savion St 9, Oranit&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;gender =&amp;nbsp; Male&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="280" width="230" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;startFill=0;" edge="1" parent="1" source="1vqfvMEIsQ65eC-vyrc4-5" target="1vqfvMEIsQ65eC-vyrc4-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="545" />
+              <mxPoint x="310" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-11" value="Registered at" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="1vqfvMEIsQ65eC-vyrc4-9">
+          <mxGeometry x="0.8118" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-5" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline;&quot;&gt;&lt;b&gt;client:Client&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ID = 8&lt;br&gt;username = client example3&lt;br&gt;password = supersecret123&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;phone = 0521587423&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;email = example3@gmail.com&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;firstname = Bolt&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;lastname = Generic&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;address = Haim Hertzog St 24, Jerusalem&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;gender =&amp;nbsp; Male&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="240" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startFill=0;" edge="1" parent="1" source="1vqfvMEIsQ65eC-vyrc4-6" target="1vqfvMEIsQ65eC-vyrc4-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-13" value="Belongs to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="1vqfvMEIsQ65eC-vyrc4-12">
+          <mxGeometry x="0.3295" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="1vqfvMEIsQ65eC-vyrc4-6" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline;&quot;&gt;&lt;b&gt;trxCourse:Course&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ID = 10&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = Group&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;name = &quot;TRX&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;participants = [client:&quot;John Generic&quot;], [client:&quot;Snow Generic&quot;], [client:&quot;Bolt Generic&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;Category = Functional Training&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;Capacity = 5&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;ageRange = [16,80]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;Occurence = 18:00, Monday&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="350" y="90" width="230" height="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
