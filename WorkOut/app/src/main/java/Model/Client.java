@@ -5,5 +5,15 @@ public class Client extends User {
     private String lastName;
     private Address address;
     private Gender gender;
+
+    public Client(int id, String username, String password, Phone phone, String email,
+                  String firstName, String lastName, Address address, Gender gender)
+    {
+        super(id, username, password, phone, email);
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.gender = gender;
+    }
     
 }
