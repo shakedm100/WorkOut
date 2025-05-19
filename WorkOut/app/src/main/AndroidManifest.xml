@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".MapActivity" />
+        <activity android:name=".ProfileActivity"/>
+        <activity android:name=".RatingsActivity"/>
+        <activity android:name=".MessagesActivity"/>
+        <activity android:name=".SearchActivity"/>
     </application>
 
 </manifest>
