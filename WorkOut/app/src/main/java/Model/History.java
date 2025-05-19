@@ -7,7 +7,7 @@ public class History extends Entity
     private LocalDateTime date;
     private Client client;
 
-    public History(int id, Course course, LocalDateTime date, Client client)
+    public History(String id, Course course, LocalDateTime date, Client client)
     {
         super(id);
         this.course = course;

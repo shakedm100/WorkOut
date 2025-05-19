@@ -10,7 +10,7 @@ public class Business extends User
     private ArrayList<Rating> ratings;
     private String policy;
 
-    public Business(int id, String username, String password, Phone phone, String email, String name,
+    public Business(String id, String username, String password, Phone phone, String email, String name,
                     Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
     {
         super(id, username, password, phone, email);

@@ -4,7 +4,7 @@ public class City extends Entity
 {
     private String name;
 
-    public City(int id, String name)
+    public City(String id, String name)
     {
         super(id);
         this.name = name;
