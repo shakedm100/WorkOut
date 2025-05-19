@@ -32,7 +32,7 @@ public class UserRepository {
         }
     }
 
-    /*public Call<User> getUser(String id) {
-        return apiService.fetchUser(id);
-    }*/
+    public Call<User> getUser(String id) {
+        return apiService.fetchUserByID(id);
+    }
 }
