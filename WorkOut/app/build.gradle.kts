@@ -2,6 +2,9 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
+
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
 }
 
 //  Load from local.properties
@@ -38,6 +41,12 @@ android {
             )
         }
     }
+
+    // To enable MVVM architecture using DataBinding
+    buildFeatures {
+        dataBinding = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -51,7 +60,19 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.play.services.maps)
+    implementation(libs.room.common.jvm)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    // Retrofit core - for APIServices
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // Retrofit → Gson converter
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // Gson library
+    implementation("com.google.code.gson:gson:2.8.9")
 }
