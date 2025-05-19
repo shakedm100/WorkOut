@@ -13,7 +13,7 @@ public class Course extends Entity
     private Category category;
     private String description;
 
-    public Course(int id, CourseType courseType, String name, ArrayList<Client> participants, int capacity,
+    public Course(String id, CourseType courseType, String name, ArrayList<Client> participants, int capacity,
                   AgeRange ageRange, Schedule schedule, Category category, String description)
     {
         super(id);

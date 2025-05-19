@@ -6,7 +6,7 @@ public class Rating extends Entity
     private String comment;
     private Client client;
 
-    public Rating(int id, float stars, String comment, Client client)
+    public Rating(String id, float stars, String comment, Client client)
     {
         super(id);
         this.stars = stars;

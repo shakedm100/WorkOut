@@ -6,7 +6,7 @@ public class User extends Entity {
     private Phone phone;
     private String email;
 
-    public User(int id, String username, String password, Phone phone, String email)
+    public User(String id, String username, String password, Phone phone, String email)
     {
         super(id);
         this.username = username;
