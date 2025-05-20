@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.room.common.jvm)
     implementation(libs.firebase.database)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -75,4 +76,15 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // Gson library
     implementation("com.google.code.gson:gson:2.8.9")
+
+    // Core Credential Manager:
+    implementation("androidx.credentials:credentials:<latest-version>")
+
+    // The “play-services-auth” bridge that brings in the Google federated providers
+    implementation("androidx.credentials:credentials-play-services-auth:<latest-version>")
+
+    // Google ID helper library for parsing/validating tokens
+    implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
+    implementation("androidx.credentials:credentials:1.0.1")
+
 }
