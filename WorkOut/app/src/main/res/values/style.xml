@@ -8,4 +8,8 @@
     <style name="businessButtons">
         <item name="backgroundTint">#003eff</item>
     </style>
+
+    <!-- This will take affect only on Android 10 and below -->
+    <style name="Theme.MyApp.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+    </style>
 </resources>

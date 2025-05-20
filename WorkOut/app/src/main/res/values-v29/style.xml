@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.MyApp.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Prevent Android 10+ from auto-inverting your colors -->
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
