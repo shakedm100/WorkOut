@@ -22,7 +22,10 @@ android {
     compileSdk = 35
 
     signingConfigs {
-        // create a new config named "debug"
+        /*Alters the current debug config
+        This way anyone in the team that wants to debug
+        have access to the Database without adding their SHA-1 each time
+        for each platform they use*/
         named("debug") {
             storeFile = file("keystores/team-debug.keystore")
             storePassword = "workout123"
