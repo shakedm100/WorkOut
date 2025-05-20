@@ -21,6 +21,16 @@ android {
     namespace = "com.example.workout"
     compileSdk = 35
 
+    signingConfigs {
+        // create a new config named "debug"
+        named("debug") {
+            storeFile = file("keystores/team-debug.keystore")
+            storePassword = "workout123"
+            keyAlias = "teamDebugKey"
+            keyPassword = "workout123"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.workout"
         minSdk = 24
@@ -33,6 +43,9 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
