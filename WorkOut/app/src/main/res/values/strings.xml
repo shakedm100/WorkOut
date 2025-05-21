@@ -10,4 +10,13 @@
     <string name="usernameTextDescription">Enter your new username</string>
     <string name="search_button">Search By Category</string>
     <string name="back_image" />
+    <string-array name="categories_array">
+        <item>יוגה</item>
+        <item>פילאטיס</item>
+        <item>חדר כושר</item>
+        <item>קיר טיפוס</item>
+        <item>טניס</item>
+        <item>בריכה</item>
+    </string-array>
+
 </resources>

@@ -8,7 +8,7 @@
     tools:context=".ProfileActivity">
 
 
-    <!-- תמונת פרופיל -->
+
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="0dp"
