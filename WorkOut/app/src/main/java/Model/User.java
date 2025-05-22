@@ -2,15 +2,15 @@ package Model;
 
 public class User extends Entity {
     private String username;
-    private String password;
+    //private String password;
     private Phone phone;
     private String email;
 
-    public User(String id, String username, String password, Phone phone, String email)
+    public User(String id, String username, Phone phone, String email)
     {
         super(id);
         this.username = username;
-        this.password = password;
+        //this.password = password;
         this.phone = phone;
         this.email = email;
     }
@@ -19,9 +19,9 @@ public class User extends Entity {
         return username;
     }
 
-    public String getPassword() {
+    /*public String getPassword() {
         return password;
-    }
+    }*/
 
     public String getEmail() {
         return email;

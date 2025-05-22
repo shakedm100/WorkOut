@@ -9,7 +9,7 @@ public class Client extends User {
     public Client(String id, String username, String password, Phone phone, String email,
                   String firstName, String lastName, Address address, Gender gender)
     {
-        super(id, username, password, phone, email);
+        super(id, username, phone, email);
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;

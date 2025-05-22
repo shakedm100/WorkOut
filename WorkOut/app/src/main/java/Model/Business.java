@@ -13,7 +13,7 @@ public class Business extends User
     public Business(String id, String username, String password, Phone phone, String email, String name,
                     Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
     {
-        super(id, username, password, phone, email);
+        super(id, username, phone, email);
         this.name = name;
         this.location = location;
         this.followers = followers;
