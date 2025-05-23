@@ -19,11 +19,15 @@ import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 
+import com.google.android.gms.common.Scopes;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import Model.Address;
@@ -86,7 +90,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void requestGoogleIdToken() {
+    private void requestGoogleIdToken()
+    {
+
         // Build the Google ID request
         GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
                 // show _all_ Google accounts on the device, not just pre-authorized ones:
@@ -126,36 +132,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private void handleCredential(@NonNull Credential credential) {
         // 7) Check for Google ID token credential type
-        if (credential instanceof GoogleIdTokenCredential) {
-            GoogleIdTokenCredential gidc = (GoogleIdTokenCredential) credential;
+        if (GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(credential.getType())) {
+            GoogleIdTokenCredential gidc = GoogleIdTokenCredential.createFrom(credential.getData());
             // 8) Parse and validate
             gidc = GoogleIdTokenCredential.createFrom(gidc.getData());
             String idToken = gidc.getIdToken();
 
-            // 9) Send the token to your backend via repository
-            new Thread(() -> {
-                try {
-                    //AuthResponse auth = userRepository.authenticateWithGoogle(idToken);
-                    runOnUiThread(() -> {
-                        // TODO: store auth.getJwt(), nav to main app screen
-                        Toast.makeText(this,
-                                "Welcome, " ,
-                                Toast.LENGTH_SHORT).show();
-                    });
-                } catch (Exception ex) {
-                    runOnUiThread(() ->
-                            Toast.makeText(this,
-                                    "Auth error: " + ex.getMessage(),
-                                    Toast.LENGTH_LONG).show()
-                    );
-                }
-            }).start();
-
-        } else {
-            // not a Google ID credential
-            Toast.makeText(this,
-                    "Unexpected credential type: " + credential.getType(),
-                    Toast.LENGTH_LONG).show();
+            ClientRepository clientRepository = new ClientRepository();
+            clientRepository.handleGoogleAuthWithFirebase(idToken).addOnSuccessListener(task ->
+            {
+                Client client = task;
+                startActivity(new Intent(this, MainActivity.class));
+            }).addOnFailureListener(e ->
+            {
+                System.out.println(e);
+            });
         }
     }
 }

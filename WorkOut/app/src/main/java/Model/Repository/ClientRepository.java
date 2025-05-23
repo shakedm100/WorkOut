@@ -2,11 +2,17 @@ package Model.Repository;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Filter;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -184,6 +190,38 @@ public class ClientRepository
                     //Gender gender = doc.get("gender", Gender.class);
                     Gender gender = Gender.Male; // For testing purposes
                     return new Client(id, user, password, phone, email, firstName, lastName, address, gender);
+        });
+    }
+
+    public Task<Client> handleGoogleAuthWithFirebase(String idToken)
+    {
+        AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        return auth.signInWithCredential(firebaseCredential).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            FirebaseUser googleClient = task.getResult().getUser();
+            if (googleClient == null) {
+                throw new IllegalStateException("FirebaseUser was null");
+            }
+            String firstName = "";
+            String lastName = "";
+            if(googleClient.getDisplayName() != null)
+            {
+                String[] firstAndLast = googleClient.getDisplayName().split(" ", 2);
+                firstName = firstAndLast[0];
+                if(firstAndLast.length > 1)
+                    lastName = firstAndLast[1];
+            }
+
+            String phoneNumber = googleClient.getPhoneNumber();
+            Phone phone = null;
+            if(PhonePrefix.fromString(phoneNumber) != null)
+                phone = new Phone(PhonePrefix.fromString(phoneNumber), phoneNumber);
+            return new Client(googleClient.getUid(), "", "", phone,
+                    googleClient.getEmail(), firstName, lastName, null, null);
         });
     }
 

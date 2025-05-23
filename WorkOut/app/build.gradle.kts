@@ -96,13 +96,12 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.9")
 
     // Core Credential Manager:
-    implementation("androidx.credentials:credentials:<latest-version>")
-
+    implementation("androidx.credentials:credentials:1.0.1")
     // The “play-services-auth” bridge that brings in the Google federated providers
     implementation("androidx.credentials:credentials-play-services-auth:<latest-version>")
 
     // Google ID helper library for parsing/validating tokens
     implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
-    implementation("androidx.credentials:credentials:1.0.1")
+    implementation("com.google.android.gms:play-services-auth:<latest version>")
 
 }
