@@ -1,8 +1,11 @@
 package com.example.workout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,20 +49,39 @@ public class LoginActivity extends AppCompatActivity {
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
 
         Button registerButton = findViewById(R.id.registerButton);
-        registerButton.setOnClickListener(v -> saveUserProfileToFirestore("1", "shakedm100", "shaked1@gmail.com", null));
+        registerButton.setOnClickListener(task -> {
+            Intent newIntent = new Intent(this, RegisterActivity.class);
+            startActivity(newIntent);
+        });
+
+        Button loginButton = findViewById(R.id.loginButton);
+        loginButton.setOnClickListener(click ->
+        {
+            startActivity(new Intent(this, MainActivity.class));
+        });
     }
 
-    public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl) {
+    private void checkIfUserAndPassword()
+    {
+        EditText userText = findViewById(R.id.usernameTextLogin);
+        String username = userText.getText().toString();
+        EditText passwordText = findViewById(R.id.passwordTextLogin);
+        String password = passwordText.getText().toString();
 
-        ClientRepository clientRepository = new ClientRepository();
-        Client sessionClient = null;
-        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("1","Oranit"), "Hayarkon");
-        clientRepository.insertClient("dvir", "1234", phone, email, "Dvir",
-                "Bento", address, Gender.Male).addOnSuccessListener(client ->
-                System.out.println("Hello" + client.getUsername()));
-
-
+        ClientRepository repository = new ClientRepository();
+        Client current;
+        repository.checkLogin(username, password).addOnSuccessListener(client ->
+        {
+            // Change Activity to Main
+            if(client != null)
+            {
+                startActivity(new Intent(this, MainActivity.class));
+            }
+        })
+            .addOnFailureListener(e -> {
+            // Login failed (bad credentials or Firestore error)
+            // TODO: Add error handling
+        });
     }
 
 

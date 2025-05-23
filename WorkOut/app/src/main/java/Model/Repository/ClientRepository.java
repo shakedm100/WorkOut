@@ -10,6 +10,7 @@ import com.google.firebase.firestore.Filter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import Model.Client;
@@ -129,6 +130,22 @@ public class ClientRepository
         DocumentReference currentClient = db.collection("clients").document(client.getId());
 
         return currentClient.delete().continueWith(task -> task.isSuccessful());
+    }
+
+    public Task<Client> checkLogin(String username, String password)
+    {
+        return getClientByUsername(username).continueWith(task -> {
+            if(!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            Client client = task.getResult();
+            if(client == null)
+                throw new NoSuchElementException("No such user: " + username);
+
+            if(client.getPassword().equals(password))
+                return client;
+            throw new IllegalArgumentException("Invalid password");
+        });
     }
 
     public Task<Client> getClientByUsername(String username)
