@@ -10,13 +10,15 @@ import com.google.firebase.firestore.Filter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import Model.City;
 import Model.Client;
 import Model.Gender;
 import Model.Phone;
 import Model.Address;
-
+import Model.PhonePrefix;
 
 
 public class ClientRepository
@@ -131,6 +133,22 @@ public class ClientRepository
         return currentClient.delete().continueWith(task -> task.isSuccessful());
     }
 
+    public Task<Client> checkLogin(String username, String password)
+    {
+        return getClientByUsername(username).continueWith(task -> {
+            if(!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            Client client = task.getResult();
+            if(client == null)
+                throw new NoSuchElementException("No such user: " + username);
+
+            if(client.getPassword().equals(password))
+                return client;
+            throw new IllegalArgumentException("Invalid password");
+        });
+    }
+
     public Task<Client> getClientByUsername(String username)
     {
         return db.collection("clients")
@@ -153,27 +171,19 @@ public class ClientRepository
                     DocumentSnapshot doc = snap.getDocuments().get(0);
 
                     // If this doesn't work we can try the other method in the comments
-                    Client client = doc.toObject(Client.class);
-                    if (client == null) {
-                        throw new IllegalStateException(
-                                "Failed to map document to Client");
-                    }
-                    client.setId(doc.getId());
-                    return client;
-                /*
-                Another option if the first one doesn't work:
-                 String id = doc.getId();
-                 String user = doc.getString("username");
-                 String password = doc.getString("password");
-                 Phone phone = doc.toObject(Phone.class);     // or doc.get("phone", Phone.class);
-                 String email = doc.getString("email");
-                 String firstName = doc.getString("firstName");
-                 String lastName = doc.getString("lastName");
-                 Address address = doc.toObject(Address.class);
-                 Gender gender = doc.get("gender", Gender.class);
-
-                 return new Client(id, usr, pwd, phone, email, firstName, lastName, address, gender);
-                 */
+                    String id = doc.getId();
+                    String user = doc.getString("username");
+                    String password = doc.getString("password");
+                    //Phone phone = doc.toObject(Phone.class);     // or doc.get("phone", Phone.class);
+                    Phone phone = new Phone(PhonePrefix.PREFIX_052, "5427435"); // For testing purposes
+                    String email = doc.getString("email");
+                    String firstName = doc.getString("firstName");
+                    String lastName = doc.getString("lastName");
+                    //Address address = doc.toObject(Address.class);
+                    Address address = new Address(new City("1", "Oranit"), "Hayarkon"); // For testing purposes
+                    //Gender gender = doc.get("gender", Gender.class);
+                    Gender gender = Gender.Male; // For testing purposes
+                    return new Client(id, user, password, phone, email, firstName, lastName, address, gender);
         });
     }
 

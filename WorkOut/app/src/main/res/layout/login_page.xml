@@ -111,4 +111,17 @@
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/noHaveAnAccountLabel"
         app:layout_constraintTop_toTopOf="@+id/noHaveAnAccountLabel" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#FFFFFF"
+        android:text="Login"
+        android:textColor="#030303"
+        android:textColorLink="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>
