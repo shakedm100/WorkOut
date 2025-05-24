@@ -4,7 +4,7 @@ public class Phone {
     private PhonePrefix prefix;
     private String number;
 
-    /**
+    /***
      * No-arg constructor required by Firestore’s POJO mapper
      * POJO convention is:
      * 1. Give each class a public no-argument constructor
