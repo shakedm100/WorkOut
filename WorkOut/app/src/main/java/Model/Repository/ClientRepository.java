@@ -59,15 +59,15 @@ public class ClientRepository
         user.put("username", username);
         user.put("password", password);
         user.put("email", email);
-        //user.put("phone", phone);
+        user.put("phone", phone);
         user.put("firstName", firstName);
         user.put("lastName", lastName);
-        //user.put("address", address);
-        //user.put("gender", gender);
+        user.put("address", address);
+        user.put("gender", gender);
 
-        // 1) check existence
+        // check existence
         return canRegisterUser(username, email)
-                // 2) depending on the check, either fail or go add()
+                // depending on the check, either fail or go add()
                 .continueWithTask(checkTask -> {
                     if (!checkTask.isSuccessful()) {
                         // propagate any error from the existence check
@@ -82,7 +82,7 @@ public class ClientRepository
                     // username free → add the new document
                     return db.collection("clients").add(user);
                 })
-                // 3) map the DocumentReference into your Client
+                // map the DocumentReference into your Client
                 .continueWith(addTask -> {
                     if (!addTask.isSuccessful()) {
                         throw Objects.requireNonNull(addTask.getException());

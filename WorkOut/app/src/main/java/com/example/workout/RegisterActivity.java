@@ -24,8 +24,9 @@ public class RegisterActivity extends AppCompatActivity {
         //Button registerButton = findViewById(R.id.re); TODO: We forgot to add a register button!!
     }
 
-    public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl) {
-
+    public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl)
+    {
+        // Used for testing purposes
         ClientRepository clientRepository = new ClientRepository();
         Client sessionClient = null;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
@@ -33,7 +34,5 @@ public class RegisterActivity extends AppCompatActivity {
         clientRepository.insertClient("Alice", "1234", phone, email, "Dvir",
                 "Bento", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername()));
-
-
     }
 }
