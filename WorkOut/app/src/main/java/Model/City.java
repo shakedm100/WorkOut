@@ -4,6 +4,8 @@ public class City extends Entity
 {
     private String name;
 
+    public City() {}
+
     public City(String id, String name)
     {
         super(id);
@@ -13,4 +15,7 @@ public class City extends Entity
     public String getName() {
         return name;
     }
+
+    public void setName(String name)
+    { this.name = name; }
 }

@@ -63,6 +63,20 @@ public class LoginActivity extends AppCompatActivity {
         {
             checkIfUserAndPassword();
         });
+//        loginButton.setOnClickListener(click ->
+//        {
+//            testInsertion();
+//        });
+    }
+
+    private void testInsertion()
+    {
+        ClientRepository clientRepository = new ClientRepository();
+        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
+        Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
+        clientRepository.insertClient("shakedm100", "1234", phone, "shaked1mi@gmail.com", "Shaked",
+                "Michael", address, Gender.Male).addOnSuccessListener(client ->
+                System.out.println("Hello" + client.getUsername()));
     }
 
     private void checkIfUserAndPassword()
