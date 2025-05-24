@@ -105,4 +105,9 @@ dependencies {
     implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
     implementation("androidx.credentials:credentials:1.0.1")
 
+    // ViewModel dependencies
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime:2.7.0") 
+
 }

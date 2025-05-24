@@ -15,5 +15,14 @@ public class Client extends User {
         this.address = address;
         this.gender = gender;
     }
+
+    // getters and setters
+
+    public String getFirstName()
+    {
+        return firstName;
+    }
+
+
     
 }

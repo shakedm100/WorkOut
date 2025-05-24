@@ -1,6 +1,7 @@
 package com.example.workout;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -15,13 +16,14 @@ import androidx.credentials.CredentialManagerCallback;
 import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 import Model.Address;
 import Model.City;
@@ -30,10 +32,28 @@ import Model.Gender;
 import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.ClientRepository;
+import ViewModel.MyViewModel;
+//import Model.Repository.TestClientRepository;
+
+// ViewModel imports
+import androidx.lifecycle.ViewModelProvider;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import ViewModel.MyViewModel;
+//
+
+import android.util.Log;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
     private FirebaseAuth auth;
+
+    // ViewModel vars
+    private MyViewModel viewModel;
+    private TextView textView;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +67,41 @@ public class LoginActivity extends AppCompatActivity {
 
         Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(v -> saveUserProfileToFirestore("1", "shakedm100", "shaked1@gmail.com", null));
+        //registerButton.setOnClickListener(v -> fetchClientFromFirestore());
+
+        /*
+        // TESTS
+        TestClientRepository testRepo = new TestClientRepository();
+
+        // Test GET
+        testRepo.testGetClientByUsername("dvir");
+
+        // Test UPDATE
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("email", "updated@example.com");
+        testRepo.testUpdateClientByUsername("dvir", updates);
+
+        // Test DELETE
+        testRepo.testDeleteClientByUsername("john123");
+
+         */
+
+        // ViewModel changes
+
+        // get the instance as the MyViewModel class with the functions
+        viewModel = new ViewModelProvider(this).get(MyViewModel.class);
+
+        // listen to new data
+        viewModel.getTextData().observe(this, text -> textView.setText(text));
+
+        // Update ViewModel data on button click
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.updateText("Hello from ViewModel!");
+            }
+        });
+
     }
 
     public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl) {
@@ -58,8 +113,48 @@ public class LoginActivity extends AppCompatActivity {
         clientRepository.insertClient("dvir", "1234", phone, email, "Dvir",
                 "Bento", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername()));
+    }
 
+    /**
+     * Fetch a client from the Firestore by username
+     */
+    public void fetchClientFromFirestore(String username)
+    {
+        ClientRepository clientRepository = new ClientRepository();
+        clientRepository.getClientByUsername("dvir");
+    }
 
+    public void updateClientByUsername(String username)
+    {
+        ClientRepository clientRepository = new ClientRepository();
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("email", "newemail@example.com");
+
+        clientRepository.updateUserByUsername(username, updates)
+                .addOnSuccessListener(success -> {
+                    if (success) {
+                        Log.d("Firestore", "User updated successfully");
+                    } else {
+                        Log.d("Firestore", "User not found");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Update failed", e));
+    }
+
+    public void deleteClientByUsername(String username)
+    {
+        ClientRepository clientRepository = new ClientRepository();
+
+        clientRepository.deleteUserByUsername(username)
+                .addOnSuccessListener(success -> {
+                    if (success) {
+                        Log.d("Firestore", "User deleted successfully");
+                    } else {
+                        Log.d("Firestore", "User not found");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Deletion failed", e));
     }
 
 
