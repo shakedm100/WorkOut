@@ -176,7 +176,17 @@ public class ClientRepository
                     // grab the first (and only) document
                     DocumentSnapshot doc = snap.getDocuments().get(0);
 
-                    // If this doesn't work we can try the other method in the comments
+                    // This should work if your Client class has a no-arg constructor
+                    // and getters/setters for every field, in short POJO convention
+                    Client client = doc.toObject(Client.class);
+                    if (client == null) {
+                        throw new IllegalStateException(
+                                "Failed to map document to Client");
+                    }
+                    client.setId(doc.getId());
+                    return client;
+
+                    /*// If this doesn't work we can try the other method in the comments
                     String id = doc.getId();
                     String user = doc.getString("username");
                     String password = doc.getString("password");
@@ -189,7 +199,7 @@ public class ClientRepository
                     Address address = new Address(new City("1", "Oranit"), "Hayarkon"); // For testing purposes
                     //Gender gender = doc.get("gender", Gender.class);
                     Gender gender = Gender.Male; // For testing purposes
-                    return new Client(id, user, password, phone, email, firstName, lastName, address, gender);
+                    return new Client(id, user, password, phone, email, firstName, lastName, address, gender);*/
         });
     }
 

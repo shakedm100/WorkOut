@@ -5,6 +5,7 @@ public class Address
     private City city;
     private String name;
 
+    public Address(){}
     public Address(City city, String name)
     {
         this.city = city;
