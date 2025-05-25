@@ -10,6 +10,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import Model.Business;
@@ -89,11 +90,11 @@ public class BusinessRepository
     {
         DocumentReference currentClient = db.collection(collection).document(business.getId());
 
-        return currentClient.delete().continueWith(task -> task.isSuccessful());
+        return currentClient.delete().continueWith(Task::isSuccessful);
     }
 
     // This method gets the business by the username
-    public Task<Business> getBusinessByUsername(String username)
+    public Task<Business> getBusinessByUsername(String username) //TODO: Maybe can generalize to user
     {
         return db.collection(collection).whereEqualTo("username", username)
                 .limit(1).get().continueWith(task ->
@@ -121,5 +122,22 @@ public class BusinessRepository
                     business.setId(doc.getId());
                     return business;
                 });
+    }
+
+    public Task<Business> checkLogin(String username, String password) //TODO: Maybe can generalize to user
+    {
+        return getBusinessByUsername(username).continueWith(task ->
+        {
+            if (!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            Business business = task.getResult();
+            if (business == null)
+                throw new NoSuchElementException("No such user: " + username);
+
+            if (business.getPassword().equals(password))
+                return business;
+            throw new IllegalArgumentException("Invalid password");
+        });
     }
 }
