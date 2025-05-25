@@ -1,6 +1,11 @@
 package Model;
 
-public class Phone {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+public class Phone implements Parcelable {
     private PhonePrefix prefix;
     private String number;
 
@@ -21,6 +26,12 @@ public class Phone {
         this.number = number;
     }
 
+    protected Phone(Parcel in) {
+        number = in.readString();
+        String code = in.readString();
+        prefix = PhonePrefix.fromString(code);
+    }
+
     // Getter and setter for prefix
     public PhonePrefix getPrefix() {
         return prefix;
@@ -36,4 +47,27 @@ public class Phone {
     public void setNumber(String number) {
         this.number = number;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(number);
+        parcel.writeString(prefix.getCode());
+    }
+
+    public static final Creator<Phone> CREATOR = new Creator<Phone>() {
+        @Override
+        public Phone createFromParcel(Parcel in) {
+            return new Phone(in);
+        }
+
+        @Override
+        public Phone[] newArray(int size) {
+            return new Phone[size];
+        }
+    };
 }

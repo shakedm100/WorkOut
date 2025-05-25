@@ -93,7 +93,8 @@ public class LoginActivity extends AppCompatActivity {
             // Change Activity to Main
             if(client != null)
             {
-                startActivity(new Intent(this, MainActivity.class));
+                Intent intent = new Intent(this, MainActivity.class).putExtra("client", client);
+                startActivity(intent);
             }
         })
             .addOnFailureListener(e -> {
