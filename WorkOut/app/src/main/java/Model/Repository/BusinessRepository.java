@@ -1,6 +1,7 @@
 package Model.Repository;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -18,8 +19,10 @@ import Model.Location;
 import Model.Phone;
 import Model.Rating;
 
-public class BusinessRepository {
+public class BusinessRepository
+{
     private final FirebaseFirestore db;
+    private final String collection = "businesses";
 
     public BusinessRepository()
     {
@@ -42,9 +45,27 @@ public class BusinessRepository {
         business.put("followers", null); // No followers for new business
         business.put("policy", policy);
 
-        return db.collection("businesses").add(business).continueWith(task ->
+        GeneralRepository generalRepository = new GeneralRepository();
+
+        return generalRepository.canRegisterUser(collection, username, email).continueWithTask(checkTask ->
         {
-            if(!task.isSuccessful())
+            if (!checkTask.isSuccessful())
+            {
+                // propagate any error from the existence check
+                throw Objects.requireNonNull(checkTask.getException());
+            }
+            boolean exists = checkTask.getResult();
+            if (exists)
+            {
+                // short-circuit: username taken
+                return Tasks.forException(
+                        new IllegalArgumentException("Username already exists"));
+            }
+
+            return db.collection(collection).add(business);
+        }).continueWith(task ->
+        {
+            if (!task.isSuccessful())
                 throw Objects.requireNonNull(task.getException());
 
             DocumentReference ref = task.getResult();
@@ -57,7 +78,7 @@ public class BusinessRepository {
     public Task<Boolean> updateBusinessByID(Business business)
     {
         // Get the business's DocumentReference
-        DocumentReference currentBusiness = db.collection("businesses").document(business.getId());
+        DocumentReference currentBusiness = db.collection(collection).document(business.getId());
 
         // If a lambda does one action, it can be done with Method Reference instead
         // for better syntax
@@ -66,7 +87,7 @@ public class BusinessRepository {
 
     public Task<Boolean> deleteBusinessByID(Business business)
     {
-        DocumentReference currentClient = db.collection("businesses").document(business.getId());
+        DocumentReference currentClient = db.collection(collection).document(business.getId());
 
         return currentClient.delete().continueWith(task -> task.isSuccessful());
     }
@@ -74,14 +95,15 @@ public class BusinessRepository {
     // This method gets the business by the username
     public Task<Business> getBusinessByUsername(String username)
     {
-        return db.collection("businesses").whereEqualTo("username", username)
+        return db.collection(collection).whereEqualTo("username", username)
                 .limit(1).get().continueWith(task ->
                 {
-                    if(!task.isSuccessful())
+                    if (!task.isSuccessful())
                         throw Objects.requireNonNull(task.getException());
 
                     QuerySnapshot snapshot = task.getResult();
-                    if (snapshot == null || snapshot.isEmpty()) {
+                    if (snapshot == null || snapshot.isEmpty())
+                    {
                         // no user found
                         throw new IllegalArgumentException(
                                 "No business with username: " + username);
@@ -90,7 +112,8 @@ public class BusinessRepository {
                     DocumentSnapshot doc = snapshot.getDocuments().get(0);
                     Business business = doc.toObject(Business.class);
 
-                    if (business == null) {
+                    if (business == null)
+                    {
                         throw new IllegalStateException(
                                 "Failed to map document to Business");
                     }
@@ -99,6 +122,4 @@ public class BusinessRepository {
                     return business;
                 });
     }
-
-
 }
