@@ -1,8 +1,11 @@
 package Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class Course extends Entity
+public class Course extends Entity implements Parcelable
 {
     private CourseType courseType;
     private String name;
@@ -13,7 +16,10 @@ public class Course extends Entity
     private Category category;
     private String description;
 
-    public Course() {}
+    public Course()
+    {
+    }
+
     public Course(String id, CourseType courseType, String name, ArrayList<Client> participants, int capacity,
                   AgeRange ageRange, Schedule schedule, Category category, String description)
     {
@@ -28,67 +34,131 @@ public class Course extends Entity
         this.description = description;
     }
 
-    public CourseType getCourseType() {
+    public CourseType getCourseType()
+    {
         return courseType;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public ArrayList<Client> getParticipants() {
+    public ArrayList<Client> getParticipants()
+    {
         return participants;
     }
 
-    public int getCapacity() {
+    public int getCapacity()
+    {
         return capacity;
     }
 
-    public AgeRange getAgeRange() {
+    public AgeRange getAgeRange()
+    {
         return ageRange;
     }
 
-    public Schedule getSchedule() {
+    public Schedule getSchedule()
+    {
         return schedule;
     }
 
-    public Category getCategory() {
+    public Category getCategory()
+    {
         return category;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setCourseType(CourseType courseType) {
+    public void setCourseType(CourseType courseType)
+    {
         this.courseType = courseType;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public void setParticipants(ArrayList<Client> participants) {
+    public void setParticipants(ArrayList<Client> participants)
+    {
         this.participants = participants;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(int capacity)
+    {
         this.capacity = capacity;
     }
 
-    public void setAgeRange(AgeRange ageRange) {
+    public void setAgeRange(AgeRange ageRange)
+    {
         this.ageRange = ageRange;
     }
 
-    public void setSchedule(Schedule schedule) {
+    public void setSchedule(Schedule schedule)
+    {
         this.schedule = schedule;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(Category category)
+    {
         this.category = category;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
+
+    protected Course(Parcel in)
+    {
+        super(in);
+        name = in.readString();
+        participants = in.createTypedArrayList(Client.CREATOR);
+        capacity = in.readInt();
+        schedule = in.readParcelable(Schedule.class.getClassLoader());
+        description = in.readString();
+        ageRange = in.readParcelable(AgeRange.class.getClassLoader());
+        category = Category.valueOf(in.readString());
+        courseType = CourseType.valueOf(in.readString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        super.writeToParcel(dest, flags);
+        dest.writeString(name);
+        dest.writeTypedList(participants);
+        dest.writeInt(capacity);
+        dest.writeParcelable(schedule, flags);
+        dest.writeString(description);
+        dest.writeParcelable(ageRange, flags);
+        dest.writeString(String.valueOf(category));
+        dest.writeString(String.valueOf(courseType));
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    public static final Creator<Course> CREATOR = new Creator<Course>()
+    {
+        @Override
+        public Course createFromParcel(Parcel in)
+        {
+            return new Course(in);
+        }
+
+        @Override
+        public Course[] newArray(int size)
+        {
+            return new Course[size];
+        }
+    };
 }

@@ -27,16 +27,29 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.checkerframework.checker.units.qual.C;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
 import Model.Address;
+import Model.AgeRange;
+import Model.Business;
+import Model.Category;
 import Model.City;
 import Model.Client;
+import Model.Course;
+import Model.CourseType;
+import Model.Day;
 import Model.Gender;
+import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
+import Model.Rating;
 import Model.Repository.ClientRepository;
+import Model.Schedule;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
@@ -164,4 +177,23 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     }
+
+    /*
+    Business Parcel test
+    ArrayList<Client> participants = new ArrayList<>();
+    participants.add(client);
+    ArrayList<Client> followers = new ArrayList<>();
+    Rating rating = new Rating("1234", 4.9F,"Terribly amazing", client);
+    ArrayList<Rating> ratings = new ArrayList<>();
+    ratings.add(rating);
+    followers.add(client);
+    Schedule schedule = new Schedule("bla",Day.Sunday, LocalTime.now());
+    Course course = new Course("bla", CourseType.Dou, "TRX", participants, 50, new AgeRange(23,50),
+            schedule, Category.Archery, "Shoot to kill");
+    ArrayList<Course> courses = new ArrayList<>();
+    courses.add(course);
+    Business business = new Business("1234", "temp", "1234", client.getPhone(),
+            "exmaple@mail", "EasyBusy", courses, new Location(12345, 2145435),
+            followers, ratings, "Policy");
+    intent.putExtra("business", business);*/
 }

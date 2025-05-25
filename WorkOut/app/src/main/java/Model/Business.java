@@ -1,9 +1,12 @@
 package Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Business extends User
+public class Business extends User implements Parcelable
 {
     private String name;
     private List<Course> courses;
@@ -24,51 +27,107 @@ public class Business extends User
         this.policy = policy;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public List<Course> getCourses() {
+    public List<Course> getCourses()
+    {
         return courses;
     }
 
-    public Location getLocation() {
+    public Location getLocation()
+    {
         return location;
     }
 
-    public ArrayList<Client> getFollowers() {
+    public ArrayList<Client> getFollowers()
+    {
         return followers;
     }
 
-    public ArrayList<Rating> getRatings() {
+    public ArrayList<Rating> getRatings()
+    {
         return ratings;
     }
 
-    public String getPolicy() {
+    public String getPolicy()
+    {
         return policy;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(List<Course> courses)
+    {
         this.courses = courses;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(Location location)
+    {
         this.location = location;
     }
 
-    public void setFollowers(ArrayList<Client> followers) {
+    public void setFollowers(ArrayList<Client> followers)
+    {
         this.followers = followers;
     }
 
-    public void setRatings(ArrayList<Rating> ratings) {
+    public void setRatings(ArrayList<Rating> ratings)
+    {
         this.ratings = ratings;
     }
 
-    public void setPolicy(String policy) {
+    public void setPolicy(String policy)
+    {
         this.policy = policy;
     }
+
+    protected Business(Parcel in)
+    {
+        super(in);
+        name = in.readString();
+        courses = in.createTypedArrayList(Course.CREATOR);
+        followers = in.createTypedArrayList(Client.CREATOR);
+        ratings = in.createTypedArrayList(Rating.CREATOR);
+        policy = in.readString();
+        location = in.readParcelable(Location.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        super.writeToParcel(dest, flags);
+        dest.writeString(name);
+        dest.writeTypedList(courses);
+        dest.writeTypedList(followers);
+        dest.writeTypedList(ratings);
+        dest.writeString(policy);
+        dest.writeParcelable(location, flags);
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    public static final Creator<Business> CREATOR = new Creator<Business>()
+    {
+        @Override
+        public Business createFromParcel(Parcel in)
+        {
+            return new Business(in);
+        }
+
+        @Override
+        public Business[] newArray(int size)
+        {
+            return new Business[size];
+        }
+    };
 }

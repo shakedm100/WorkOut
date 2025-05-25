@@ -1,8 +1,11 @@
 package Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.time.LocalTime;
 
-public class Schedule extends Entity
+public class Schedule extends Entity implements Parcelable
 {
     private Day day;
     private LocalTime occurrence;
@@ -30,4 +33,35 @@ public class Schedule extends Entity
     public void setOccurrence(LocalTime occurrence) {
         this.occurrence = occurrence;
     }
+
+    protected Schedule(Parcel in) {
+        super(in);
+        day = Day.valueOf(in.readString());
+        occurrence = LocalTime.parse(in.readString());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(day.name());
+        // write as ISO-8601 (e.g. "14:30:00")
+        dest.writeString(occurrence.toString());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Schedule> CREATOR = new Creator<Schedule>() {
+        @Override
+        public Schedule createFromParcel(Parcel in) {
+            return new Schedule(in);
+        }
+
+        @Override
+        public Schedule[] newArray(int size) {
+            return new Schedule[size];
+        }
+    };
 }
