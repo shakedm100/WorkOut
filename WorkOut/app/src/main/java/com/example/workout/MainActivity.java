@@ -35,8 +35,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProfileActivity.class));
                 return true;
             }
-            else if (id == R.id.nav_search) {
+            /*else if (id == R.id.nav_search) {
                 startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            }*/
+            else if (id == R.id.nav_search) {
+                startActivity(new Intent(this, MapActivity.class));
                 return true;
             }
             else if (id == R.id.nav_ratings) {

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 public class City extends Entity implements Parcelable
 {
     private String name;
+    private String englishName;
 
     public City() {}
 
@@ -27,8 +28,17 @@ public class City extends Entity implements Parcelable
         return name;
     }
 
+    public String getEnglishName()
+    {
+        return englishName;
+    }
+
     public void setName(String name) { this.name = name; }
 
+    public void setEnglishName(String englishName)
+    {
+        this.englishName = englishName;
+    }
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {

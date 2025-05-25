@@ -2,7 +2,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 }
@@ -79,6 +78,7 @@ dependencies {
     implementation(libs.room.common.jvm)
     implementation(libs.firebase.database)
     implementation(libs.googleid)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -103,5 +103,10 @@ dependencies {
     // Google ID helper library for parsing/validating tokens
     implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
     implementation("com.google.android.gms:play-services-auth:<latest version>")
+    // Google Maps SDK for Android
+    implementation("com.google.android.gms:play-services-maps:19.2.0")        // :contentReference[oaicite:0]{index=0}
+
+    // Fused Location Provider (high-accuracy, battery-optimized)
+    implementation("com.google.android.gms:play-services-location:21.3.0")    // :contentReference[oaicite:1]{index=1}
 
 }

@@ -34,27 +34,45 @@ public class GeneralRepository {
         // startAt and endAt tell the db what range to look at
         // So basically the code states for the db to look at all the range starting at namePrefix
         // And namePrefix + one unicode char
-        Query q = db.collection("cities")
-                .orderBy("name")
-                .startAt(namePrefix)
-                .endAt(namePrefix + "\uf8ff") // Signal an ending with UTF-8 encoding
-                .limit(3);
-
-        return q.get().continueWith(task ->
+        Query q;
+        if(!namePrefix.isEmpty())
         {
-            if(!task.isSuccessful())
-                throw Objects.requireNonNull(task.getException());
-
-            List<City> cities = new ArrayList<>();
-            for(DocumentSnapshot snap : task.getResult())
+            if(namePrefix.charAt(0) > 128)
             {
-                City city = snap.toObject(City.class);
-                if(city != null)
-                    cities.add(city);
+                 q = db.collection("cities")
+                        .orderBy("name")
+                        .startAt(namePrefix)
+                        .endAt(namePrefix + "\uf8ff") // Signal an ending with UTF-8 encoding
+                        .limit(3);
             }
+            else
+            {
+                namePrefix = namePrefix.toUpperCase();
+                q = db.collection("cities")
+                        .orderBy("englishName")
+                        .startAt(namePrefix)
+                        .endAt(namePrefix + "\uf8ff") // Signal an ending with UTF-8 encoding
+                        .limit(3);
+            }
+            return q.get().continueWith(task ->
+            {
+                if(!task.isSuccessful())
+                    throw Objects.requireNonNull(task.getException());
 
-            return cities;
-        });
+                List<City> cities = new ArrayList<>();
+                for(DocumentSnapshot snap : task.getResult())
+                {
+                    City city = snap.toObject(City.class);
+                    if(city != null)
+                        cities.add(city);
+                }
+
+                return cities;
+            });
+        }
+
+
+        return null;
     }
 
     /**
