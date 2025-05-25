@@ -6,6 +6,7 @@ public class User extends Entity {
     private Phone phone;
     private String email;
 
+    public User() {}
     public User(String id, String username, String password, Phone phone, String email)
     {
         super(id);
@@ -29,5 +30,21 @@ public class User extends Entity {
 
     public Phone getPhone() {
         return phone;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(Phone phone) {
+        this.phone = phone;
     }
 }

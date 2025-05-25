@@ -6,6 +6,7 @@ public class Client extends User {
     private Address address;
     private Gender gender;
 
+    public Client() {}
     public Client(String id, String username, String password, Phone phone, String email,
                   String firstName, String lastName, Address address, Gender gender)
     {
@@ -15,5 +16,36 @@ public class Client extends User {
         this.address = address;
         this.gender = gender;
     }
-    
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 }

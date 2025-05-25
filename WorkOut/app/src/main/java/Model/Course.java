@@ -9,10 +9,11 @@ public class Course extends Entity
     private ArrayList<Client> participants;
     private int capacity;
     private AgeRange ageRange;
-    private Schedule occurrence;
+    private Schedule schedule;
     private Category category;
     private String description;
 
+    public Course() {}
     public Course(String id, CourseType courseType, String name, ArrayList<Client> participants, int capacity,
                   AgeRange ageRange, Schedule schedule, Category category, String description)
     {
@@ -22,7 +23,7 @@ public class Course extends Entity
         this.participants = participants;
         this.capacity = capacity;
         this.ageRange = ageRange;
-        this.occurrence = schedule;
+        this.schedule = schedule;
         this.category = category;
         this.description = description;
     }
@@ -48,7 +49,7 @@ public class Course extends Entity
     }
 
     public Schedule getSchedule() {
-        return occurrence;
+        return schedule;
     }
 
     public Category getCategory() {
@@ -57,5 +58,37 @@ public class Course extends Entity
 
     public String getDescription() {
         return description;
+    }
+
+    public void setCourseType(CourseType courseType) {
+        this.courseType = courseType;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setParticipants(ArrayList<Client> participants) {
+        this.participants = participants;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setAgeRange(AgeRange ageRange) {
+        this.ageRange = ageRange;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -7,6 +7,7 @@ public class Schedule extends Entity
     private Day day;
     private LocalTime occurrence;
 
+    public Schedule() {}
     public Schedule(String id, Day day, LocalTime occurrence)
     {
         super(id);
@@ -20,5 +21,13 @@ public class Schedule extends Entity
 
     public LocalTime getOccurrence() {
         return occurrence;
+    }
+
+    public void setDay(Day day) {
+        this.day = day;
+    }
+
+    public void setOccurrence(LocalTime occurrence) {
+        this.occurrence = occurrence;
     }
 }
