@@ -1,235 +1,229 @@
 package Model.Repository;
 
-import static android.content.ContentValues.TAG;
-
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Filter;
+
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
+import Model.City;
 import Model.Client;
 import Model.Gender;
 import Model.Phone;
 import Model.Address;
+import Model.PhonePrefix;
+
 
 public class ClientRepository
 {
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
 
     public ClientRepository()
     {
         db = FirebaseFirestore.getInstance();
     }
 
-    public Task<Client> insertClient(String username, String password, Phone phone, String email,
-                        String firstName, String lastName, Address address, Gender gender)
+    /**
+     * This function is responsible for the logic of client insertion to the database.
+     * It returns an instance of the new client if it succeeded with the new client id.
+     * If communication with the DB fails it throws an exception.
+     * If the username or email already exist it also throws an exception.
+     * @param username user's username
+     * @param password user's password
+     * @param phone user's phone
+     * @param email user's email
+     * @param firstName user's firstname
+     * @param lastName user's password
+     * @param address user's address
+     * @param gender user's gender
+     * @return a new client instance if succeeded, exception otherwise
+     */
+    public Task<Client> insertClient(String username, String password, Phone phone, String email, String firstName,
+                                     String lastName, Address address, Gender gender)
     {
-        if (db == null)
-            db = FirebaseFirestore.getInstance(); // Make sure you initialize FirebaseFirestore
-
-        // Create a new user map
+        // prepare your user data
         Map<String, Object> user = new HashMap<>();
         user.put("username", username);
+        user.put("password", password);
         user.put("email", email);
-        // Add a new document with the user's UID as the document ID
-        return db.collection("users").add(user)
-                .continueWith(task -> {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
+        user.put("phone", phone);
+        user.put("firstName", firstName);
+        user.put("lastName", lastName);
+        user.put("address", address);
+        user.put("gender", gender);
+
+        // check existence
+        return canRegisterUser(username, email)
+                // depending on the check, either fail or go add()
+                .continueWithTask(checkTask -> {
+                    if (!checkTask.isSuccessful()) {
+                        // propagate any error from the existence check
+                        throw Objects.requireNonNull(checkTask.getException());
                     }
-                    return new Client(username,password, password, phone, email, firstName, lastName, address, gender);
+                    boolean exists = checkTask.getResult();
+                    if (exists) {
+                        // short-circuit: username taken
+                        return Tasks.forException(
+                                new IllegalArgumentException("Username already exists"));
+                    }
+                    // username free → add the new document
+                    return db.collection("clients").add(user);
+                })
+                // map the DocumentReference into your Client
+                .continueWith(addTask -> {
+                    if (!addTask.isSuccessful()) {
+                        throw Objects.requireNonNull(addTask.getException());
+                    }
+                    DocumentReference ref = addTask.getResult();
+                    String id = ref.getId();
+                    return new Client(id, username, password, phone, email, firstName, lastName, address, gender);
                 });
     }
 
-    public Task<Client> getClientByUsername(String username) {
-        if (db == null)
-            db = FirebaseFirestore.getInstance();
 
-        // Query the "users" collection where the username matches
-        return db.collection("users")
-                .whereEqualTo("username", username)
-                .limit(1) // Only get one result
+    /**
+     * This method receives username and email and check if one of them already exists
+     * in the database, if one of them exist it returns true async
+     * and if not it returns false async
+     * throws an error if communication failed
+     * @param username the user's username
+     * @param email the user's email
+     * @return Task<false> if the user's username & email don't exit. true otherwise
+     */
+    private Task<Boolean> canRegisterUser(String username, String email)
+    {
+        return db.collection("clients")
+                .where(
+                        Filter.or(
+                                Filter.equalTo("username", username),
+                                Filter.equalTo("email", email)
+                        )
+                )
+                .limit(1)
                 .get()
                 .continueWith(task -> {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        throw Objects.requireNonNull(task.getException());
                     }
-
-                    QuerySnapshot query = task.getResult();
-                    if (!query.isEmpty()) {
-                        DocumentSnapshot doc = query.getDocuments().get(0);
-
-                        // Extract fields and return a new Client object
-                        String user = doc.getString("username");
-                        //String email = doc.getString("email");
-
-                        // You may need to add more fields as needed
-                        return new Client(user, "", "", null, "", "", "", null, null);
-                    } else {
-                        return null; // Username not found
-                    }
+                    QuerySnapshot snap = task.getResult();
+                    // true -> we found at least one document with either username or email
+                    return snap != null && !snap.isEmpty();
                 });
     }
 
-    public Task<Boolean> updateUserByUsername(String username, Map<String, Object> updates) {
-        if (db == null)
-            db = FirebaseFirestore.getInstance();
+    public Task<Boolean> updateClientByID(Client client)
+    {
+        // Get the client's DocumentReference
+        DocumentReference currentClient = db.collection("clients").document(client.getId());
 
-        // Find the user by username and update the first match
-        return db.collection("users")
+        return currentClient.set(client).continueWith(task -> task.isSuccessful());
+    }
+
+    public Task<Boolean> deleteClientByID(Client client)
+    {
+        DocumentReference currentClient = db.collection("clients").document(client.getId());
+
+        return currentClient.delete().continueWith(task -> task.isSuccessful());
+    }
+
+    public Task<Client> checkLogin(String username, String password)
+    {
+        return getClientByUsername(username).continueWith(task -> {
+            if(!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            Client client = task.getResult();
+            if(client == null)
+                throw new NoSuchElementException("No such user: " + username);
+
+            if(client.getPassword().equals(password))
+                return client;
+            throw new IllegalArgumentException("Invalid password");
+        });
+    }
+
+    public Task<Client> getClientByUsername(String username)
+    {
+        return db.collection("clients")
                 .whereEqualTo("username", username)
                 .limit(1)
                 .get()
-                .continueWithTask(task -> {
+                .continueWith(task -> {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        // bubble up Firestore errors
+                        throw Objects.requireNonNull(task.getException());
+                    }
+                    QuerySnapshot snap = task.getResult();
+                    if (snap == null || snap.isEmpty()) {
+                        // no user found
+                        throw new IllegalArgumentException(
+                                "No client with username: " + username);
                     }
 
-                    QuerySnapshot query = task.getResult();
-                    if (!query.isEmpty()) {
-                        DocumentSnapshot doc = query.getDocuments().get(0);
-                        return doc.getReference().update(updates)
-                                .continueWith(updateTask -> updateTask.isSuccessful());
-                    } else {
-                        return Tasks.forResult(false); // User not found
-                    }
-                });
-    }
+                    // grab the first (and only) document
+                    DocumentSnapshot doc = snap.getDocuments().get(0);
 
-    public Task<Boolean> deleteUserByUsername(String username) {
-        if (db == null)
-            db = FirebaseFirestore.getInstance();
-
-        // Find the user by username and delete the first match
-        return db.collection("users")
-                .whereEqualTo("username", username)
-                .limit(1)
-                .get()
-                .continueWithTask(task -> {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    QuerySnapshot query = task.getResult();
-                    if (!query.isEmpty()) {
-                        DocumentSnapshot doc = query.getDocuments().get(0);
-                        return doc.getReference().delete()
-                                .continueWith(deleteTask -> deleteTask.isSuccessful());
-                    } else {
-                        return Tasks.forResult(false); // User not found
-                    }
-                });
-    }
-
-
-
-    /*
-    public Client selectClientByID(String username)
-    {
-        if (db == null)
-            db = FirebaseFirestore.getInstance(); // Make sure you initialize FirebaseFirestore
-
-        DocumentReference docRef = db.collection("users").document(username); // get client from "users" where username = given username
-
-        docRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) { // if document found
-                String name = documentSnapshot.getString("name");
-
-                Log.d("Firestore", "Client name: " + name + " found");
-            } else {
-                Log.d("Firestore", "No such client found");
-            }
-        }).addOnFailureListener(e -> {
-            Log.e("Firestore", "Error fetching client", e);
+                    // If this doesn't work we can try the other method in the comments
+                    String id = doc.getId();
+                    String user = doc.getString("username");
+                    String password = doc.getString("password");
+                    //Phone phone = doc.toObject(Phone.class);     // or doc.get("phone", Phone.class);
+                    Phone phone = new Phone(PhonePrefix.PREFIX_052, "5427435"); // For testing purposes
+                    String email = doc.getString("email");
+                    String firstName = doc.getString("firstName");
+                    String lastName = doc.getString("lastName");
+                    //Address address = doc.toObject(Address.class);
+                    Address address = new Address(new City("1", "Oranit"), "Hayarkon"); // For testing purposes
+                    //Gender gender = doc.get("gender", Gender.class);
+                    Gender gender = Gender.Male; // For testing purposes
+                    return new Client(id, user, password, phone, email, firstName, lastName, address, gender);
         });
-
     }
 
-
-
-    public Task<Client> getClientByUsername(String username, ClientCallBack callback) {
-
-        if (db == null)
-            db = FirebaseFirestore.getInstance(); // Make sure you initialize FirebaseFirestore
-
-        db.collection("users") // users collection
-                .whereEqualTo("username", username) // where username field = given username
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
-                        Client client = doc.toObject(Client.class); // get the client
-                        callback.onClientFound(client);
-                    } else {
-                        callback.onClientNotFound();
-                    }
-                })
-                .addOnFailureListener(callback::onError);
-    }
-
-    public void updateClientByUsername(String username, Map<String, Object> updatedFields, ClientCallBack callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .whereEqualTo("username", username)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        // Get first matching document
-                        DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
-
-                        // Update it
-                        document.getReference()
-                                .update(updatedFields)
-                                .addOnSuccessListener(unused -> callback.onComplete(true))
-                                .addOnFailureListener(e -> callback.onComplete(false));
-                    } else {
-                        callback.onComplete(false); // No client with that name
-                    }
-                })
-                .addOnFailureListener(e -> callback.onComplete(false));
-    }
-
-
-
-
-    public boolean updateClient(Client client)
+    public Task<Client> handleGoogleAuthWithFirebase(String idToken)
     {
-        if (db == null)
-            db = FirebaseFirestore.getInstance(); // Make sure you initialize FirebaseFirestore
+        AuthCredential firebaseCredential = GoogleAuthProvider.getCredential(idToken, null);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        return auth.signInWithCredential(firebaseCredential).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
 
-        final boolean found = false;
-
-        DocumentReference docRef = db.collection("users").document("SF");
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        found = true;
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
+            FirebaseUser googleClient = task.getResult().getUser();
+            if (googleClient == null) {
+                throw new IllegalStateException("FirebaseUser was null");
             }
-        });
+            String firstName = "";
+            String lastName = "";
+            if(googleClient.getDisplayName() != null)
+            {
+                String[] firstAndLast = googleClient.getDisplayName().split(" ", 2);
+                firstName = firstAndLast[0];
+                if(firstAndLast.length > 1)
+                    lastName = firstAndLast[1];
+            }
 
+            String phoneNumber = googleClient.getPhoneNumber();
+            Phone phone = null;
+            if(PhonePrefix.fromString(phoneNumber) != null)
+                phone = new Phone(PhonePrefix.fromString(phoneNumber), phoneNumber);
+            return new Client(googleClient.getUid(), "", "", phone,
+                    googleClient.getEmail(), firstName, lastName, null, null);
+        });
     }
 
- */
+
 }

@@ -1,9 +1,12 @@
 package com.example.workout;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,10 +21,16 @@ import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.common.Scopes;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,20 +53,36 @@ import android.widget.TextView;
 import ViewModel.MyViewModel;
 //
 
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity; // Or androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider;
+
+// Assuming LoginUiState and LoginViewModel are in the ViewModel package
+import ViewModel.LoginUiState; // Update with your actual package
+import ViewModel.LoginViewModel; // Update with your actual package
+// import com.example.workout.R; // For accessing R.id values
+
 import android.util.Log;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
     private FirebaseAuth auth;
-
-    // ViewModel vars
-    private MyViewModel viewModel;
-    private TextView textView;
-    private Button button;
+    private LoginViewModel loginViewModel;
+    private EditText editTextUsername;
+    private EditText editTextPassword;
+    private Button buttonLogin;
+    private ProgressBar progressBar;
+    private TextView textViewError;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
 
@@ -66,99 +91,125 @@ public class LoginActivity extends AppCompatActivity {
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
 
         Button registerButton = findViewById(R.id.registerButton);
-        registerButton.setOnClickListener(v -> saveUserProfileToFirestore("1", "shakedm100", "shaked1@gmail.com", null));
-        //registerButton.setOnClickListener(v -> fetchClientFromFirestore());
-
-        /*
-        // TESTS
-        TestClientRepository testRepo = new TestClientRepository();
-
-        // Test GET
-        testRepo.testGetClientByUsername("dvir");
-
-        // Test UPDATE
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("email", "updated@example.com");
-        testRepo.testUpdateClientByUsername("dvir", updates);
-
-        // Test DELETE
-        testRepo.testDeleteClientByUsername("john123");
-
-         */
-
-        // ViewModel changes
-
-        // get the instance as the MyViewModel class with the functions
-        viewModel = new ViewModelProvider(this).get(MyViewModel.class);
-
-        // listen to new data
-        viewModel.getTextData().observe(this, text -> textView.setText(text));
-
-        // Update ViewModel data on button click
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewModel.updateText("Hello from ViewModel!");
-            }
+        registerButton.setOnClickListener(task -> {
+            Intent newIntent = new Intent(this, RegisterActivity.class);
+            startActivity(newIntent);
         });
+
+
+        // Initialize Views
+        editTextUsername = findViewById(R.id.usernameTextLogin);
+        editTextPassword = findViewById(R.id.passwordTextLogin);
+        buttonLogin = findViewById(R.id.loginButton);
+        progressBar = findViewById(R.id.progressBar);
+        textViewError = findViewById(R.id.errorTextView);
+
+        // Initialize ViewModel
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+
+        // Observe LiveData from ViewModel
+        setupObservers();
+
+        // Set up button click listener
+        setupButtonClickListeners();
 
     }
 
-    public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl) {
+    // show the respond
+    private void setupObservers() {
+        loginViewModel.getLoginUiState().observe(this, loginUiState -> {
+            // Handle UI changes based on the state
+            switch (loginUiState.getStatus()) {
+                case IDLE:
+                    progressBar.setVisibility(View.GONE);
+                    buttonLogin.setEnabled(true);
+                    textViewError.setVisibility(View.GONE);
+                    break;
+                case LOADING:
+                    progressBar.setVisibility(View.VISIBLE);
+                    buttonLogin.setEnabled(false);
+                    textViewError.setVisibility(View.GONE);
+                    break;
+                case SUCCESS:
+                    progressBar.setVisibility(View.GONE);
+                    buttonLogin.setEnabled(true);
+                    textViewError.setVisibility(View.GONE);
+                    Toast.makeText(LoginActivity.this, "Login Successful! Data: " + loginUiState.getData(), Toast.LENGTH_LONG).show();
+                    // TODO: Navigate to the next screen and create it
+                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class); // move to home page
+                     startActivity(intent);
+                     finish(); // Optional: finish LoginActivity so user can't go back
+                    break;
+                case ERROR:
+                    progressBar.setVisibility(View.GONE);
+                    buttonLogin.setEnabled(true);
+                    textViewError.setText(loginUiState.getErrorMessage());
+                    textViewError.setVisibility(View.VISIBLE);
+                    break;
+            }
+        });
+    }
 
+    private void setupButtonClickListeners() {
+        buttonLogin.setOnClickListener(v -> {
+            String username = editTextUsername.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
+
+            // Basic validation
+            if (username.isEmpty()) {
+                editTextUsername.setError("Username cannot be empty");
+                return;
+            }
+            if (password.isEmpty()) {
+                editTextPassword.setError("Password cannot be empty");
+                return;
+            }
+
+            // Call the ViewModel method
+            loginViewModel.loginClient(username, password);
+        });
+    }
+
+    public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl) {}
+
+    private void testInsertion()
+    {
         ClientRepository clientRepository = new ClientRepository();
-        Client sessionClient = null;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("1","Oranit"), "Hayarkon");
-        clientRepository.insertClient("dvir", "1234", phone, email, "Dvir",
-                "Bento", address, Gender.Male).addOnSuccessListener(client ->
+        Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
+        clientRepository.insertClient("shakedm100", "1234", phone, "shaked1mi@gmail.com", "Shaked",
+                "Michael", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername()));
     }
 
-    /**
-     * Fetch a client from the Firestore by username
-     */
-    public void fetchClientFromFirestore(String username)
+    private void checkIfUserAndPassword()
     {
-        ClientRepository clientRepository = new ClientRepository();
-        clientRepository.getClientByUsername("dvir");
-    }
+        EditText userText = findViewById(R.id.usernameTextLogin);
+        String username = userText.getText().toString();
+        EditText passwordText = findViewById(R.id.passwordTextLogin);
+        String password = passwordText.getText().toString();
 
-    public void updateClientByUsername(String username)
-    {
-        ClientRepository clientRepository = new ClientRepository();
-
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("email", "newemail@example.com");
-
-        clientRepository.updateUserByUsername(username, updates)
-                .addOnSuccessListener(success -> {
-                    if (success) {
-                        Log.d("Firestore", "User updated successfully");
-                    } else {
-                        Log.d("Firestore", "User not found");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Firestore", "Update failed", e));
-    }
-
-    public void deleteClientByUsername(String username)
-    {
-        ClientRepository clientRepository = new ClientRepository();
-
-        clientRepository.deleteUserByUsername(username)
-                .addOnSuccessListener(success -> {
-                    if (success) {
-                        Log.d("Firestore", "User deleted successfully");
-                    } else {
-                        Log.d("Firestore", "User not found");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("Firestore", "Deletion failed", e));
+        ClientRepository repository = new ClientRepository();
+        Client current;
+        repository.checkLogin(username, password).addOnSuccessListener(client ->
+        {
+            // Change Activity to Main
+            if(client != null)
+            {
+                startActivity(new Intent(this, MainActivity.class));
+            }
+        })
+            .addOnFailureListener(e -> {
+            // Login failed (bad credentials or Firestore error)
+                System.out.println(e.toString());
+            // TODO: Add error handling
+        });
     }
 
 
-    private void requestGoogleIdToken() {
+    private void requestGoogleIdToken()
+    {
+
         // Build the Google ID request
         GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
                 // show _all_ Google accounts on the device, not just pre-authorized ones:

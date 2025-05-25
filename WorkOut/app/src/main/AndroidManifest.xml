@@ -43,6 +43,8 @@
         <activity android:name=".RatingsActivity"/>
         <activity android:name=".MessagesActivity"/>
         <activity android:name=".SearchActivity"/>
+        <activity android:name=".RegisterActivity"/>
+        <activity android:name=".MainActivity"/>
     </application>
 
 </manifest>

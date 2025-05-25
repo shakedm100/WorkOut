@@ -4,9 +4,36 @@ public class Phone {
     private PhonePrefix prefix;
     private String number;
 
+    /***
+     * No-arg constructor required by Firestore’s POJO mapper
+     * POJO convention is:
+     * 1. Give each class a public no-argument constructor
+     * 2. Expose each field via a public getter (or make the fields public)
+     * 3. Avoid transient or mark fields you don’t want stored with @Exclude
+     */
+    public Phone() {
+        // Firestore will use setters to populate fields
+    }
+
     public Phone(PhonePrefix phonePrefix, String number)
     {
         this.prefix = phonePrefix;
+        this.number = number;
+    }
+
+    // Getter and setter for prefix
+    public PhonePrefix getPrefix() {
+        return prefix;
+    }
+    public void setPrefix(PhonePrefix prefix) {
+        this.prefix = prefix;
+    }
+
+    // Getter and setter for number
+    public String getNumber() {
+        return number;
+    }
+    public void setNumber(String number) {
         this.number = number;
     }
 }
