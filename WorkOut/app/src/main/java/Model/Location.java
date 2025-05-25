@@ -8,6 +8,7 @@ public class Location implements Parcelable
     private long longitude;
     private long latitude;
 
+    public Location() {}
     public Location(long longitude, long latitude)
     {
         this.longitude = longitude;

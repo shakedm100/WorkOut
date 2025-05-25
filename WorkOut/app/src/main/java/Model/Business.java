@@ -15,6 +15,7 @@ public class Business extends User implements Parcelable
     private ArrayList<Rating> ratings;
     private String policy;
 
+    public Business() {}
     public Business(String id, String username, String password, Phone phone, String email, String name,
                     List<Course> courses, Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
     {

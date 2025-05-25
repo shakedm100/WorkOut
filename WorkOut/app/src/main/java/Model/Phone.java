@@ -16,9 +16,8 @@ public class Phone implements Parcelable {
      * 2. Expose each field via a public getter (or make the fields public)
      * 3. Avoid transient or mark fields you don’t want stored with @Exclude
      */
-    public Phone() {
-        // Firestore will use setters to populate fields
-    }
+    // Firestore will use setters to populate fields
+    public Phone() {}
 
     public Phone(PhonePrefix phonePrefix, String number)
     {

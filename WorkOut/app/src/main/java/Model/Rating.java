@@ -9,6 +9,7 @@ public class Rating extends Entity implements Parcelable
     private String comment;
     private Client client;
 
+    public Rating() {}
     public Rating(String id, float stars, String comment, Client client)
     {
         super(id);
@@ -27,6 +28,21 @@ public class Rating extends Entity implements Parcelable
 
     public Client getClient() {
         return client;
+    }
+
+    public void setStars(float stars)
+    {
+        this.stars = stars;
+    }
+
+    public void setComment(String comment)
+    {
+        this.comment = comment;
+    }
+
+    public void setClient(Client client)
+    {
+        this.client = client;
     }
 
     protected Rating(Parcel in) {

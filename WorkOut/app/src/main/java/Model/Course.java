@@ -16,9 +16,7 @@ public class Course extends Entity implements Parcelable
     private Category category;
     private String description;
 
-    public Course()
-    {
-    }
+    public Course() {}
 
     public Course(String id, CourseType courseType, String name, ArrayList<Client> participants, int capacity,
                   AgeRange ageRange, Schedule schedule, Category category, String description)
