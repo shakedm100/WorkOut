@@ -71,32 +71,33 @@ public class BusinessRepository {
         return currentClient.delete().continueWith(task -> task.isSuccessful());
     }
 
+    // This method gets the business by the username
     public Task<Business> getBusinessByUsername(String username)
     {
         return db.collection("businesses").whereEqualTo("username", username)
                 .limit(1).get().continueWith(task ->
-        {
-            if(!task.isSuccessful())
-                throw Objects.requireNonNull(task.getException());
+                {
+                    if(!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
 
-            QuerySnapshot snapshot = task.getResult();
-            if (snapshot == null || snapshot.isEmpty()) {
-                // no user found
-                throw new IllegalArgumentException(
-                        "No business with username: " + username);
-            }
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot == null || snapshot.isEmpty()) {
+                        // no user found
+                        throw new IllegalArgumentException(
+                                "No business with username: " + username);
+                    }
 
-            DocumentSnapshot doc = snapshot.getDocuments().get(0);
-            Business business = doc.toObject(Business.class);
+                    DocumentSnapshot doc = snapshot.getDocuments().get(0);
+                    Business business = doc.toObject(Business.class);
 
-            if (business == null) {
-                throw new IllegalStateException(
-                        "Failed to map document to Business");
-            }
+                    if (business == null) {
+                        throw new IllegalStateException(
+                                "Failed to map document to Business");
+                    }
 
-            business.setId(doc.getId());
-            return business;
-        });
+                    business.setId(doc.getId());
+                    return business;
+                });
     }
 
 
