@@ -97,12 +97,8 @@ dependencies {
 
     // Core Credential Manager:
     implementation("androidx.credentials:credentials:1.0.1")
-    // The “play-services-auth” bridge that brings in the Google federated providers
-    implementation("androidx.credentials:credentials-play-services-auth:<latest-version>")
-
     // Google ID helper library for parsing/validating tokens
     implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
-    implementation("com.google.android.gms:play-services-auth:<latest version>")
     // Google Maps SDK for Android
     implementation("com.google.android.gms:play-services-maps:19.2.0")        // :contentReference[oaicite:0]{index=0}
 
