@@ -64,7 +64,6 @@ public class LoginActivity extends AppCompatActivity {
         credentialManager = CredentialManager.create(getApplicationContext());
         ImageButton googleAuth = findViewById(R.id.googleRegisterButton);
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
-
         Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(task -> {
             Intent newIntent = new Intent(this, RegisterActivity.class);
@@ -177,23 +176,4 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
     }
-
-    /*
-    Business Parcel test
-    ArrayList<Client> participants = new ArrayList<>();
-    participants.add(client);
-    ArrayList<Client> followers = new ArrayList<>();
-    Rating rating = new Rating("1234", 4.9F,"Terribly amazing", client);
-    ArrayList<Rating> ratings = new ArrayList<>();
-    ratings.add(rating);
-    followers.add(client);
-    Schedule schedule = new Schedule("bla",Day.Sunday, LocalTime.now());
-    Course course = new Course("bla", CourseType.Dou, "TRX", participants, 50, new AgeRange(23,50),
-            schedule, Category.Archery, "Shoot to kill");
-    ArrayList<Course> courses = new ArrayList<>();
-    courses.add(course);
-    Business business = new Business("1234", "temp", "1234", client.getPhone(),
-            "exmaple@mail", "EasyBusy", courses, new Location(12345, 2145435),
-            followers, ratings, "Policy");
-    intent.putExtra("business", business);*/
 }
