@@ -3,6 +3,8 @@ package Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 public class Location implements Parcelable
 {
     private long longitude;
@@ -39,6 +41,21 @@ public class Location implements Parcelable
     {
         longitude = in.readLong();
         latitude = in.readLong();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Location location = (Location) o;
+        return longitude == location.longitude && latitude == location.latitude;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(longitude, latitude);
     }
 
     @Override
