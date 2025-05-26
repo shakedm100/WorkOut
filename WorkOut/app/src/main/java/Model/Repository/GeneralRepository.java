@@ -16,14 +16,19 @@ import java.util.Objects;
 
 import Model.City;
 
-public class GeneralRepository {
+public class GeneralRepository
+{
 
     FirebaseFirestore db;
 
-    public GeneralRepository() { db = FirebaseFirestore.getInstance(); }
+    public GeneralRepository()
+    {
+        db = FirebaseFirestore.getInstance();
+    }
 
     /**
      * Returns up to 3 cities whose names start with the given partialName.
+     *
      * @param namePrefix the name prefix to search for
      * @return a Task that completes with a List<City>
      */
@@ -35,11 +40,11 @@ public class GeneralRepository {
         // So basically the code states for the db to look at all the range starting at namePrefix
         // And namePrefix + one unicode char
         Query q;
-        if(!namePrefix.isEmpty())
+        if (!namePrefix.isEmpty())
         {
-            if(namePrefix.charAt(0) > 128)
+            if (namePrefix.charAt(0) > 128)
             {
-                 q = db.collection("cities")
+                q = db.collection("cities")
                         .orderBy("name")
                         .startAt(namePrefix)
                         .endAt(namePrefix + "\uf8ff") // Signal an ending with UTF-8 encoding
@@ -56,14 +61,14 @@ public class GeneralRepository {
             }
             return q.get().continueWith(task ->
             {
-                if(!task.isSuccessful())
+                if (!task.isSuccessful())
                     throw Objects.requireNonNull(task.getException());
 
                 List<City> cities = new ArrayList<>();
-                for(DocumentSnapshot snap : task.getResult())
+                for (DocumentSnapshot snap : task.getResult())
                 {
                     City city = snap.toObject(City.class);
-                    if(city != null)
+                    if (city != null)
                         cities.add(city);
                 }
 
@@ -80,23 +85,22 @@ public class GeneralRepository {
      * in the database, if one of them exist it returns true async
      * and if not it returns false async
      * throws an error if communication failed
+     *
      * @param username the user's username
-     * @param email the user's email
+     * @param email    the user's email
      * @return Task<false> if the user's username & email don't exit. true otherwise
      */
     public Task<Boolean> canRegisterUser(String collection, String username, String email)
     {
         return db.collection(collection)
-                .where(
-                        Filter.or(
-                                Filter.equalTo("username", username),
-                                Filter.equalTo("email", email)
-                        )
-                )
+                .where(Filter.or(Filter.equalTo("username", username),
+                                Filter.equalTo("email", email)))
                 .limit(1)
                 .get()
-                .continueWith(task -> {
-                    if (!task.isSuccessful()) {
+                .continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                    {
                         throw Objects.requireNonNull(task.getException());
                     }
                     QuerySnapshot snap = task.getResult();
