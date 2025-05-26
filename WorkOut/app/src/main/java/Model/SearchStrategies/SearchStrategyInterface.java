@@ -1,10 +1,11 @@
 package Model.SearchStrategies;
+import com.google.android.gms.tasks.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import Model.Business;
 
 public interface SearchStrategyInterface<T>
 {
-    abstract ArrayList<Business> filter(T... args);
+    abstract Task<List<Business>> search(T args);
 }
