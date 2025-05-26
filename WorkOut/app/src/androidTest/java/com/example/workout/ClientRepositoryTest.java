@@ -7,11 +7,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.FirebaseApp;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import Model.Address;
+import Model.Business;
 import Model.City;
 import Model.Client;
 import Model.Gender;
@@ -29,13 +32,26 @@ import java.util.concurrent.TimeoutException;
 @RunWith(AndroidJUnit4.class)
 public class ClientRepositoryTest
 {
-    private ClientRepository repository;
-    private Client testSubject;
+    private static ClientRepository repository;
+    private static Client testSubject;
 
-    @Before
-    public void setUp()
+    @BeforeClass
+    public static void setUp()
     {
         repository = new ClientRepository();
+
+        try
+        {
+            Client testBusiness = await(repository.getClientByUsername("test"), 10, TimeUnit.SECONDS);
+            await(repository.deleteClientByID(testBusiness), 10, TimeUnit.SECONDS);
+        }
+        catch (Exception e) { /*User doesn't exist in db, good!*/ }
+    }
+
+    @AfterClass
+    public static void setDown() throws ExecutionException, InterruptedException, TimeoutException
+    {
+        await(repository.deleteClientByID(testSubject), 30, TimeUnit.SECONDS);
     }
 
     @Test
