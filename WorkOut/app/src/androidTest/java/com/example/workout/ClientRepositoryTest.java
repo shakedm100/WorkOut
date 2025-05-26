@@ -1,20 +1,13 @@
 package com.example.workout;
 
-import android.content.Context;
-
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.FirebaseApp;
-
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import Model.Address;
-import Model.Business;
 import Model.City;
 import Model.Client;
 import Model.Gender;
@@ -55,7 +48,7 @@ public class ClientRepositoryTest
     }
 
     @Test
-    public void insertClientTest() throws ExecutionException, InterruptedException, TimeoutException
+    public void queryClientTest() throws ExecutionException, InterruptedException, TimeoutException
     {
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
@@ -64,5 +57,15 @@ public class ClientRepositoryTest
                 System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS);
 
         assertNotNull(testSubject);
+
+        //TODO: Add many asserts
+        //TODO: Check get functionality
+
+        Client updateClient = testSubject;
+        updateClient.setFirstName("Lagrange");
+        repository.updateClientByID(updateClient);
+        Client check = await(repository.getClientByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
+        assertNotNull(check);
+        assertEquals(check.getFirstName(), updateClient.getFirstName());
     }
 }

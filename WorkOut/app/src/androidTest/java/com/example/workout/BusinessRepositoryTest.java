@@ -43,7 +43,6 @@ import Model.Schedule;
 public class BusinessRepositoryTest
 {
     private static BusinessRepository repository;
-    private Context appContext;
     private static Business testSubject;
     private static Client testHelper;
 
@@ -74,6 +73,8 @@ public class BusinessRepositoryTest
         await(repository.deleteBusinessByID(testSubject), 30, TimeUnit.SECONDS);
     }
 
+    // TODO: The order of testing is pretty random, should just handle all queries in a
+    // single function
     @Test
     public void insertBusinessTest() throws ExecutionException, InterruptedException, TimeoutException
     {
