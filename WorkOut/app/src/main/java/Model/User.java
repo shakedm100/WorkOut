@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class User extends Entity implements Parcelable {
     private String username;
     private String password;
@@ -86,4 +88,18 @@ public class User extends Entity implements Parcelable {
             return new User[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(phone, user.phone) && Objects.equals(email, user.email);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(username, password, phone, email);
+    }
 }

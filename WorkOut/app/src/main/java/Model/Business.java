@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Business extends User implements Parcelable
 {
@@ -163,5 +164,19 @@ public class Business extends User implements Parcelable
         }
 
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Business business = (Business) o;
+        return Objects.equals(name, business.name) && Objects.equals(courses, business.courses) && Objects.equals(location, business.location) && Objects.equals(followers, business.followers) && Objects.equals(ratings, business.ratings) && Objects.equals(policy, business.policy);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(name, courses, location, followers, ratings, policy);
     }
 }

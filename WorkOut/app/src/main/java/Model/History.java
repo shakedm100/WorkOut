@@ -2,6 +2,7 @@ package Model;
 import android.annotation.SuppressLint;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @SuppressLint("ParcelCreator")
 public class History extends Entity
@@ -44,5 +45,19 @@ public class History extends Entity
     public void setClient(Client client)
     {
         this.client = client;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        History history = (History) o;
+        return Objects.equals(course, history.course) && Objects.equals(date, history.date) && Objects.equals(client, history.client);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(course, date, client);
     }
 }

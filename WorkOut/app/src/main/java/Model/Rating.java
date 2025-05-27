@@ -3,6 +3,8 @@ package Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 public class Rating extends Entity implements Parcelable
 {
     private float stars;
@@ -76,4 +78,18 @@ public class Rating extends Entity implements Parcelable
             return new Rating[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Rating rating = (Rating) o;
+        return Float.compare(stars, rating.stars) == 0 && Objects.equals(comment, rating.comment) && Objects.equals(client, rating.client);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(stars, comment, client);
+    }
 }

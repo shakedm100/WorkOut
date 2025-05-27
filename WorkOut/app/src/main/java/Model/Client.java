@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class Client extends User implements Parcelable{
     private String firstName;
     private String lastName;
@@ -111,4 +113,18 @@ public class Client extends User implements Parcelable{
             return new Client[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Client client = (Client) o;
+        return Objects.equals(firstName, client.firstName) && Objects.equals(lastName, client.lastName) && Objects.equals(address, client.address) && gender == client.gender;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(firstName, lastName, address, gender);
+    }
 }

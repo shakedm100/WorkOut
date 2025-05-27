@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 public class Schedule extends Entity implements Parcelable
 {
@@ -64,4 +65,18 @@ public class Schedule extends Entity implements Parcelable
             return new Schedule[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Schedule schedule = (Schedule) o;
+        return day == schedule.day && Objects.equals(occurrence, schedule.occurrence);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(day, occurrence);
+    }
 }

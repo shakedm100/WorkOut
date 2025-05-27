@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class City extends Entity implements Parcelable
 {
     private String name;
@@ -63,4 +65,17 @@ public class City extends Entity implements Parcelable
         }
     };
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        City city = (City) o;
+        return Objects.equals(name, city.name) && Objects.equals(englishName, city.englishName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(name, englishName);
+    }
 }

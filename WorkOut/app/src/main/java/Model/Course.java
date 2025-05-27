@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Course extends Entity implements Parcelable
 {
@@ -159,4 +160,18 @@ public class Course extends Entity implements Parcelable
             return new Course[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Course course = (Course) o;
+        return capacity == course.capacity && courseType == course.courseType && Objects.equals(name, course.name) && Objects.equals(participants, course.participants) && Objects.equals(ageRange, course.ageRange) && Objects.equals(schedule, course.schedule) && category == course.category && Objects.equals(description, course.description);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(courseType, name, participants, capacity, ageRange, schedule, category, description);
+    }
 }
