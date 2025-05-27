@@ -8,11 +8,11 @@
     <string name="welcome">Hello!</string>
     <string name="workout">WorkOut</string>
     <string name="usernameTextDescription">Enter your new username</string>
-    <string name="search_button">Search</string>
     <string name="back_image" />
     <string name="home">Home</string>
     <string name="ratings">Ratings</string>
     <string name="register">Register</string>
     <string name="account">Account</string>
     <string name="server_client_id">297334655599-g38pkumooanurin9ob62t56cmqoe2goc.apps.googleusercontent.com</string>
+    <string name="search_button">Search</string>
 </resources>
