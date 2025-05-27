@@ -15,4 +15,7 @@
     <string name="account">Account</string>
     <string name="server_client_id">297334655599-g38pkumooanurin9ob62t56cmqoe2goc.apps.googleusercontent.com</string>
     <string name="search_button">Search</string>
+    <string name="business">business</string>
+    <string name="update">update</string>
+    <string name="classes">classes</string>/>
 </resources>

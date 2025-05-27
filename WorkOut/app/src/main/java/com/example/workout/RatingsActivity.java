@@ -7,7 +7,7 @@ import android.widget.RatingBar;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class RatingActivity extends AppCompatActivity {
+public class RatingsActivity extends AppCompatActivity {
 
     private RatingBar ratingBar;
     private EditText commentEditText;
@@ -16,7 +16,7 @@ public class RatingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rating);
+        setContentView(R.layout.activity_ratings);
 
         ratingBar = findViewById(R.id.ratingBar);
         commentEditText = findViewById(R.id.commentEditText);

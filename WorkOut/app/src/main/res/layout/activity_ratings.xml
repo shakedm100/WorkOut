@@ -37,7 +37,6 @@
         android:layout_height="150dp"
         android:hint="כתוב תגובה על העסק..."
         android:gravity="top|start"
-        android:background="@drawable/edit_text_background"
         android:padding="12dp"
         android:inputType="textMultiLine"
         android:lines="4"

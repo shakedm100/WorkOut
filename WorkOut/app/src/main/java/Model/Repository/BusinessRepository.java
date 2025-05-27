@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class BusinessRepository
     }
 
     public Task<Business> insertBusiness(String username, String password, Phone phone, String email,
-                                         String businessName, List<Course> courses, Location location,
+                                         String businessName, Location location,
                                          String policy)
     {
         Map<String, Object> business = new HashMap<>();
@@ -40,7 +41,7 @@ public class BusinessRepository
         business.put("phone", phone);
         business.put("email", email);
         business.put("businessName", businessName);
-        business.put("courses", courses); //TODO: maybe also enter null at insert
+        business.put("courses", null);
         business.put("location", location);
         business.put("ratings", null); // No ratings for new business
         business.put("followers", null); // No followers for new business
@@ -71,12 +72,12 @@ public class BusinessRepository
 
             DocumentReference ref = task.getResult();
             String id = ref.getId();
-            return new Business(id, username, password, phone, email, businessName, courses, location,
-                    null, null, policy);
+            return new Business(id, username, password, phone, email, businessName, new ArrayList<>(), location,
+                    new ArrayList<>(), new ArrayList<>(), policy);
         });
     }
 
-    public Task<Boolean> updateBusinessByID(Business business)
+    public Task<Boolean> updateBusiness(Business business)
     {
         // Get the business's DocumentReference
         DocumentReference currentBusiness = db.collection(collection).document(business.getId());
