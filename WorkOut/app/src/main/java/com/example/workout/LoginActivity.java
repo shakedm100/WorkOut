@@ -24,18 +24,36 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.checkerframework.checker.units.qual.C;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 import Model.Address;
+import Model.AgeRange;
+import Model.Business;
+import Model.Category;
 import Model.City;
 import Model.Client;
+import Model.Course;
+import Model.CourseType;
+import Model.Day;
 import Model.Gender;
+import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
+import Model.Rating;
 import Model.Repository.ClientRepository;
 //import Model.Repository.TestClientRepository;
 import android.widget.ProgressBar;
 import ViewModel.LoginViewModel;
 
+import Model.Schedule;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
@@ -55,7 +73,6 @@ public class LoginActivity extends AppCompatActivity {
         credentialManager = CredentialManager.create(getApplicationContext());
         ImageButton googleAuth = findViewById(R.id.googleRegisterButton);
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
-
         Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(task -> {
             // navigate to register activity
@@ -133,9 +150,11 @@ public class LoginActivity extends AppCompatActivity {
             // Call the ViewModel method
             loginViewModel.loginClient(username, password);
         });
+//        loginButton.setOnClickListener(click ->
+//        {
+//            testInsertion();
+//        });
     }
-
-    public void saveUserProfileToFirestore(String userId, String username, String email, String profilePictureUrl) {}
 
     private void testInsertion()
     {
@@ -161,7 +180,8 @@ public class LoginActivity extends AppCompatActivity {
             // Change Activity to Main
             if(client != null)
             {
-                startActivity(new Intent(this, MainActivity.class));
+                Intent intent = new Intent(this, MainActivity.class).putExtra("client", client);
+                startActivity(intent);
             }
         })
             .addOnFailureListener(e -> {
@@ -214,36 +234,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private void handleCredential(@NonNull Credential credential) {
         // 7) Check for Google ID token credential type
-        if (credential instanceof GoogleIdTokenCredential) {
-            GoogleIdTokenCredential gidc = (GoogleIdTokenCredential) credential;
+        if (GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(credential.getType())) {
+            GoogleIdTokenCredential gidc = GoogleIdTokenCredential.createFrom(credential.getData());
             // 8) Parse and validate
             gidc = GoogleIdTokenCredential.createFrom(gidc.getData());
             String idToken = gidc.getIdToken();
 
-            // 9) Send the token to your backend via repository
-            new Thread(() -> {
-                try {
-                    //AuthResponse auth = userRepository.authenticateWithGoogle(idToken);
-                    runOnUiThread(() -> {
-                        // TODO: store auth.getJwt(), nav to main app screen
-                        Toast.makeText(this,
-                                "Welcome, " ,
-                                Toast.LENGTH_SHORT).show();
-                    });
-                } catch (Exception ex) {
-                    runOnUiThread(() ->
-                            Toast.makeText(this,
-                                    "Auth error: " + ex.getMessage(),
-                                    Toast.LENGTH_LONG).show()
-                    );
-                }
-            }).start();
-
-        } else {
-            // not a Google ID credential
-            Toast.makeText(this,
-                    "Unexpected credential type: " + credential.getType(),
-                    Toast.LENGTH_LONG).show();
+            ClientRepository clientRepository = new ClientRepository();
+            clientRepository.handleGoogleAuthWithFirebase(idToken).addOnSuccessListener(task ->
+            {
+                Client client = task;
+                startActivity(new Intent(this, MainActivity.class));
+            }).addOnFailureListener(e ->
+            {
+                System.out.println(e);
+            });
         }
     }
 }

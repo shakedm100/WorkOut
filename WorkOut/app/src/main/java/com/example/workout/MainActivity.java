@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 //
 
+import Model.Business;
+import Model.Client;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView textView;
@@ -22,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page); // Choose the correct XML
+
+        Client client = getIntent().getParcelableExtra("client");
 
         // Find the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -37,8 +42,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProfileActivity.class));
                 return true;
             }
-            else if (id == R.id.nav_search) {
+            /*else if (id == R.id.nav_search) {
                 startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            }*/
+            else if (id == R.id.nav_search) {
+                startActivity(new Intent(this, MapActivity.class));
                 return true;
             }
             else if (id == R.id.nav_ratings) {

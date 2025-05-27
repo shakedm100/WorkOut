@@ -2,7 +2,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 }
@@ -36,7 +35,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.workout"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -79,10 +78,7 @@ dependencies {
     implementation(libs.room.common.jvm)
     implementation(libs.firebase.database)
     implementation(libs.googleid)
-    implementation(libs.lifecycle.viewmodel.android)
-    implementation(libs.mediation.test.suite)
-    implementation(libs.impress)
-    implementation(libs.engage.core)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -101,16 +97,12 @@ dependencies {
 
     // Core Credential Manager:
     implementation("androidx.credentials:credentials:1.0.1")
-    // The “play-services-auth” bridge that brings in the Google federated providers
-    implementation("androidx.credentials:credentials-play-services-auth:<latest-version>")
-
     // Google ID helper library for parsing/validating tokens
     implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
-    implementation("com.google.android.gms:play-services-auth:<latest version>")
+    // Google Maps SDK for Android
+    implementation("com.google.android.gms:play-services-maps:19.2.0")        // :contentReference[oaicite:0]{index=0}
 
-    // ViewModel dependencies
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime:2.7.0") 
+    // Fused Location Provider (high-accuracy, battery-optimized)
+    implementation("com.google.android.gms:play-services-location:21.3.0")    // :contentReference[oaicite:1]{index=1}
 
 }

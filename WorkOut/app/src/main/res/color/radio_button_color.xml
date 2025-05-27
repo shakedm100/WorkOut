@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--this xml is for the color of choosing male/female-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- מצב נבחר -->
+    <item android:color="@color/black" android:state_checked="true"/>
+    <!-- מצב לא נבחר -->
+    <item android:color="@color/black"/>
+</selector>
+

@@ -161,7 +161,7 @@ public class RegisterActivity extends AppCompatActivity {
             );
         });
 
-        // TODO: add back to login button
+        // TODO: add back to login button -> when active screens will be available
         // Button backToLoginButton = findViewById(R.id.backToLoginButtonRegister);
         // backToLoginButton.setOnClickListener(v -> {
         //     finish(); // Simply finish RegisterActivity to go back to LoginActivity
