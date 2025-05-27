@@ -41,10 +41,9 @@ public class BusinessRepository
         business.put("phone", phone);
         business.put("email", email);
         business.put("businessName", businessName);
-        business.put("courses", null);
         business.put("location", location);
-        business.put("ratings", null); // No ratings for new business
-        business.put("followers", null); // No followers for new business
+        business.put("ratings", new ArrayList<>()); // No ratings for new business
+        business.put("followers", new ArrayList<>()); // No followers for new business
         business.put("policy", policy);
 
         GeneralRepository generalRepository = new GeneralRepository();
@@ -87,7 +86,7 @@ public class BusinessRepository
         return currentBusiness.set(business).continueWith(Task::isSuccessful);
     }
 
-    public Task<Boolean> deleteBusinessByID(Business business)
+    public Task<Boolean> deleteBusiness(Business business)
     {
         DocumentReference currentClient = db.collection(collection).document(business.getId());
 

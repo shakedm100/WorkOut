@@ -36,7 +36,7 @@ public class CourseRepository
         Map<String, Object> course = new HashMap<>();
         course.put("name", name);
         course.put("schedule", schedule);
-        course.put("participants", null);
+        course.put("participants", new ArrayList<>());
         course.put("capacity", capacity);
         course.put("type", type);
         course.put("ageRange", ageRange);
@@ -88,7 +88,7 @@ public class CourseRepository
     }
 
 
-    public Task<Business> getAllBusinessesCourses(Business business)
+    public Task<List<Course>> getAllBusinessesCourses(Business business)
     {
         return db.collection(collection).document(business.getId()).collection(subCollection).get()
                 .continueWith(task ->
@@ -97,6 +97,7 @@ public class CourseRepository
                         throw Objects.requireNonNull(task.getException());
 
                     QuerySnapshot snap = task.getResult();
+                    List<Course> courses = new ArrayList<>();
                     if (snap != null)
                     {
                         for (DocumentSnapshot doc : snap.getDocuments())
@@ -105,11 +106,12 @@ public class CourseRepository
                             if (course != null)
                             {
                                 course.setId(doc.getId());
+                                courses.add(course);
                                 business.addCourse(course);
                             }
                         }
                     }
-                    return business;
+                    return courses;
                 });
     }
 }

@@ -9,14 +9,17 @@ import static org.junit.Assert.assertTrue;
 import android.content.Context;
 
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.Timestamp;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ import Model.Rating;
 import Model.Repository.BusinessRepository;
 import Model.Schedule;
 
+@RunWith(AndroidJUnit4.class)
 public class BusinessRepositoryTest
 {
     private static BusinessRepository repository;
@@ -61,7 +65,7 @@ public class BusinessRepositoryTest
             // Just to add more robustness to testing, even if something failed it
             // still attempts to delete the previous test subject
             Business testBusiness = await(repository.getBusinessByUsername("test"), 10, TimeUnit.SECONDS);
-            await(repository.deleteBusinessByID(testBusiness), 10, TimeUnit.SECONDS);
+            await(repository.deleteBusiness(testBusiness), 10, TimeUnit.SECONDS);
         }
         catch (Exception e) { /*User doesn't exist in db, good!*/ }
     }
@@ -71,7 +75,7 @@ public class BusinessRepositoryTest
     {
         // All database calls need to await because if we don't it just exits the test
         // without finishing executing the function
-        await(repository.deleteBusinessByID(testSubject), 30, TimeUnit.SECONDS);
+        await(repository.deleteBusiness(testSubject), 30, TimeUnit.SECONDS);
     }
 
     @Test
@@ -84,7 +88,7 @@ public class BusinessRepositoryTest
         ArrayList<Rating> ratings = new ArrayList<>();
         ratings.add(rating);
         followers.add(testHelper);
-        Schedule schedule = new Schedule("bla", Day.Sunday, LocalTime.now());
+        Schedule schedule = new Schedule("bla", Day.Sunday, Timestamp.now());
         Course course = new Course("bla", CourseType.Dou, "TRX", participants, 50, new AgeRange(23,50),
                 schedule, Category.Archery, "Shoot to kill");
         ArrayList<Course> courses = new ArrayList<>();
