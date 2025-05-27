@@ -1,47 +1,52 @@
 package ViewModel;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import Model.Repository.ClientRepository;
+import Model.AgeRange;
+import Model.Business;
+import Model.Category;
+import Model.CourseType;
+import Model.Repository.CourseRepository;
+import Model.Schedule;
 
 // TODO: change to the correct repository and add the desired functions
 public class CourseViewModel extends ViewModel {
 
-    private final ClientRepository clientRepository; // CHANGE
+    private final CourseRepository courseRepository;
 
-    private final MutableLiveData<CourseUiState> _courseUiState = new MutableLiveData<>(CourseUiState.idle());
-    public LiveData<CourseUiState> loginUiState = _courseUiState;
+    private final MutableLiveData<GenericUiState<String>> _courseUiState = new MutableLiveData<>(GenericUiState.idle());
+    public LiveData<GenericUiState<String>> courseUiState = _courseUiState;
 
     public CourseViewModel() {
         // It's better to inject the repository via constructor
-        this.clientRepository = new ClientRepository();
+        this.courseRepository = new CourseRepository();
     }
 
     // Constructor for Dependency Injection
-    public CourseViewModel(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
+    public CourseViewModel(CourseRepository clientRepository) {
+        this.courseRepository = clientRepository;
     }
 
-    public void insertCourse(String username, String password) {
-        _loginUiState.postValue(LoginUiState.loading());
+    public void insertCourse(@NonNull Business business, String name, Schedule schedule, int capacity,
+                             CourseType type, AgeRange ageRange, Category category, String description) {
+        _courseUiState.postValue(GenericUiState.loading("Inserting course..."));
 
-        clientRepository.checkLogin(username, password)
-                .addOnSuccessListener(client -> { // Assuming 'client' is the success data, e.g., a user object or token
-                    // You might want to extract a token or relevant data from 'client'
-                    _loginUiState.postValue(LoginUiState.success("UserLoggedIn")); // maybe pass client.getToken()
-
+        courseRepository.insertCourse(business, name, schedule, capacity, type, ageRange, category, description)
+                .addOnSuccessListener(client -> {
+                    _courseUiState.postValue(GenericUiState.success("Course inserted!"));
 
                 })
                 .addOnFailureListener(e -> {
-                    _loginUiState.postValue(LoginUiState.error(e.getMessage()));
+                    _courseUiState.postValue(GenericUiState.error(e.getMessage()));
 
                 });
     }
 
-    public LiveData<LoginUiState> getLoginUiState() {
-        return loginUiState;
-    }
+//    public LiveData<GenericUiState> getLoginUiState() {
+//        return loginUiState;
+//    }
 
 }

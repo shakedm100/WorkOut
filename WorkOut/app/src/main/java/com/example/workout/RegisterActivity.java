@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory;
 
+import ViewModel.GenericUiState;
 import ViewModel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -38,6 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Spinner spinnerPhonePrefix, spinnerCity; // Assuming you have this in your XML: R.id.spinnerPhonePrefix
     // private Spinner spinnerGender; // If you use a spinner for Gender: R.id.spinnerGender
     private RadioGroup radioGroupGender;
+    private RadioButton radioMale, radioFemale;
     private Button buttonRegister;
     private ProgressBar progressBarRegister;
     private TextView textViewRegisterError;
@@ -61,14 +64,16 @@ public class RegisterActivity extends AppCompatActivity {
         editTextUsername = findViewById(R.id.usernameText);
         editTextFirstName = findViewById(R.id.firstNameText);
         editTextLastName = findViewById(R.id.lastNameText);
-        spinnerPhonePrefix = findViewById(R.id.p); // phone spinner
+        spinnerPhonePrefix = findViewById(R.id.spinner); // TODO: add the spinner
         editTextPhoneNumber = findViewById(R.id.phoneText);
         spinnerCity = findViewById(R.id.citySpinner);
         editTextStreet = findViewById(R.id.addressText);
         radioGroupGender = findViewById(R.id.radioGrp);
+        radioMale = findViewById(R.id.radioM);
+        radioFemale = findViewById(R.id.radioF);
 
-        buttonRegister = findViewById(R.id.registerBtn); // Your button ID for registration
-        progressBarRegister = findViewById(R.id.progressBarRegister);
+        buttonRegister = findViewById(R.id.registerButton); // Your button ID for registration
+        progressBarRegister = findViewById(R.id.progressBarRegister); // TODO: add the progress + error
         textViewRegisterError = findViewById(R.id.textViewRegisterError);
 
         // Setup Observers for LiveData
@@ -98,12 +103,12 @@ public class RegisterActivity extends AppCompatActivity {
                     buttonRegister.setEnabled(true);
                     textViewRegisterError.setVisibility(View.GONE);
                     Toast.makeText(RegisterActivity.this,
-                            registerUiState.getSuccessMessage(), Toast.LENGTH_LONG).show();
+                            "Registration Successful!", Toast.LENGTH_LONG).show();
                     // navigate to login screen after success
                     Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
                     startActivity(intent);
-                    finish(); // Finish RegisterActivity
+                    finish(); // Finish RegisterActivity -> can't go back
                     break;
                 case ERROR:
                     progressBarRegister.setVisibility(View.GONE);
@@ -132,8 +137,19 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
-            String city = editTextCity.getText().toString().trim();
+            String city = spinnerCity.getSelectedItem().toString().trim();
             String street = editTextStreet.getText().toString().trim();
+//            String genderString = String.valueOf(radioGroupGender.getCheckedRadioButtonId());
+//            Gender gender;
+//            if (genderString.equals("Male"))
+//                gender = Gender.Male;
+//
+//            else
+//                gender = Gender.Female;
+
+            Gender gender = Gender.Female;
+            if (radioMale.isChecked())
+                gender = Gender.Male;
 
             // String genderStr = "";
             // if(spinnerGender.getSelectedItem() != null) {
@@ -142,6 +158,7 @@ public class RegisterActivity extends AppCompatActivity {
             // TODO: Convert genderStr to Gender enum in ViewModel or before calling
 
 
+            /* Validation is checked in the registration process
             // Perform basic validation here if needed, or rely on ViewModel validation
             if (email.isEmpty() || password.isEmpty() || username.isEmpty() || firstName.isEmpty()
                     || lastName.isEmpty() || phonePrefixStr.isEmpty() || phoneNumber.isEmpty()
@@ -153,10 +170,12 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+             */
+
             // Call the ViewModel method to perform registration
             registerViewModel.registerUser(
                     email, password, username, firstName, lastName,
-                    phonePrefixStr, phoneNumber, city, street
+                    phonePrefixStr, phoneNumber, city, street, gender
                     // TODO: add gender
             );
         });

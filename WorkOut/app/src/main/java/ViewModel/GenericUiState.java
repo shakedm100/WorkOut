@@ -58,6 +58,10 @@ public class GenericUiState<T> {
         return new GenericUiState<>(Status.LOADING, null, null);
     }
 
+    public static <T> GenericUiState<T> loading(String message) {
+        return new GenericUiState<>(Status.LOADING, null, message);
+    }
+
     public static <T> GenericUiState<T> success(T data) {
         return new GenericUiState<>(Status.SUCCESS, data, null);
     }

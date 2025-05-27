@@ -3,6 +3,9 @@ package ViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.google.android.gms.tasks.Task;
+
 import Model.Repository.ClientRepository; // Assuming this handles user creation
 import Model.Address;
 import Model.City;
@@ -11,48 +14,126 @@ import Model.Phone;
 import Model.PhonePrefix;
 
 import Model.Repository.ClientRepository;
-// Import other necessary models like User, Task, etc.
+import Model.Repository.GeneralRepository;
 
 public class RegisterViewModel extends ViewModel {
 
     private final Model.Repository.ClientRepository clientRepository;
-    private final MutableLiveData<RegisterUiState> _registerUiState = new MutableLiveData<>(RegisterUiState.idle());
-    public LiveData<RegisterUiState> registerUiState = _registerUiState;
 
-    public RegisterViewModel(ClientRepository clientRepository) {
+    private final GeneralRepository generalRepository;
+
+    private final MutableLiveData<GenericUiState<String>> _registerUiState = new MutableLiveData<>(GenericUiState.idle());
+    public LiveData<GenericUiState<String>> registerUiState = _registerUiState;
+
+    public RegisterViewModel(ClientRepository clientRepository, GeneralRepository generalRepository) {
         this.clientRepository = clientRepository;
+        this.generalRepository = generalRepository;
     }
 
     public void registerUser(String email, String password, String username, String firstName, String lastName,
-                             String phonePrefixStr, String phoneNumberStr, String cityName, String street) {
+                             String phonePrefixStr, String phoneNumberStr, String cityName, String street, Gender gender) {
 
-        _registerUiState.postValue(RegisterUiState.loading());
+        _registerUiState.postValue(GenericUiState.loading("Validating input..."));
 
-        // Basic validation (can be expanded)
-        if (email.isEmpty() || password.isEmpty() || username.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
-            _registerUiState.postValue(RegisterUiState.error("Please fill all required fields."));
+        // validation
+        if (email == null || email.trim().isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
+            _registerUiState.postValue(GenericUiState.error("Please enter a valid email address."));
+            return;
+        }
+        if (password == null || password.isEmpty() || password.length() < 6) { // Example: password length check
+            _registerUiState.postValue(GenericUiState.error("Password must be at least 6 characters."));
+            return;
+        }
+        if (username == null || username.trim().isEmpty()) {
+            _registerUiState.postValue(GenericUiState.error("Please enter a username."));
+            return;
+        }
+        if (firstName == null || firstName.trim().isEmpty()) {
+            _registerUiState.postValue(GenericUiState.error("Please enter a first name."));
+            return;
+        }
+        if (lastName == null || lastName.trim().isEmpty()) {
+            _registerUiState.postValue(GenericUiState.error("Please enter a last name."));
+            return;
+        }
+        if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty()) {
+            _registerUiState.postValue(GenericUiState.error("Please select a phone prefix."));
+            return;
+        }
+        PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
+        if (prefix == null) {
+            _registerUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
+            return;
+        }
+        if (phoneNumberStr == null || phoneNumberStr.trim().isEmpty() || !phoneNumberStr.trim().matches("\\d+")) { // Basic check for digits
+            _registerUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
+            return;
+        }
+        if (cityName == null || cityName.trim().isEmpty()) {
+            _registerUiState.postValue(GenericUiState.error("Please enter a city name."));
+            return;
+        }
+        if (street == null || street.trim().isEmpty()) {
+            _registerUiState.postValue(GenericUiState.error("Please enter a street address."));
+            return;
+        }
+        if (gender == null) { // TODO: add the gender value
+            _registerUiState.postValue(GenericUiState.error("Please select a gender."));
             return;
         }
 
-        // Convert string inputs to model objects
-        // Add error handling for parsing, e.g., if PhonePrefix is invalid
-        PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr); // You'll need to implement fromString or similar in PhonePrefix
-        Phone phone = new Phone(prefix, phoneNumberStr);
-        City city = new City(null, cityName); // Assuming city might not have an ID initially
-        com.google.android.engage.common.datamodel.Address address = new com.google.android.engage.common.datamodel.Address(city, street);
+        // Trim inputs after validation
+        final String finalEmail = email.trim();
+        final String finalUsername = username.trim();
+        final String finalFirstName = firstName.trim();
+        final String finalLastName = lastName.trim();
+        final String finalPhoneNumber = phoneNumberStr.trim();
+        final String finalCityName = cityName.trim();
+        final String finalStreet = street.trim();
 
-        // Call your repository method to perform the registration
-        // The parameters for insertClient might need adjustment based on your actual method signature
-        clientRepository.insertClient(username, password, phone, email, firstName, lastName, address, Gender.Male /* TODO: Get gender from UI */)
-                .addOnSuccessListener(client -> { // Assuming 'client' is the created user or a success indicator
-                    _registerUiState.postValue(RegisterUiState.success("Registration successful! Client ID: " + client.getId()));
+        _registerUiState.postValue(GenericUiState.loading("Verifying city information..."));
+
+        // Asynchronous City Fetching
+        generalRepository.getCityByNamePartially(finalCityName)
+                .addOnSuccessListener(cityObject -> {
+                    if (cityObject == null || cityObject.get(0).getId() == null || cityObject.get(0).getId().trim().isEmpty()) {
+                        _registerUiState.postValue(GenericUiState.error("City '" + finalCityName + "' not found or is invalid. Please use a valid city."));
+                        return;
+                    }
+
+                    // valid city -> register
+                    _registerUiState.postValue(GenericUiState.loading("Finalizing registration..."));
+
+                    Phone phone = new Phone(prefix, finalPhoneNumber);
+                    Address address = new Address(cityObject.get(0), finalStreet); // Use the fetched cityObject
+
+                    // --- 3. Asynchronous Client Insertion ---
+                    clientRepository.insertClient(finalUsername, password, phone, finalEmail, finalFirstName, finalLastName, address, gender)
+                            .addOnSuccessListener(result -> { // 'result' could be Void, DocumentReference, or Client
+                                // String successMessage = "Registration successful!";
+                                // if (result instanceof Client) {
+                                //    successMessage = "Registration successful! Client ID: " + ((Client) result).getId();
+                                // } else if (result instanceof com.google.firebase.firestore.DocumentReference) {
+                                //    successMessage = "Registration successful! Client ID: " + ((com.google.firebase.firestore.DocumentReference) result).getId();
+                                // }
+                                _registerUiState.postValue(GenericUiState.success("Registration successful! Welcome " + finalFirstName));
+                            })
+                            .addOnFailureListener(insertException -> {
+                                _registerUiState.postValue(GenericUiState.error("Registration failed: " + insertException.getMessage()));
+                            });
                 })
-                .addOnFailureListener(e -> {
-                    _registerUiState.postValue(RegisterUiState.error("Registration failed: " + e.getMessage()));
+                .addOnFailureListener(cityFetchException -> {
+                    _registerUiState.postValue(GenericUiState.error("Could not verify city: " + cityFetchException.getMessage()));
                 });
     }
 
-    public LiveData<RegisterUiState> getRegisterUiState() {
+    public LiveData<GenericUiState<String>> getRegisterUiState() {
         return registerUiState;
     }
+
+    // Optional: Method to reset the state if needed from the Activity/Fragment
+    public void resetRegisterState() {
+        _registerUiState.postValue(GenericUiState.idle());
+    }
+
 }

@@ -42,7 +42,8 @@ public class ProfileActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+    } // <- remove this when uncomment
+        /*
         // Initialize Views
         textViewFirstName = findViewById(R.id.firstNameText);
         textViewLastName = findViewById(R.id.lastNameText);
@@ -91,7 +92,7 @@ public class ProfileActivity extends AppCompatActivity {
                     //Client client = profileDataState.getData();
                     Toast.makeText(ProfileActivity.this, "Update Successful!", Toast.LENGTH_LONG).show();
                     // navigate to home activity when success occurs
-                    Intent intent = new Intent(ProfileActivity.this, HomeActivity.class); // move to home page
+                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class); // move to home page
                     startActivity(intent);
                     finish(); // Optional: finish ProfileActivity so user can't go back
                     break;
@@ -125,4 +126,6 @@ public class ProfileActivity extends AppCompatActivity {
             clientProfileViewModel.updateClientProfile(username, password);
         });
     }
+
+         */
 }

@@ -118,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
                     textViewError.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Login Successful! Data: " + loginUiState.getData(), Toast.LENGTH_LONG).show();
                     // navigate to home activity when success occurs
-                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class); // move to home page
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class); // move to home page
                     startActivity(intent);
                     finish(); // Optional: finish LoginActivity so user can't go back
                     break;
@@ -137,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
             String username = editTextUsername.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();
 
-            // Basic validation
+            // validation
             if (username.isEmpty()) {
                 editTextUsername.setError("Username cannot be empty");
                 return;
