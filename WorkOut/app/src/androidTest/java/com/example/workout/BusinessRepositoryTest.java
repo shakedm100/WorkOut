@@ -3,6 +3,7 @@ package com.example.workout;
 import static com.google.android.gms.tasks.Tasks.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -51,7 +52,7 @@ public class BusinessRepositoryTest
     {
         repository = new BusinessRepository();
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
+        Address address = new Address(new City("2", "Rosh Ha'Ayin"), "Haim Hertzog");
         testHelper = new Client("esdrg","shakedm100", "1234", phone,
                 "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
 
@@ -73,10 +74,8 @@ public class BusinessRepositoryTest
         await(repository.deleteBusinessByID(testSubject), 30, TimeUnit.SECONDS);
     }
 
-    // TODO: The order of testing is pretty random, should just handle all queries in a
-    // single function
     @Test
-    public void insertBusinessTest() throws ExecutionException, InterruptedException, TimeoutException
+    public void queryBusinessTest() throws ExecutionException, InterruptedException, TimeoutException
     {
         ArrayList<Client> participants = new ArrayList<>();
         participants.add(testHelper);
@@ -90,6 +89,8 @@ public class BusinessRepositoryTest
                 schedule, Category.Archery, "Shoot to kill");
         ArrayList<Course> courses = new ArrayList<>();
         courses.add(course);
+
+        // Test insert
         testSubject = await(repository.insertBusiness("test", "1234", testHelper.getPhone(),
                 "test@mail", "EasyBusy", new Location(12345, 2145435),
                 "Policy"), 10, TimeUnit.SECONDS);
@@ -102,22 +103,25 @@ public class BusinessRepositoryTest
         assertEquals(new Location(12345, 2145435), testSubject.getLocation());
         assertEquals("EasyBusy", testSubject.getName());
         assertEquals("Policy", testSubject.getPolicy());
-    }
 
-    @Test
-    public void getBusinessByUsernameTest() throws ExecutionException, InterruptedException, TimeoutException
-    {
+        // Insert fail by username
+        assertThrows(Exception.class, () -> await(repository.insertBusiness("test", "1234", testHelper.getPhone(),
+                "bla@mail", "EasyBusy", new Location(12345, 2145435),
+                "Policy"), 10, TimeUnit.SECONDS));
+
+        // Insert fail by email
+        assertThrows(Exception.class, () -> await(repository.insertBusiness("bla", "1234", testHelper.getPhone(),
+                "test@mail", "EasyBusy", new Location(12345, 2145435),
+                "Policy"), 10, TimeUnit.SECONDS));
+
+        // Test get by username
         Business check = await(repository.getBusinessByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
         assertNotNull(check);
         assertEquals(check.getId(), testSubject.getId());
-    }
 
-    @Test
-    public void updateBusinessTest() throws ExecutionException, InterruptedException, TimeoutException
-    {
-        Boolean check = await(repository.updateBusiness(testSubject), 10, TimeUnit.SECONDS);
-        assertNotNull(check);
-        assertTrue(check);
+        // Test update
+        Boolean checkUpdate = await(repository.updateBusiness(testSubject), 10, TimeUnit.SECONDS);
+        assertNotNull(checkUpdate);
+        assertTrue(checkUpdate);
     }
-
 }

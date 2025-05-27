@@ -32,6 +32,18 @@ public class Business extends User implements Parcelable
         this.policy = policy;
     }
 
+    public Business(String id, String username, String password, Phone phone, String email, String name,
+                    Location location, String policy)
+    {
+        super(id, username, password, phone, email);
+        this.name = name;
+        this.courses = new ArrayList<>();
+        this.location = location;
+        this.followers = new ArrayList<>();
+        this.ratings = new ArrayList<>();
+        this.policy = policy;
+    }
+
     public String getName()
     {
         return name;

@@ -18,6 +18,7 @@ public class City extends Entity implements Parcelable
     {
         super(id);
         this.name = name;
+        englishName = "";
     }
 
     protected City(Parcel in) {
@@ -36,6 +37,20 @@ public class City extends Entity implements Parcelable
     }
 
     public void setName(String name) { this.name = name; }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        City city = (City) o;
+        return Objects.equals(name, city.name) && Objects.equals(englishName, city.englishName);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(name, englishName);
+    }
 
     public void setEnglishName(String englishName)
     {
@@ -65,17 +80,5 @@ public class City extends Entity implements Parcelable
         }
     };
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (o == null || getClass() != o.getClass()) return false;
-        City city = (City) o;
-        return Objects.equals(name, city.name) && Objects.equals(englishName, city.englishName);
-    }
 
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(name, englishName);
-    }
 }
