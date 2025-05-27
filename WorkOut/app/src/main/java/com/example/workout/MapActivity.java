@@ -1,9 +1,6 @@
 package com.example.workout;
 
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,16 +20,13 @@ import com.google.android.gms.maps.model.LatLng;
 import android.Manifest;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
+import Adapters.CityAdapter;
 import Model.Repository.GeneralRepository;
 
 
