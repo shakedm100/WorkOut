@@ -13,6 +13,9 @@ roomCommonJvm = "2.7.1"
 firebaseDatabase = "21.0.0"
 googleid = "1.1.1"
 lifecycleViewmodelAndroid = "2.9.0"
+mediationTestSuite = "3.0.0"
+impress = "0.0.3"
+engageCore = "1.5.8"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -28,6 +31,9 @@ room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.r
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
+mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
+impress = { group = "com.google.ar", name = "impress", version.ref = "impress" }
+engage-core = { group = "com.google.android.engage", name = "engage-core", version.ref = "engageCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

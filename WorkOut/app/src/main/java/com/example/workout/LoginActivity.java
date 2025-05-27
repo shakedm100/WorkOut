@@ -21,18 +21,9 @@ import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.common.Scopes;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.HashMap;
-import java.util.Map;
 
 import Model.Address;
 import Model.City;
@@ -41,35 +32,10 @@ import Model.Gender;
 import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.ClientRepository;
-import ViewModel.MyViewModel;
 //import Model.Repository.TestClientRepository;
-
-// ViewModel imports
-import androidx.lifecycle.ViewModelProvider;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import ViewModel.MyViewModel;
-//
-
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import ViewModel.LoginViewModel;
 
-import androidx.appcompat.app.AppCompatActivity; // Or androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider;
-
-// Assuming LoginUiState and LoginViewModel are in the ViewModel package
-import ViewModel.LoginUiState; // Update with your actual package
-import ViewModel.LoginViewModel; // Update with your actual package
-// import com.example.workout.R; // For accessing R.id values
-
-import android.util.Log;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
@@ -92,27 +58,26 @@ public class LoginActivity extends AppCompatActivity {
 
         Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(task -> {
+            // navigate to register activity
             Intent newIntent = new Intent(this, RegisterActivity.class);
             startActivity(newIntent);
         });
 
-
-        // Initialize Views
+        // initialize Views
         editTextUsername = findViewById(R.id.usernameTextLogin);
         editTextPassword = findViewById(R.id.passwordTextLogin);
         buttonLogin = findViewById(R.id.loginButton);
         progressBar = findViewById(R.id.progressBar);
         textViewError = findViewById(R.id.errorTextView);
 
-        // Initialize ViewModel
+        // initialize ViewModel
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-        // Observe LiveData from ViewModel
+        // get LiveData from ViewModel
         setupObservers();
 
-        // Set up button click listener
+        // create button click listener
         setupButtonClickListeners();
-
     }
 
     // show the respond
@@ -135,10 +100,10 @@ public class LoginActivity extends AppCompatActivity {
                     buttonLogin.setEnabled(true);
                     textViewError.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Login Successful! Data: " + loginUiState.getData(), Toast.LENGTH_LONG).show();
-                    // TODO: Navigate to the next screen and create it
-                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class); // move to home page
-                     startActivity(intent);
-                     finish(); // Optional: finish LoginActivity so user can't go back
+                    // navigate to home activity when success occurs
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class); // move to home page
+                    startActivity(intent);
+                    finish(); // Optional: finish LoginActivity so user can't go back
                     break;
                 case ERROR:
                     progressBar.setVisibility(View.GONE);

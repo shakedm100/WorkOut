@@ -13,7 +13,7 @@ public class LoginViewModel extends ViewModel {
 
     private final ClientRepository clientRepository; // Inject this if possible
 
-    // Option 1: Using a single LiveData for UI State (Recommended)
+    // Using a single LiveData for UI State
     private final MutableLiveData<LoginUiState> _loginUiState = new MutableLiveData<>(LoginUiState.idle());
     public LiveData<LoginUiState> loginUiState = _loginUiState;
 
@@ -22,7 +22,7 @@ public class LoginViewModel extends ViewModel {
         this.clientRepository = new ClientRepository();
     }
 
-    // Constructor for Dependency Injection (Recommended)
+    // Constructor for Dependency Injection
      public LoginViewModel(ClientRepository clientRepository) {
          this.clientRepository = clientRepository;
      }
@@ -32,14 +32,12 @@ public class LoginViewModel extends ViewModel {
 
         clientRepository.checkLogin(username, password)
                 .addOnSuccessListener(client -> { // Assuming 'client' is the success data, e.g., a user object or token
-                    // Using Option 1
                     // You might want to extract a token or relevant data from 'client'
                     _loginUiState.postValue(LoginUiState.success("UserLoggedIn")); // maybe pass client.getToken()
 
 
                 })
                 .addOnFailureListener(e -> {
-                    // Using Option 1
                     _loginUiState.postValue(LoginUiState.error(e.getMessage()));
 
                 });
