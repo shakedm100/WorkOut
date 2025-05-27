@@ -25,12 +25,12 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
     }
 
     // Conversion source: https://stackoverflow.com/questions/1253499/simple-calculations-for-working-with-lat-lon-and-km-distance
-    private double convertLatitudeToKM(long latitude)
+    private double convertLatitudeToKM(double latitude)
     {
         return latitude * 110.574;
     }
 
-    private double convertLongitudeToKM(long longitude, long latitude)
+    private double convertLongitudeToKM(double longitude, double latitude)
     {
         double rad = Math.toRadians(latitude);
         return 111.320*longitude*Math.cos(rad);

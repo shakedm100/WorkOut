@@ -10,7 +10,7 @@ import java.util.Objects;
 public class Business extends User implements Parcelable
 {
     private String name;
-    private List<Course> courses;
+    private ArrayList<Course> courses;
     private Location location;
     private ArrayList<Client> followers;
     private ArrayList<Rating> ratings;
@@ -21,7 +21,7 @@ public class Business extends User implements Parcelable
     }
 
     public Business(String id, String username, String password, Phone phone, String email, String name,
-                    List<Course> courses, Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
+                    ArrayList<Course> courses, Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
     {
         super(id, username, password, phone, email);
         this.name = name;
@@ -79,7 +79,7 @@ public class Business extends User implements Parcelable
         this.name = name;
     }
 
-    public void setCourses(List<Course> courses)
+    public void setCourses(ArrayList<Course> courses)
     {
         this.courses = courses;
     }

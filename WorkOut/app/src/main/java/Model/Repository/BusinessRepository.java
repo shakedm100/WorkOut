@@ -120,6 +120,9 @@ public class BusinessRepository
                     }
 
                     business.setId(doc.getId());
+                    business.setCourses(new ArrayList<>());
+                    CourseRepository courseRepository = new CourseRepository();
+                    courseRepository.getAllBusinessesCourses(business);
                     return business;
                 });
     }

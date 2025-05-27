@@ -17,6 +17,7 @@ import Model.Business;
 import Model.Category;
 import Model.Course;
 import Model.CourseType;
+import Model.Day;
 import Model.Schedule;
 
 public class CourseRepository
@@ -111,6 +112,28 @@ public class CourseRepository
                             }
                         }
                     }
+                    return courses;
+                });
+    }
+
+    public Task<List<Course>> getCoursesByDayOfWeek(Business business, Day day)
+    {
+        return db.collection(collection).document(business.getId()).collection(subCollection)
+                .whereEqualTo("schedule.day", day).get().continueWith(task ->
+                {
+                    if(!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
+
+                    QuerySnapshot querySnapshot = task.getResult();
+                    List<Course> courses = new ArrayList<>();
+                    for(DocumentSnapshot documentSnapshot : querySnapshot)
+                    {
+                        Course current = documentSnapshot.toObject(Course.class);
+                        if(current != null)
+                            courses.add(current);
+
+                    }
+
                     return courses;
                 });
     }

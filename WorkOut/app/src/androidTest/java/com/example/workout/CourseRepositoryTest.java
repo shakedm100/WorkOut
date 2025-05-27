@@ -57,13 +57,25 @@ public class CourseRepositoryTest
 
         try
         {
-            testBusiness = await(businessRepository.insertBusiness("test", "1234", testClient.getPhone(),
-                    "test@mail", "EasyBusy", new Location(12345, 2145435),
+            testBusiness = await(businessRepository.insertBusiness("testEverything", "1234", testClient.getPhone(),
+                    "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
                     "Policy"), 10, TimeUnit.SECONDS);
         }catch (Exception e)
         {
+            System.out.println("ERROR: Business probably exists");
+        }
+
+        try
+        {
+            if(testBusiness == null)
+                testBusiness = await(businessRepository.getBusinessByUsername("testEverything"), 10, TimeUnit.SECONDS);
+        }
+        catch (Exception e)
+        {
             System.out.println("ERROR: Business insertion failed on setUp");
         }
+
+
     }
 
     @AfterClass
@@ -108,12 +120,20 @@ public class CourseRepositoryTest
         assertEquals(testSubject.getCategory(), checkCourse.getCategory());
         assertEquals(testSubject.getDescription(), checkCourse.getDescription());
 
+        // Test day of week
+        ArrayList<Course> daysOfWeek = (ArrayList<Course>) await(courseRepository.getCoursesByDayOfWeek(testBusiness,
+                Day.Sunday), 10, TimeUnit.SECONDS);
 
+        assertNotNull(daysOfWeek);
+        assertFalse(daysOfWeek.isEmpty());
+
+        // Test update
         Course updateCourse = testSubject;
         updateCourse.setCapacity(45);
         boolean check = await(courseRepository.updateCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
         assertTrue(check);
 
+        // Test delete
         boolean checkDelete = await(courseRepository.deleteCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
         assertTrue(checkDelete);
     }

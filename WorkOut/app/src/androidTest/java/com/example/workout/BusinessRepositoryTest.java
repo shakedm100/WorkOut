@@ -63,8 +63,8 @@ public class BusinessRepositoryTest
         try
         {
             // Just to add more robustness to testing, even if something failed it
-            // still attempts to delete the previous test subject
-            Business testBusiness = await(repository.getBusinessByUsername("test"), 10, TimeUnit.SECONDS);
+            // still attempts to delete the previous testEverything subject
+            Business testBusiness = await(repository.getBusinessByUsername("testEverything"), 10, TimeUnit.SECONDS);
             await(repository.deleteBusiness(testBusiness), 10, TimeUnit.SECONDS);
         }
         catch (Exception e) { /*User doesn't exist in db, good!*/ }
@@ -73,7 +73,7 @@ public class BusinessRepositoryTest
     @AfterClass
     public static void setDown() throws ExecutionException, InterruptedException, TimeoutException
     {
-        // All database calls need to await because if we don't it just exits the test
+        // All database calls need to await because if we don't it just exits the testEverything
         // without finishing executing the function
         await(repository.deleteBusiness(testSubject), 30, TimeUnit.SECONDS);
     }
@@ -95,27 +95,27 @@ public class BusinessRepositoryTest
         courses.add(course);
 
         // Test insert
-        testSubject = await(repository.insertBusiness("test", "1234", testHelper.getPhone(),
-                "test@mail", "EasyBusy", new Location(12345, 2145435),
+        testSubject = await(repository.insertBusiness("testEverything", "1234", testHelper.getPhone(),
+                "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
                 "Policy"), 10, TimeUnit.SECONDS);
 
         assertNotNull(testSubject);
-        assertEquals("test", testSubject.getUsername());
+        assertEquals("testEverything", testSubject.getUsername());
         assertEquals("1234", testSubject.getPassword());
         assertEquals(testHelper.getPhone(), testSubject.getPhone());
-        assertEquals("test@mail", testSubject.getEmail());
+        assertEquals("testEverything@mail", testSubject.getEmail());
         assertEquals(new Location(12345, 2145435), testSubject.getLocation());
         assertEquals("EasyBusy", testSubject.getName());
         assertEquals("Policy", testSubject.getPolicy());
 
         // Insert fail by username
-        assertThrows(Exception.class, () -> await(repository.insertBusiness("test", "1234", testHelper.getPhone(),
+        assertThrows(Exception.class, () -> await(repository.insertBusiness("testEverything", "1234", testHelper.getPhone(),
                 "bla@mail", "EasyBusy", new Location(12345, 2145435),
                 "Policy"), 10, TimeUnit.SECONDS));
 
         // Insert fail by email
         assertThrows(Exception.class, () -> await(repository.insertBusiness("bla", "1234", testHelper.getPhone(),
-                "test@mail", "EasyBusy", new Location(12345, 2145435),
+                "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
                 "Policy"), 10, TimeUnit.SECONDS));
 
         // Test get by username
