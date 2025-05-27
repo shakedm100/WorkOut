@@ -21,7 +21,6 @@ import Model.Schedule;
 
 public class CourseRepository
 {
-
     FirebaseFirestore db;
     private final String collection = "businesses";
     private final String subCollection = "courses";
@@ -52,11 +51,21 @@ public class CourseRepository
 
                     DocumentReference reference = task.getResult();
                     String id = reference.getId();
-                    return new Course(id, type, name, null, capacity, ageRange, schedule, category, description);
+                    Course add = new Course(id, type, name, new ArrayList<>(), capacity, ageRange, schedule, category, description);
+                    business.addCourse(add);
+                    return add;
                 });
     }
 
     public Task<Boolean> updateCourse(Course course, Business business)
+    {
+        return updateHelper(course, business).addOnSuccessListener(task ->
+        {
+            business.updateCourse(course);
+        });
+    }
+
+    private Task<Boolean> updateHelper(Course course, Business business)
     {
         DocumentReference current = db.collection(collection).document(business.getId())
                 .collection(subCollection).document(course.getId());
@@ -65,12 +74,21 @@ public class CourseRepository
 
     public Task<Boolean> deleteCourse(Course course, Business business)
     {
+        return deleteHelper(course, business).addOnSuccessListener(task ->
+        {
+           business.deleteCourse(course);
+        });
+    }
+
+    private Task<Boolean> deleteHelper(Course course, Business business)
+    {
         DocumentReference current = db.collection(collection).document(business.getId())
                 .collection(subCollection).document(course.getId());
         return current.delete().continueWith(Task::isSuccessful);
     }
 
-    public Task<List<Course>> getAllBusinessesCourses(Business business)
+
+    public Task<Business> getAllBusinessesCourses(Business business)
     {
         return db.collection(collection).document(business.getId()).collection(subCollection).get()
                 .continueWith(task ->
@@ -79,7 +97,6 @@ public class CourseRepository
                         throw Objects.requireNonNull(task.getException());
 
                     QuerySnapshot snap = task.getResult();
-                    List<Course> courses = new ArrayList<>();
                     if (snap != null)
                     {
                         for (DocumentSnapshot doc : snap.getDocuments())
@@ -88,11 +105,11 @@ public class CourseRepository
                             if (course != null)
                             {
                                 course.setId(doc.getId());
-                                courses.add(course);
+                                business.addCourse(course);
                             }
                         }
                     }
-                    return courses;
+                    return business;
                 });
     }
 }
