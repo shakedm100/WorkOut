@@ -3,17 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="357dp"
+        android:layout_height="92dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:src="@color/material_dynamic_primary90"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.875"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="27dp" />
 
     <TextView
         android:id="@+id/userNameTextView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="110dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="200dp"
+        android:labelFor="@id/usernameTextLogin"
         android:text="Username:"
         android:textSize="20sp"
-        android:labelFor="@id/usernameTextLogin"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,7 +35,7 @@
         android:id="@+id/usernameTextLogin"
         android:layout_width="200dp"
         android:layout_height="48dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="40dp"
         android:autofillHints="username"
         android:ems="10"
@@ -45,11 +59,12 @@
         android:id="@+id/passwordTextView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="40dp"
         android:labelFor="@id/passwordTextLogin"
         android:text="Password:"
         android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userNameTextView2" />
 
@@ -57,9 +72,11 @@
         android:id="@+id/loginView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="40dp"
         android:text="Login"
-        android:textSize="30sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="40sp"
+        android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -68,19 +85,20 @@
         android:id="@+id/googleOptionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
         android:text="Or sign in with google:"
         android:textSize="20sp"
+        android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordTextView2" />
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
 
     <ImageButton
         android:id="@+id/googleRegisterButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:autofillHints="google register"
         android:background="@drawable/google_logo"
         android:contentDescription="google sign in"
@@ -91,24 +109,40 @@
         android:id="@+id/noHaveAnAccountLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:text="Don't have an account?"
-        android:textSize="18sp"
+        android:textSize="20sp"
+        android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/googleRegisterButton" />
 
     <Button
         android:id="@+id/registerButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-15dp"
-        android:layout_marginTop="-14dp"
+        android:layout_width="218dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="#00A3A3A3"
         android:text="Click here to register"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="#000000"
         android:textColorLink="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/noHaveAnAccountLabel"
-        app:layout_constraintTop_toTopOf="@+id/noHaveAnAccountLabel" />
+        android:textSize="16sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noHaveAnAccountLabel" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:backgroundTint="@color/material_dynamic_primary90"
+        android:text="Login"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordTextView2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

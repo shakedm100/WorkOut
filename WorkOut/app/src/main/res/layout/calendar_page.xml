@@ -5,11 +5,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- רקע עליון -->
+
+    <!-- כותרת -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="332dp"
+        android:layout_height="114dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:src="@color/material_dynamic_primary90"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calendar"
+        android:textSize="40sp"
+        android:textColor="@color/black"
+        android:textStyle="bold|italic"
+        android:fontFamily="serif"
+        app:layout_constraintTop_toTopOf="@+id/backgroundImage"
+        app:layout_constraintBottom_toBottomOf="@+id/backgroundImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <CalendarView
         android:id="@+id/calendarView"
         android:layout_width="411dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="212dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -17,7 +47,8 @@
         android:id="@+id/activityExampleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="44dp"
         android:text="Tennis \n 13:00-15:00"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"

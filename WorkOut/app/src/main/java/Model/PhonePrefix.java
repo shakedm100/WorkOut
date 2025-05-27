@@ -15,6 +15,30 @@ public enum PhonePrefix {
         this.code = code;
     }
 
+    public static PhonePrefix fromString(String phoneNumber)
+    {
+        if(phoneNumber == null)
+            return null;
+
+        switch (phoneNumber)
+        {
+            case "050":
+                return PREFIX_050;
+            case "052":
+                return PREFIX_052;
+            case "053":
+                return PREFIX_053;
+            case "054":
+                return PREFIX_054;
+            case "055":
+                return PREFIX_055;
+            case "058":
+                return PREFIX_058;
+            default:
+                return null;
+        }
+    }
+
     /**
      * @return the numeric prefix, e.g. "050"
      */

@@ -1,0 +1,98 @@
+package Model.Repository;
+
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import Model.AgeRange;
+import Model.Business;
+import Model.Category;
+import Model.Course;
+import Model.CourseType;
+import Model.Schedule;
+
+public class CourseRepository
+{
+
+    FirebaseFirestore db;
+    private final String collection = "businesses";
+    private final String subCollection = "courses";
+
+    public CourseRepository()
+    {
+        db = FirebaseFirestore.getInstance();
+    }
+
+    public Task<Course> insertCourse(Business business, String name, Schedule schedule, int capacity,
+                                     CourseType type, AgeRange ageRange, Category category, String description)
+    {
+        Map<String, Object> course = new HashMap<>();
+        course.put("name", name);
+        course.put("schedule", schedule);
+        course.put("participants", null);
+        course.put("capacity", capacity);
+        course.put("type", type);
+        course.put("ageRange", ageRange);
+        course.put("category", category);
+        course.put("description", description);
+
+        return db.collection(collection).document(business.getId()).collection(subCollection)
+                .add(course).continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
+
+                    DocumentReference reference = task.getResult();
+                    String id = reference.getId();
+                    return new Course(id, type, name, null, capacity, ageRange, schedule, category, description);
+                });
+    }
+
+    public Task<Boolean> updateCourse(Course course, Business business)
+    {
+        DocumentReference current = db.collection(collection).document(business.getId())
+                .collection(subCollection).document(course.getId());
+        return current.set(course).continueWith(Task::isSuccessful);
+    }
+
+    public Task<Boolean> deleteCourse(Course course, Business business)
+    {
+        DocumentReference current = db.collection(collection).document(business.getId())
+                .collection(subCollection).document(course.getId());
+        return current.delete().continueWith(Task::isSuccessful);
+    }
+
+    public Task<List<Course>> getAllBusinessesCourses(Business business)
+    {
+        return db.collection(collection).document(business.getId()).collection(subCollection).get()
+                .continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
+
+                    QuerySnapshot snap = task.getResult();
+                    List<Course> courses = new ArrayList<>();
+                    if (snap != null)
+                    {
+                        for (DocumentSnapshot doc : snap.getDocuments())
+                        {
+                            Course course = doc.toObject(Course.class);
+                            if (course != null)
+                            {
+                                course.setId(doc.getId());
+                                courses.add(course);
+                            }
+                        }
+                    }
+                    return courses;
+                });
+    }
+}

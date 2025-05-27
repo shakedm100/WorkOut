@@ -3,4 +3,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#EEF0FF</color>
+    <color name="azure">#00AEEF</color>
 </resources>
