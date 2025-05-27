@@ -5,41 +5,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- כותרת -->
-    <ImageView
-        android:id="@+id/backgroundImage"
-        android:layout_width="332dp"
-        android:layout_height="114dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:src="@color/material_dynamic_primary90"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Map"
-        android:textSize="40sp"
-        android:textColor="@color/black"
-        android:textStyle="bold|italic"
-        android:fontFamily="serif"
-        app:layout_constraintTop_toTopOf="@+id/backgroundImage"
-        app:layout_constraintBottom_toBottomOf="@+id/backgroundImage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
-        android:layout_width="411dp"
-        android:layout_height="600dp"
-        android:layout_marginTop="168dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:contentDescription="@string/map"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/mapViewSearchTextBox"
+        android:layout_width="0dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#FCFCFC"
+        android:ems="10"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
+        android:hint="Search"
+        android:background="@color/white"
+        android:foregroundTint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/mapView"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/citiesRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/mapViewSearchTextBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
