@@ -6,22 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import android.content.Context;
-
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.Timestamp;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -105,7 +98,7 @@ public class BusinessRepositoryTest
         assertEquals(testHelper.getPhone(), testSubject.getPhone());
         assertEquals("testEverything@mail", testSubject.getEmail());
         assertEquals(new Location(12345, 2145435), testSubject.getLocation());
-        assertEquals("EasyBusy", testSubject.getName());
+        assertEquals("EasyBusy", testSubject.getBusinessName());
         assertEquals("Policy", testSubject.getPolicy());
 
         // Insert fail by username

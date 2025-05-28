@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class Business extends User implements Parcelable
 {
-    private String name;
+    private String businessName;
     private ArrayList<Course> courses;
     private Location location;
     private ArrayList<Client> followers;
@@ -20,11 +20,11 @@ public class Business extends User implements Parcelable
     {
     }
 
-    public Business(String id, String username, String password, Phone phone, String email, String name,
+    public Business(String id, String username, String password, Phone phone, String email, String businessName,
                     ArrayList<Course> courses, Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
     {
         super(id, username, password, phone, email);
-        this.name = name;
+        this.businessName = businessName;
         this.courses = courses;
         this.location = location;
         this.followers = followers;
@@ -32,11 +32,11 @@ public class Business extends User implements Parcelable
         this.policy = policy;
     }
 
-    public Business(String id, String username, String password, Phone phone, String email, String name,
+    public Business(String id, String username, String password, Phone phone, String email, String businessName,
                     Location location, String policy)
     {
         super(id, username, password, phone, email);
-        this.name = name;
+        this.businessName = businessName;
         this.courses = new ArrayList<>();
         this.location = location;
         this.followers = new ArrayList<>();
@@ -44,9 +44,9 @@ public class Business extends User implements Parcelable
         this.policy = policy;
     }
 
-    public String getName()
+    public String getBusinessName()
     {
-        return name;
+        return businessName;
     }
 
     public List<Course> getCourses()
@@ -74,9 +74,9 @@ public class Business extends User implements Parcelable
         return policy;
     }
 
-    public void setName(String name)
+    public void setBusinessName(String businessName)
     {
-        this.name = name;
+        this.businessName = businessName;
     }
 
     public void setCourses(ArrayList<Course> courses)
@@ -107,7 +107,7 @@ public class Business extends User implements Parcelable
     protected Business(Parcel in)
     {
         super(in);
-        name = in.readString();
+        businessName = in.readString();
         courses = in.createTypedArrayList(Course.CREATOR);
         followers = in.createTypedArrayList(Client.CREATOR);
         ratings = in.createTypedArrayList(Rating.CREATOR);
@@ -119,7 +119,7 @@ public class Business extends User implements Parcelable
     public void writeToParcel(Parcel dest, int flags)
     {
         super.writeToParcel(dest, flags);
-        dest.writeString(name);
+        dest.writeString(businessName);
         dest.writeTypedList(courses);
         dest.writeTypedList(followers);
         dest.writeTypedList(ratings);
@@ -150,6 +150,8 @@ public class Business extends User implements Parcelable
 
     public boolean addCourse(Course course)
     {
+        if(courses == null)
+            courses = new ArrayList<>();
         if (course != null)
         {
             courses.add(course);
@@ -183,12 +185,12 @@ public class Business extends User implements Parcelable
     {
         if (o == null || getClass() != o.getClass()) return false;
         Business business = (Business) o;
-        return Objects.equals(name, business.name) && Objects.equals(courses, business.courses) && Objects.equals(location, business.location) && Objects.equals(followers, business.followers) && Objects.equals(ratings, business.ratings) && Objects.equals(policy, business.policy);
+        return Objects.equals(businessName, business.businessName) && Objects.equals(courses, business.courses) && Objects.equals(location, business.location) && Objects.equals(followers, business.followers) && Objects.equals(ratings, business.ratings) && Objects.equals(policy, business.policy);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(name, courses, location, followers, ratings, policy);
+        return Objects.hash(businessName, courses, location, followers, ratings, policy);
     }
 }
