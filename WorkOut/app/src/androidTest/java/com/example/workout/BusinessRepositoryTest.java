@@ -2,6 +2,7 @@ package com.example.workout;
 
 import static com.google.android.gms.tasks.Tasks.await;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +37,11 @@ import Model.PhonePrefix;
 import Model.Rating;
 import Model.Repository.BusinessRepository;
 import Model.Schedule;
+import Model.SearchStrategies.SearchAgeStrategy;
+import Model.SearchStrategies.SearchCategoryStrategy;
+import Model.SearchStrategies.SearchCourseTypeStrategy;
+import Model.SearchStrategies.SearchRadiusStrategy;
+import Model.SearchStrategies.SearchStrategyInterface;
 
 @RunWith(AndroidJUnit4.class)
 public class BusinessRepositoryTest
@@ -120,5 +126,43 @@ public class BusinessRepositoryTest
         Boolean checkUpdate = await(repository.updateBusiness(testSubject), 10, TimeUnit.SECONDS);
         assertNotNull(checkUpdate);
         assertTrue(checkUpdate);
+    }
+
+    @Test
+    public void genericSearchTest() throws ExecutionException, InterruptedException, TimeoutException
+    {
+        SearchStrategyInterface searchStrategy;
+
+        searchStrategy = new SearchAgeStrategy();
+
+        AgeRange ageRange = new AgeRange(10,70);
+        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.search(ageRange)
+                , 10, TimeUnit.SECONDS);
+        assertNotNull(businesses);
+        assertFalse(businesses.isEmpty());
+
+        searchStrategy = new SearchCategoryStrategy();
+
+        businesses = (ArrayList<Business>) await(searchStrategy.search(Category.Baseball)
+                , 10, TimeUnit.SECONDS);
+
+        assertNotNull(businesses);
+        assertFalse(businesses.isEmpty());
+
+        searchStrategy = new SearchCourseTypeStrategy();
+
+        businesses = (ArrayList<Business>) await(searchStrategy.search(CourseType.Group)
+                , 10, TimeUnit.SECONDS);
+
+        assertNotNull(businesses);
+        assertFalse(businesses.isEmpty());
+
+        searchStrategy = new SearchRadiusStrategy(10);
+
+        businesses = (ArrayList<Business>) await(searchStrategy
+                .search(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+
+        assertNotNull(businesses);
+        assertFalse(businesses.isEmpty());
     }
 }
