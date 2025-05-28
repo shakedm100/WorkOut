@@ -21,7 +21,9 @@ import android.Manifest;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -119,7 +121,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         });
-
 
 
     }

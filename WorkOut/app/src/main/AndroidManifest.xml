@@ -43,7 +43,7 @@
         </activity>
         <activity android:name=".MapActivity" />
         <activity android:name=".ProfileActivity"/>
-        <activity android:name=".RatingActivity"/>
+        <activity android:name=".RatingsActivity"/>
         <activity android:name=".MessagesActivity"/>
         <activity android:name=".SearchActivity"/>
         <activity android:name=".RegisterActivity"/>

@@ -1,5 +1,7 @@
 package Model;
 
+import androidx.annotation.Nullable;
+
 public enum Category
 {
     Bicycle,
@@ -26,5 +28,23 @@ public enum Category
     Karate,
     Archery,
     Rugby,
-    Swimming
+    Swimming;
+
+
+    /**
+     * Try to map a free‐form string into one of the enum constants.
+     */
+    public static @Nullable Category fromString(String s)
+    {
+        if (s == null) return null;
+        String key = s.trim().replace(" ", "_");
+        try
+        {
+            return valueOf(key);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return null;
+        }
+    }
 }
