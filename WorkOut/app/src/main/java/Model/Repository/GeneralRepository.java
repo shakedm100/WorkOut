@@ -3,14 +3,11 @@ package Model.Repository;
 import android.location.Geocoder;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.w3c.dom.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -150,7 +147,7 @@ public class GeneralRepository
                 if(split.length > 0)
                 {
                     name = split[0];
-                    City city = new City("id", addresses.get(0).getLocality());
+                    City city = new City(addresses.get(0).getLocality());
                     return new Address(city, name);
                 }
             }

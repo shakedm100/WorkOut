@@ -5,21 +5,17 @@ import android.os.Parcelable;
 
 import com.google.firebase.Timestamp;
 
-import java.time.LocalTime;
 import java.util.Objects;
 
-public class Schedule extends Entity implements Parcelable
+public class Schedule implements Parcelable
 {
     private Day day;
     private Timestamp occurrence;
 
-    public Schedule()
-    {
-    }
+    public Schedule() {}
 
-    public Schedule(String id, Day day, Timestamp occurrence)
+    public Schedule(Day day, Timestamp occurrence)
     {
-        super(id);
         this.day = day;
         this.occurrence = occurrence;
     }
@@ -46,7 +42,6 @@ public class Schedule extends Entity implements Parcelable
 
     protected Schedule(Parcel in)
     {
-        super(in);
         day = Day.valueOf(in.readString());
         occurrence = in.readParcelable(Timestamp.class.getClassLoader());
     }
@@ -54,7 +49,6 @@ public class Schedule extends Entity implements Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags)
     {
-        super.writeToParcel(dest, flags);
         dest.writeString(day.name());
         // write as ISO-8601 (e.g. "14:30:00")
         dest.writeString(occurrence.toString());

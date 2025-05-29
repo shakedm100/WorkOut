@@ -98,7 +98,7 @@
         app:layout_constraintTop_toBottomOf="@id/typeSpinner" />
 
     <LinearLayout
-        android:id="@+id/slider_container"
+        android:id="@+id/search_slider_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -106,11 +106,7 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/searchButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typeSpinner">
-
-        <!-- the RangeSlider will be injected here -->
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/typeSpinner"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

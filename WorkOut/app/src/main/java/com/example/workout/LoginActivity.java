@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,37 +18,16 @@ import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 
-import com.google.android.gms.common.Scopes;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.checkerframework.checker.units.qual.C;
-
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 
 import Model.Address;
-import Model.AgeRange;
-import Model.Business;
-import Model.Category;
 import Model.City;
 import Model.Client;
-import Model.Course;
-import Model.CourseType;
-import Model.Day;
 import Model.Gender;
-import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
-import Model.Rating;
 import Model.Repository.ClientRepository;
-import Model.Schedule;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
@@ -84,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
     {
         ClientRepository clientRepository = new ClientRepository();
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
+        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
         clientRepository.insertClient("shakedm100", "1234", phone, "shaked1mi@gmail.com", "Shaked",
                 "Michael", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername()));

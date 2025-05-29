@@ -44,7 +44,7 @@ public class GeneralRepositoryTest
     @Test
     public void convertAddressToLocationTest()
     {
-        City city = new City("bla", "ראש העין");
+        City city = new City("ראש העין");
         Address address = new Address(city, "חיים הרצוג 24");
         Geocoder geocoder = new Geocoder(context, new Locale("he", "IL"));
         Location location = generalRepository.convertAddressToLocation(geocoder, address);

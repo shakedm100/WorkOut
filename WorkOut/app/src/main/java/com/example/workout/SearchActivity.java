@@ -1,7 +1,6 @@
 package com.example.workout;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -126,7 +125,7 @@ public class SearchActivity extends AppCompatActivity
          * /////////////////////////
          */
 
-        ViewGroup container = findViewById(R.id.slider_container);
+        ViewGroup container = findViewById(R.id.search_slider_container);
 
         // Create the RangeSlider
         ageSlider = new RangeSlider(this);

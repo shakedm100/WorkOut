@@ -5,31 +5,32 @@
     android:padding="24dp">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/addAndUpdateLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"> <!-- מרווח כללי מלמעלה -->
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/autoClassName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Class Name" />
 
-        <AutoCompleteTextView
-            android:id="@+id/autoClassType"
+        <Spinner
+            android:id="@+id/autoCourseType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Class Type"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:hint="Class Type" />
 
-        <AutoCompleteTextView
+        <Spinner
             android:id="@+id/autoCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Category"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:hint="Category" />
 
         <Spinner
             android:id="@+id/spinnerTime"
@@ -37,11 +38,29 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />
 
-        <Spinner
-            android:id="@+id/spinnerAgeRange"
+        <LinearLayout
+            android:id="@+id/update_course_slider_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical" />
+
+        <EditText
+            android:id="@+id/capacityEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Total Capacity"
+            android:inputType="numberSigned" />
+
+        <EditText
+            android:id="@+id/descriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:ems="10"
+            android:hint="Course Description"
+            android:inputType="text" />
 
         <Button
             android:id="@+id/buttonSave"

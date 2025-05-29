@@ -51,7 +51,7 @@ public class CourseRepositoryTest
         businessRepository = new BusinessRepository();
 
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("2", "Rosh Ha'Ayin"), "Haim Hertzog");
+        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
         testClient = new Client("esdrg","shakedm100", "1234", phone,
                 "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
 
@@ -87,7 +87,7 @@ public class CourseRepositoryTest
     @Test
     public void queryCourseTest() throws ExecutionException, InterruptedException, TimeoutException
     {
-        Schedule schedule = new Schedule("bla", Day.Sunday, Timestamp.now());
+        Schedule schedule = new Schedule(Day.Sunday, Timestamp.now());
         AgeRange ageRange = new AgeRange(23,50);
 
         // Test insert
