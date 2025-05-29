@@ -58,6 +58,7 @@ public class SearchActivity extends AppCompatActivity
     CourseType chosenCourseType;
     EditText editTextCategory;
     EditText editTextLocation;
+    final int LOCATION_PERMISSION_REQUEST = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -260,7 +261,8 @@ public class SearchActivity extends AppCompatActivity
                     != PackageManager.PERMISSION_GRANTED)
             {
                 // Request location permission if needed
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        LOCATION_PERMISSION_REQUEST);
             }
             try
             {

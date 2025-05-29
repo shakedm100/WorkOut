@@ -180,6 +180,58 @@ public class Business extends User implements Parcelable
         return false;
     }
 
+    public boolean addRating(Rating rating)
+    {
+        if(ratings == null)
+            ratings = new ArrayList<>();
+        return ratings.add(rating);
+    }
+
+    public boolean deleteRating(Rating rating)
+    {
+        return ratings.remove(rating);
+    }
+
+    public boolean updateRating(Rating rating)
+    {
+        for (int i = 0; i < ratings.size(); i++)
+        {
+            if(ratings.get(i).getClient().equals(rating.getClient()))
+            {
+                ratings.set(i, rating);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean addFollower(Client follower)
+    {
+        if(followers == null)
+            followers = new ArrayList<>();
+        return followers.add(follower);
+    }
+
+    public boolean deleteFollower(Client follower)
+    {
+        return followers.remove(follower);
+    }
+
+    public boolean updateFollower(Client follower)
+    {
+        for (int i = 0; i < followers.size(); i++)
+        {
+            if(followers.get(i).getUsername().equals(follower.getUsername()))
+            {
+                followers.set(i, follower);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public boolean equals(Object o)
     {

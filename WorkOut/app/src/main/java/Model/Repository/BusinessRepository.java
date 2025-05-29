@@ -68,7 +68,9 @@ public class BusinessRepository
         }).continueWith(task ->
         {
             if (!task.isSuccessful())
+            {
                 throw Objects.requireNonNull(task.getException());
+            }
 
             DocumentReference ref = task.getResult();
             String id = ref.getId();
@@ -101,7 +103,9 @@ public class BusinessRepository
                 .limit(1).get().continueWith(task ->
                 {
                     if (!task.isSuccessful())
+                    {
                         throw Objects.requireNonNull(task.getException());
+                    }
 
                     QuerySnapshot snapshot = task.getResult();
                     if (snapshot == null || snapshot.isEmpty())
@@ -133,14 +137,20 @@ public class BusinessRepository
         return getBusinessByUsername(username).continueWith(task ->
         {
             if (!task.isSuccessful())
+            {
                 throw Objects.requireNonNull(task.getException());
+            }
 
             Business business = task.getResult();
             if (business == null)
+            {
                 throw new NoSuchElementException("No such user: " + username);
+            }
 
             if (business.getPassword().equals(password))
+            {
                 return business;
+            }
             throw new IllegalArgumentException("Invalid password");
         });
     }
@@ -156,4 +166,38 @@ public class BusinessRepository
     {
         return searchStrategy.search(data);
     }
+
+    public Task<Business> addRatingToBusiness(Rating rating, Business business)
+    {
+        if(!business.addRating(rating))
+            throw new RuntimeException("Insert to business failed!");
+
+        return updateBusiness(business).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+            {
+                business.deleteRating(rating);
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            return business;
+        });
+    }
+
+/*    public Task<Business> addFollowerToBusiness(Client follower, Business business)
+    {
+        if(!business.addRating(follower))
+            throw new RuntimeException("Insert to business failed!");
+
+        return updateBusiness(business).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+            {
+                business.deleteRating(follower);
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            return business;
+        });
+    }*/
 }
