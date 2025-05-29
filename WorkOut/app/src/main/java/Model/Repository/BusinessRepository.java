@@ -20,6 +20,7 @@ import Model.Course;
 import Model.Location;
 import Model.Phone;
 import Model.Rating;
+import Model.SearchStrategies.SearchStrategyInterface;
 
 public class BusinessRepository
 {
@@ -41,10 +42,9 @@ public class BusinessRepository
         business.put("phone", phone);
         business.put("email", email);
         business.put("businessName", businessName);
-        business.put("courses", null);
         business.put("location", location);
-        business.put("ratings", null); // No ratings for new business
-        business.put("followers", null); // No followers for new business
+        business.put("ratings", new ArrayList<>()); // No ratings for new business
+        business.put("followers", new ArrayList<>()); // No followers for new business
         business.put("policy", policy);
 
         GeneralRepository generalRepository = new GeneralRepository();
@@ -87,7 +87,7 @@ public class BusinessRepository
         return currentBusiness.set(business).continueWith(Task::isSuccessful);
     }
 
-    public Task<Boolean> deleteBusinessByID(Business business)
+    public Task<Boolean> deleteBusiness(Business business)
     {
         DocumentReference currentClient = db.collection(collection).document(business.getId());
 
@@ -121,6 +121,9 @@ public class BusinessRepository
                     }
 
                     business.setId(doc.getId());
+                    business.setCourses(new ArrayList<>());
+                    CourseRepository courseRepository = new CourseRepository();
+                    courseRepository.getAllBusinessesCourses(business);
                     return business;
                 });
     }
@@ -140,5 +143,17 @@ public class BusinessRepository
                 return business;
             throw new IllegalArgumentException("Invalid password");
         });
+    }
+
+    /**
+     * This function is responsible for all the search logic. It receives a generic
+     * SearchInterface that decides how to search and an object that acts as a search filter.
+     * @param searchStrategy dictates how to search
+     * @param data the relative search data
+     * @return a list of businesses that agree with the search terms
+     */
+    public Task<List<Business>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
+    {
+        return searchStrategy.search(data);
     }
 }

@@ -1,5 +1,7 @@
 package Model.SearchStrategies;
 
+import static com.google.android.gms.tasks.Tasks.await;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
@@ -13,14 +15,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import Model.AgeRange;
 import Model.Business;
+import Model.Course;
+import Model.Repository.CourseRepository;
 
 public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
 {
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
+    private CourseRepository courseRepository;
+
+    public SearchAgeStrategy()
+    {
+        db = FirebaseFirestore.getInstance();
+        courseRepository = new CourseRepository();
+    }
 
     /**
      * This method find all the businesses that have courses with a compatible age range,
@@ -31,45 +43,69 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
     @Override
     public Task<List<Business>> search(AgeRange ageRange)
     {
-        return db.collection("businesses").document().collection("courses")
-                .whereGreaterThanOrEqualTo("minAge", ageRange.getMaxAge()) // minAge >=
-                .whereLessThanOrEqualTo("maxAge", ageRange.getMinAge())// maxAge <=
-                .get().onSuccessTask(task ->
-                {
-                    Set<DocumentReference> referenceSet = new HashSet<>();
-                    for(DocumentSnapshot documentSnapshot : task)
-                    {
-                        // If we want to change it to return Courses, all that needs to be done
-                        // is to delete currentBusiness and add to the referenceSet currentCourse instead
-                        DocumentReference currentCourse = documentSnapshot.getReference();
-                        DocumentReference currentBusiness = currentCourse.getParent().getParent();
-                        if(currentBusiness != null)
-                            referenceSet.add(currentBusiness);
-                    }
+        return db.collectionGroup("courses")
+                .whereLessThanOrEqualTo("ageRange.minAge", ageRange.getMaxAge())
+                .whereGreaterThanOrEqualTo("ageRange.maxAge", ageRange.getMinAge())
+                .get()
 
-                    if(referenceSet.isEmpty())
+                // Flat-map the matching course docs into their parent‐business refs
+                .onSuccessTask(courseSnap -> {
+                    Set<DocumentReference> bizRefs = new HashSet<>();
+                    for (DocumentSnapshot cs : courseSnap) {
+                        DocumentReference bizRef = cs.getReference()
+                                .getParent()    // “courses”
+                                .getParent();   // the business doc
+                        if (bizRef != null) bizRefs.add(bizRef);
+                    }
+                    if (bizRefs.isEmpty()) {
+                        // no businesses then immediate empty List<Business>
                         return Tasks.forResult(Collections.emptyList());
-
-                    List<Task<DocumentSnapshot>> fetchTasks = referenceSet.stream()
-                            .map(DocumentReference::get).collect(Collectors.toList());
-
-                    @SuppressWarnings("Not redundant") // if we don't specify Task<List<DocumentSnapshot>> the next task
-                            // won't know the documentSnapshots can get the results
-                    Task<List<DocumentSnapshot>> allSnapshots = Tasks.whenAllSuccess(fetchTasks);
-                    return allSnapshots;
-                })
-                .continueWith(task -> {
-                    if(!task.isSuccessful())
-                        throw Objects.requireNonNull(task.getException());
-
-                    List<DocumentSnapshot> documentSnapshots = task.getResult();
-                    List<Business> businessList = new ArrayList<>();
-                    for(DocumentSnapshot documentSnapshot : documentSnapshots)
-                    {
-                        businessList.add(documentSnapshot.toObject(Business.class));
                     }
+                    // fetch each business document
+                    List<Task<DocumentSnapshot>> bizFetches = bizRefs.stream()
+                            .map(DocumentReference::get)
+                            .collect(Collectors.toList());
+                    // whenAllSuccess here returns Task<List<DocumentSnapshot>>
+                    return Tasks.<DocumentSnapshot>whenAllSuccess(bizFetches);
+                })
 
-                    return businessList;
+                // Convert DocumentSnapshots → Business instances
+                .onSuccessTask(bizSnapsRaw -> {
+                    @SuppressWarnings("unchecked")
+                    List<DocumentSnapshot> bizSnaps = (List<DocumentSnapshot>) bizSnapsRaw;
+
+                    // map each snapshot to a Business (but courses still missing)
+                    List<Business> businesses = bizSnaps.stream()
+                            .map(ds -> {
+                                Business b = ds.toObject(Business.class);
+                                b.setId(ds.getId());
+                                return b;
+                            })
+                            .collect(Collectors.toList());
+
+                    // For each Business, fetch its courses and attach them
+                    List<Task<Business>> withCourses = businesses.stream()
+                            .map(b -> courseRepository
+                                    .getAllBusinessesCourses(b)                  // Task<List<Course>>
+                                    .continueWith(cTask -> {
+                                        if (!cTask.isSuccessful()) throw cTask.getException();
+                                        b.setCourses((ArrayList<Course>) cTask.getResult());         // populate
+                                        return b;                                // now a Task<Business>
+                                    })
+                            )
+                            .collect(Collectors.toList());
+
+                    // whenAllSuccess on the List<Task<Business>> gives Task<List<Business>>
+                    return Tasks.<Business>whenAllSuccess(withCourses);
+                })
+
+                // Just in case, turn the final raw List<Object> into List<Business>
+                .continueWith(finalTask -> {
+                    if (!finalTask.isSuccessful()) throw finalTask.getException();
+                    @SuppressWarnings("unchecked")
+                    List<Business> result = (List<Business>) finalTask.getResult();
+                    return result;
                 });
     }
 }
+

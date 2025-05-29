@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class Phone implements Parcelable {
     private PhonePrefix prefix;
     private String number;
@@ -58,7 +60,8 @@ public class Phone implements Parcelable {
         parcel.writeString(prefix.getCode());
     }
 
-    public static final Creator<Phone> CREATOR = new Creator<Phone>() {
+    public static final Creator<Phone> CREATOR = new Creator<Phone>()
+    {
         @Override
         public Phone createFromParcel(Parcel in) {
             return new Phone(in);
@@ -69,4 +72,18 @@ public class Phone implements Parcelable {
             return new Phone[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Phone phone = (Phone) o;
+        return prefix == phone.prefix && Objects.equals(number, phone.number);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(prefix, number);
+    }
 }

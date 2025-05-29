@@ -4,10 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Course extends Entity implements Parcelable
 {
-    private CourseType courseType;
+    private CourseType type;
     private String name;
     private ArrayList<Client> participants;
     private int capacity;
@@ -18,11 +19,11 @@ public class Course extends Entity implements Parcelable
 
     public Course() {}
 
-    public Course(String id, CourseType courseType, String name, ArrayList<Client> participants, int capacity,
+    public Course(String id, CourseType type, String name, ArrayList<Client> participants, int capacity,
                   AgeRange ageRange, Schedule schedule, Category category, String description)
     {
         super(id);
-        this.courseType = courseType;
+        this.type = type;
         this.name = name;
         this.participants = participants;
         this.capacity = capacity;
@@ -32,9 +33,23 @@ public class Course extends Entity implements Parcelable
         this.description = description;
     }
 
-    public CourseType getCourseType()
+    public Course(String id, CourseType type, String name, int capacity,
+                  AgeRange ageRange, Schedule schedule, Category category, String description)
     {
-        return courseType;
+        super(id);
+        this.type = type;
+        this.name = name;
+        this.participants = new ArrayList<>();
+        this.capacity = capacity;
+        this.ageRange = ageRange;
+        this.schedule = schedule;
+        this.category = category;
+        this.description = description;
+    }
+
+    public CourseType getType()
+    {
+        return type;
     }
 
     public String getName()
@@ -72,9 +87,9 @@ public class Course extends Entity implements Parcelable
         return description;
     }
 
-    public void setCourseType(CourseType courseType)
+    public void setType(CourseType type)
     {
-        this.courseType = courseType;
+        this.type = type;
     }
 
     public void setName(String name)
@@ -122,7 +137,7 @@ public class Course extends Entity implements Parcelable
         description = in.readString();
         ageRange = in.readParcelable(AgeRange.class.getClassLoader());
         category = Category.valueOf(in.readString());
-        courseType = CourseType.valueOf(in.readString());
+        type = CourseType.valueOf(in.readString());
     }
 
     @Override
@@ -136,7 +151,7 @@ public class Course extends Entity implements Parcelable
         dest.writeString(description);
         dest.writeParcelable(ageRange, flags);
         dest.writeString(String.valueOf(category));
-        dest.writeString(String.valueOf(courseType));
+        dest.writeString(String.valueOf(type));
     }
 
     @Override
@@ -159,4 +174,18 @@ public class Course extends Entity implements Parcelable
             return new Course[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Course course = (Course) o;
+        return capacity == course.capacity && type == course.type && Objects.equals(name, course.name) && Objects.equals(participants, course.participants) && Objects.equals(ageRange, course.ageRange) && Objects.equals(schedule, course.schedule) && category == course.category && Objects.equals(description, course.description);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(type, name, participants, capacity, ageRange, schedule, category, description);
+    }
 }

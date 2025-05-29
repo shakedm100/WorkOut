@@ -17,11 +17,11 @@ import Model.Business;
 import Model.Category;
 import Model.Course;
 import Model.CourseType;
+import Model.Day;
 import Model.Schedule;
 
 public class CourseRepository
 {
-
     FirebaseFirestore db;
     private final String collection = "businesses";
     private final String subCollection = "courses";
@@ -37,7 +37,7 @@ public class CourseRepository
         Map<String, Object> course = new HashMap<>();
         course.put("name", name);
         course.put("schedule", schedule);
-        course.put("participants", null);
+        course.put("participants", new ArrayList<>());
         course.put("capacity", capacity);
         course.put("type", type);
         course.put("ageRange", ageRange);
@@ -52,11 +52,21 @@ public class CourseRepository
 
                     DocumentReference reference = task.getResult();
                     String id = reference.getId();
-                    return new Course(id, type, name, null, capacity, ageRange, schedule, category, description);
+                    Course add = new Course(id, type, name, new ArrayList<>(), capacity, ageRange, schedule, category, description);
+                    business.addCourse(add);
+                    return add;
                 });
     }
 
     public Task<Boolean> updateCourse(Course course, Business business)
+    {
+        return updateHelper(course, business).addOnSuccessListener(task ->
+        {
+            business.updateCourse(course);
+        });
+    }
+
+    private Task<Boolean> updateHelper(Course course, Business business)
     {
         DocumentReference current = db.collection(collection).document(business.getId())
                 .collection(subCollection).document(course.getId());
@@ -65,10 +75,19 @@ public class CourseRepository
 
     public Task<Boolean> deleteCourse(Course course, Business business)
     {
+        return deleteHelper(course, business).addOnSuccessListener(task ->
+        {
+           business.deleteCourse(course);
+        });
+    }
+
+    private Task<Boolean> deleteHelper(Course course, Business business)
+    {
         DocumentReference current = db.collection(collection).document(business.getId())
                 .collection(subCollection).document(course.getId());
         return current.delete().continueWith(Task::isSuccessful);
     }
+
 
     public Task<List<Course>> getAllBusinessesCourses(Business business)
     {
@@ -89,9 +108,32 @@ public class CourseRepository
                             {
                                 course.setId(doc.getId());
                                 courses.add(course);
+                                business.addCourse(course);
                             }
                         }
                     }
+                    return courses;
+                });
+    }
+
+    public Task<List<Course>> getCoursesByDayOfWeek(Business business, Day day)
+    {
+        return db.collection(collection).document(business.getId()).collection(subCollection)
+                .whereEqualTo("schedule.day", day).get().continueWith(task ->
+                {
+                    if(!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
+
+                    QuerySnapshot querySnapshot = task.getResult();
+                    List<Course> courses = new ArrayList<>();
+                    for(DocumentSnapshot documentSnapshot : querySnapshot)
+                    {
+                        Course current = documentSnapshot.toObject(Course.class);
+                        if(current != null)
+                            courses.add(current);
+
+                    }
+
                     return courses;
                 });
     }

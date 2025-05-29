@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class AgeRange implements Parcelable
 {
     private int minAge;
@@ -66,4 +68,18 @@ public class AgeRange implements Parcelable
             return new AgeRange[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        AgeRange ageRange = (AgeRange) o;
+        return minAge == ageRange.minAge && maxAge == ageRange.maxAge;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(minAge, maxAge);
+    }
 }

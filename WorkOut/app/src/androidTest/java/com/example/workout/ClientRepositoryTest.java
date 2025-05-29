@@ -35,7 +35,7 @@ public class ClientRepositoryTest
 
         try
         {
-            Client testBusiness = await(repository.getClientByUsername("test"), 10, TimeUnit.SECONDS);
+            Client testBusiness = await(repository.getClientByUsername("testEverything"), 10, TimeUnit.SECONDS);
             await(repository.deleteClientByID(testBusiness), 10, TimeUnit.SECONDS);
         }
         catch (Exception e) { /*User doesn't exist in db, good!*/ }
@@ -52,15 +52,45 @@ public class ClientRepositoryTest
     {
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
-        testSubject = await(repository.insertClient("test", "1234", phone, "test@gmail.com", "Shaked",
-                "Michael", address, Gender.Male).addOnSuccessListener(client ->
-                System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS);
+
+        // Test insert functionality
+        testSubject = await(repository.insertClient("testEverything", "1234", phone, "testEverything@gmail.com", "Shaked",
+                "Michael", address, Gender.Male), 10, TimeUnit.SECONDS);
 
         assertNotNull(testSubject);
 
-        //TODO: Add many asserts
-        //TODO: Check get functionality
+        assertEquals("testEverything", testSubject.getUsername());
+        assertEquals("1234", testSubject.getPassword());
+        assertEquals(phone, testSubject.getPhone());
+        assertEquals("testEverything@gmail.com", testSubject.getEmail());
+        assertEquals("Shaked", testSubject.getFirstName());
+        assertEquals("Michael", testSubject.getLastName());
+        assertEquals(address, testSubject.getAddress());
+        assertEquals(Gender.Male, testSubject.getGender());
 
+        // Fail by username
+        assertThrows(Exception.class,()-> await(repository.insertClient("testEverything", "1234", phone, "bla@gmail.com", "Shaked",
+                "Michael", address, Gender.Male).addOnSuccessListener(client ->
+                System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
+
+        // Fail by email
+        assertThrows(Exception.class, () -> await(repository.insertClient("bla", "1234", phone, "testEverything@gmail.com", "Shaked",
+                "Michael", address, Gender.Male).addOnSuccessListener(client ->
+                System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
+
+        // Test Get functionality
+        Client checkGet = await(repository.getClientByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
+
+        assertEquals("testEverything", checkGet.getUsername());
+        assertEquals("1234", checkGet.getPassword());
+        assertEquals(phone, checkGet.getPhone());
+        assertEquals("testEverything@gmail.com", checkGet.getEmail());
+        assertEquals("Shaked", checkGet.getFirstName());
+        assertEquals("Michael", checkGet.getLastName());
+        assertEquals(address, checkGet.getAddress());
+        assertEquals(Gender.Male, checkGet.getGender());
+
+        // Test update functionality
         Client updateClient = testSubject;
         updateClient.setFirstName("Lagrange");
         repository.updateClientByID(updateClient);

@@ -1,5 +1,7 @@
 package Model.Repository;
 
+import android.location.Geocoder;
+
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -10,11 +12,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import org.w3c.dom.Document;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import Model.Address;
 import Model.City;
+import Model.Location;
 
 public class GeneralRepository
 {
@@ -49,8 +54,7 @@ public class GeneralRepository
                         .startAt(namePrefix)
                         .endAt(namePrefix + "\uf8ff") // Signal an ending with UTF-8 encoding
                         .limit(3);
-            }
-            else
+            } else
             {
                 namePrefix = namePrefix.toUpperCase();
                 q = db.collection("cities")
@@ -62,14 +66,18 @@ public class GeneralRepository
             return q.get().continueWith(task ->
             {
                 if (!task.isSuccessful())
+                {
                     throw Objects.requireNonNull(task.getException());
+                }
 
                 List<City> cities = new ArrayList<>();
                 for (DocumentSnapshot snap : task.getResult())
                 {
                     City city = snap.toObject(City.class);
                     if (city != null)
+                    {
                         cities.add(city);
+                    }
                 }
 
                 return cities;
@@ -94,7 +102,7 @@ public class GeneralRepository
     {
         return db.collection(collection)
                 .where(Filter.or(Filter.equalTo("username", username),
-                                Filter.equalTo("email", email)))
+                        Filter.equalTo("email", email)))
                 .limit(1)
                 .get()
                 .continueWith(task ->
@@ -107,5 +115,51 @@ public class GeneralRepository
                     // true -> we found at least one document with either username or email
                     return snap != null && !snap.isEmpty();
                 });
+    }
+
+    public Location convertAddressToLocation(Geocoder geocoder, Address address)
+    {
+        try
+        {
+            String location = address.getName() + ", " + address.getCity().getName();
+            List<android.location.Address> theirAddress = geocoder.getFromLocationName(location, 1);
+            if (!theirAddress.isEmpty())
+            {
+                return new Location(theirAddress.get(0).getLongitude()
+                        , theirAddress.get(0).getLatitude());
+            }
+
+            return null;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Invalid address");
+        }
+    }
+
+    public Address convertLocationToAddress(Geocoder geocoder, Location location)
+    {
+        try
+        {
+            List<android.location.Address> addresses = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 1);
+            if (!addresses.isEmpty())
+            {
+                String[] split = addresses.get(0).getFeatureName().split("/");
+                String name = "";
+                if(split.length > 0)
+                {
+                    name = split[0];
+                    City city = new City("id", addresses.get(0).getLocality());
+                    return new Address(city, name);
+                }
+            }
+
+            return null;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Invalid location");
+        }
     }
 }

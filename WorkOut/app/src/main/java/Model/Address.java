@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class Address implements Parcelable
 {
     private City city;
@@ -51,6 +53,20 @@ public class Address implements Parcelable
     {
         parcel.writeParcelable(city, i);
         parcel.writeString(name);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(city, address.city) && Objects.equals(name, address.name);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(city, name);
     }
 
     public static final Creator<Address> CREATOR = new Creator<Address>() {
