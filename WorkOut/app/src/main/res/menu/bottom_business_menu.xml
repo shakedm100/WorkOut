@@ -13,8 +13,8 @@
 
     <item
         android:id="@+id/nav_search"
-        android:icon="@drawable/update_icon"
-        android:title="@string/update" />
+        android:icon="@drawable/status"
+        android:title="@string/reviews" />
 
     <item
         android:id="@+id/nav_ratings"
@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/nav_messages"
-        android:icon="@drawable/calendar"
+        android:icon="@drawable/businesscalendar"
         android:title="@string/calendar" />
 
 </menu>

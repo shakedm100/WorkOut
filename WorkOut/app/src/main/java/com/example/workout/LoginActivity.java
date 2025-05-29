@@ -53,7 +53,6 @@ import Model.Schedule;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
-    private FirebaseAuth auth;
     //Bla
     @Override
     protected void onCreate(Bundle savedInstanceState)

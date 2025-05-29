@@ -17,5 +17,8 @@
     <string name="search_button">Search</string>
     <string name="business">business</string>
     <string name="update">update</string>
-    <string name="classes">classes</string>/>
+    <string name="classes">classes</string>
+    <string name="status">status</string>
+    <string name="reviews">reviews</string> />
+    />
 </resources>

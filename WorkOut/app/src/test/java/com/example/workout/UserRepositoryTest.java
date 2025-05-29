@@ -4,21 +4,14 @@ import static org.junit.Assert.*;
 import Model.APIService.UserAPIService;
 import Model.Phone;
 import Model.PhonePrefix;
-import Model.Repository.UserRepository;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import Model.User;
-import okio.Timeout;
-import retrofit2.Call;
-import retrofit2.Response;
 
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import java.io.IOException;
 
 public class UserRepositoryTest {
     private UserRepository repoReal;
