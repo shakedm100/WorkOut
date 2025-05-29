@@ -3,6 +3,8 @@ package com.example.workout;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -24,6 +26,11 @@ import Model.Repository.ClientRepository;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import ViewModel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -32,8 +39,8 @@ public class RegisterActivity extends AppCompatActivity {
     // Declare UI elements
     private EditText editTextEmail, editTextPassword, editTextUsername, editTextFirstName, editTextLastName;
     private EditText editTextPhoneNumber, editTextStreet, editBirthDate;
-    private Spinner spinnerPhonePrefix, spinnerCity; // Assuming you have this in your XML: R.id.spinnerPhonePrefix
-    // private Spinner spinnerGender; // If you use a spinner for Gender: R.id.spinnerGender
+    private Spinner spinnerPhonePrefix;
+    private AutoCompleteTextView cityAutoComplete;
     private RadioGroup radioGroupGender;
     private RadioButton radioMale, radioFemale;
     private Button buttonRegister;
@@ -62,17 +69,33 @@ public class RegisterActivity extends AppCompatActivity {
         spinnerPhonePrefix = findViewById(R.id.prefixSpinner);
         editTextPhoneNumber = findViewById(R.id.phoneText);
         editBirthDate = findViewById(R.id.RegisterBirthDateText);
-        spinnerCity = findViewById(R.id.citySpinner);
+        cityAutoComplete = findViewById(R.id.RegisterCityAutoComplete);
         editTextStreet = findViewById(R.id.addressText);
         radioGroupGender = findViewById(R.id.radioGrp);
         radioMale = findViewById(R.id.radioM);
         radioFemale = findViewById(R.id.radioF);
-
         buttonRegister = findViewById(R.id.registrationButton);
         progressBarRegister = findViewById(R.id.registerProgressBar);
         textViewRegisterState = findViewById(R.id.stateTextView);
 
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
+
+        // set spinner values
+        List<String> phonePrefixes = registerViewModel.getAllPhonePrefixes();
+        ArrayAdapter<String> adapterPhonePrefixes = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, phonePrefixes);
+        adapterPhonePrefixes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPhonePrefix.setAdapter(adapterPhonePrefixes);
+
+        // set autocomplete values
+        // TODO: find out how to send the string correctly -> crashes
+//        registerViewModel.getAllCities(cityAutoComplete.getText().toString()).addOnSuccessListener(cities -> {
+//            ArrayAdapter<City> adapterCities = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
+//            AutoCompleteTextView textView = (AutoCompleteTextView) cityAutoComplete;
+//            textView.setThreshold(3); // must type 3 characters to load results
+//            textView.setAdapter(adapterCities);
+//        }).addOnFailureListener(e -> {
+//            Toast.makeText(this, "Failed to load cities: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//        });
 
         // Setup Observers for LiveData
         setupObservers();
@@ -136,10 +159,8 @@ public class RegisterActivity extends AppCompatActivity {
                 phonePrefixStr = spinnerPhonePrefix.getSelectedItem().toString();
             }
 
-            String city = "";
-            if (spinnerCity.getSelectedItem() != null) {
-                city = spinnerCity.getSelectedItem().toString();
-            }
+            // TODO: make sure that's the correct way to get the string
+            String city = cityAutoComplete.getText().toString().trim();
 
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
             String street = editTextStreet.getText().toString().trim();

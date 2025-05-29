@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Task;
 
+import java.util.List;
+
 import Model.Repository.ClientRepository; // Assuming this handles user creation
 import Model.Address;
 import Model.City;
@@ -37,13 +39,28 @@ public class RegisterViewModel extends ViewModel
         this.generalRepository = new GeneralRepository();
     }
 
+    public List<String> getAllPhonePrefixes()
+    {
+        return generalRepository.getAllPhonePrefixes();
+    }
+
+    public Task<List<City>> getAllCities(String s)
+    {
+        return generalRepository.getCityByNamePartially(s);
+    }
+
+    public Task<List<City>> getBestMatchedCities(String s)
+    {
+        return generalRepository.getCityByNamePartially(s);
+    }
+
     public void registerUser(String email, String password, String username, String firstName, String lastName,
                              String phonePrefixStr, String phoneNumberStr, String birthday, String cityName, String street, Gender gender)
     {
 
         _registerUiState.postValue(GenericUiState.loading("Validating input..."));
 
-        // validation
+        // basic validation checks
         if (username == null || username.trim().isEmpty())
         {
             _registerUiState.postValue(GenericUiState.error("Please enter a username."));
@@ -87,8 +104,19 @@ public class RegisterViewModel extends ViewModel
         }
 
         if (phoneNumberStr == null || phoneNumberStr.trim().isEmpty() || !phoneNumberStr.trim().matches("\\d+"))
-        { // Basic check for digits
+        {
             _registerUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
+            return;
+        }
+        if (!phoneNumberStr.trim().matches("[0-9]+"))
+        {
+            _registerUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
+            return;
+        }
+
+        if (phoneNumberStr.trim().length() != 7)
+        {
+            _registerUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
             return;
         }
 
