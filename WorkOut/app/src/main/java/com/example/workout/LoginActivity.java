@@ -24,36 +24,17 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.checkerframework.checker.units.qual.C;
-
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 
 import Model.Address;
-import Model.AgeRange;
-import Model.Business;
-import Model.Category;
 import Model.City;
 import Model.Client;
-import Model.Course;
-import Model.CourseType;
-import Model.Day;
 import Model.Gender;
-import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
-import Model.Rating;
 import Model.Repository.ClientRepository;
 //import Model.Repository.TestClientRepository;
 import android.widget.ProgressBar;
 import ViewModel.LoginViewModel;
-
-import Model.Schedule;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
@@ -84,8 +65,8 @@ public class LoginActivity extends AppCompatActivity {
         editTextUsername = findViewById(R.id.usernameTextLogin);
         editTextPassword = findViewById(R.id.passwordTextLogin);
         buttonLogin = findViewById(R.id.loginButton);
-        progressBar = findViewById(R.id.progressBar);
-        textViewError = findViewById(R.id.errorTextView);
+        progressBar = findViewById(R.id.loginProgressBar);
+        textViewError = findViewById(R.id.loginStatusText);
 
         // initialize ViewModel
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -116,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     buttonLogin.setEnabled(true);
                     textViewError.setVisibility(View.GONE);
-                    Toast.makeText(LoginActivity.this, "Login Successful! Data: " + loginUiState.getData(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
                     // navigate to home activity when success occurs
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class); // move to home page
                     startActivity(intent);

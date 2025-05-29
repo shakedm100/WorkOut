@@ -16,7 +16,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory;
 
 import Model.Client;
 import Model.Repository.ClientRepository;
@@ -27,8 +26,8 @@ import ViewModel.LoginViewModel;
 public class ProfileActivity extends AppCompatActivity {
 
     private ClientProfileViewModel clientProfileViewModel;
-    private TextView textViewName, textViewEmail, /* other TextViews for profile data */;
-    private EditText editTextName, editTextEmail, /* EditTexts for editing */;
+    private TextView textViewName, textViewEmail;
+    private EditText editTextName, editTextEmail;
     private Button buttonSaveChanges;
     private ProgressBar progressBarProfile;
 

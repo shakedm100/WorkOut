@@ -3,8 +3,6 @@ package com.example.workout;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -26,9 +24,6 @@ import Model.Repository.ClientRepository;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.ads.mediationtestsuite.viewmodels.ViewModelFactory;
-
-import ViewModel.GenericUiState;
 import ViewModel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -36,14 +31,14 @@ public class RegisterActivity extends AppCompatActivity {
     private RegisterViewModel registerViewModel;
     // Declare UI elements
     private EditText editTextEmail, editTextPassword, editTextUsername, editTextFirstName, editTextLastName;
-    private EditText editTextPhoneNumber, editTextStreet;
+    private EditText editTextPhoneNumber, editTextStreet, editBirthDate;
     private Spinner spinnerPhonePrefix, spinnerCity; // Assuming you have this in your XML: R.id.spinnerPhonePrefix
     // private Spinner spinnerGender; // If you use a spinner for Gender: R.id.spinnerGender
     private RadioGroup radioGroupGender;
     private RadioButton radioMale, radioFemale;
     private Button buttonRegister;
     private ProgressBar progressBarRegister;
-    private TextView textViewRegisterError;
+    private TextView textViewRegisterState;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity {
         // For ClientRepository, it's good to pass it via factory for testability.
         // If your ViewModelFactory isn't set up yet for RegisterViewModel, you might temporarily
         // instantiate ClientRepository directly in the ViewModel for now, but aim to use a factory.
-        ClientRepository clientRepository = new ClientRepository(); // Ideally from a DI source
+        //ClientRepository clientRepository = new ClientRepository(); // Ideally from a DI source
         //ViewModelFactory viewModelFactory = new ViewModelFactory(getApplication(), clientRepository); // Adjust factory if needed
         //registerViewModel = new ViewModelProvider(this, viewModelFactory).get(RegisterViewModel.class);
 
@@ -64,17 +59,20 @@ public class RegisterActivity extends AppCompatActivity {
         editTextUsername = findViewById(R.id.usernameText);
         editTextFirstName = findViewById(R.id.firstNameText);
         editTextLastName = findViewById(R.id.lastNameText);
-        spinnerPhonePrefix = findViewById(R.id.spinner); // TODO: add the spinner
+        spinnerPhonePrefix = findViewById(R.id.prefixSpinner);
         editTextPhoneNumber = findViewById(R.id.phoneText);
+        editBirthDate = findViewById(R.id.RegisterBirthDateText);
         spinnerCity = findViewById(R.id.citySpinner);
         editTextStreet = findViewById(R.id.addressText);
         radioGroupGender = findViewById(R.id.radioGrp);
         radioMale = findViewById(R.id.radioM);
         radioFemale = findViewById(R.id.radioF);
 
-        buttonRegister = findViewById(R.id.registerButton); // Your button ID for registration
-        progressBarRegister = findViewById(R.id.progressBarRegister); // TODO: add the progress + error
-        textViewRegisterError = findViewById(R.id.textViewRegisterError);
+        buttonRegister = findViewById(R.id.registrationButton);
+        progressBarRegister = findViewById(R.id.registerProgressBar);
+        textViewRegisterState = findViewById(R.id.stateTextView);
+
+        registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
         // Setup Observers for LiveData
         setupObservers();
@@ -86,26 +84,27 @@ public class RegisterActivity extends AppCompatActivity {
     private void setupObservers() {
         registerViewModel.getRegisterUiState().observe(this, registerUiState -> {
             if (registerUiState == null) return; // should not happen if initialized
+            Intent intent;
 
             switch (registerUiState.getStatus()) {
                 case IDLE:
                     progressBarRegister.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
-                    textViewRegisterError.setVisibility(View.GONE);
+                    textViewRegisterState.setVisibility(View.GONE);
                     break;
                 case LOADING:
                     progressBarRegister.setVisibility(View.VISIBLE);
                     buttonRegister.setEnabled(false);
-                    textViewRegisterError.setVisibility(View.GONE);
+                    textViewRegisterState.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBarRegister.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
-                    textViewRegisterError.setVisibility(View.GONE);
+                    textViewRegisterState.setVisibility(View.GONE);
                     Toast.makeText(RegisterActivity.this,
                             "Registration Successful!", Toast.LENGTH_LONG).show();
                     // navigate to login screen after success
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                    intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
                     startActivity(intent);
                     finish(); // Finish RegisterActivity -> can't go back
@@ -113,8 +112,8 @@ public class RegisterActivity extends AppCompatActivity {
                 case ERROR:
                     progressBarRegister.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
-                    textViewRegisterError.setText(registerUiState.getErrorMessage());
-                    textViewRegisterError.setVisibility(View.VISIBLE);
+                    textViewRegisterState.setText(registerUiState.getErrorMessage());
+                    textViewRegisterState.setVisibility(View.VISIBLE);
                     break;
             }
         });
@@ -128,6 +127,7 @@ public class RegisterActivity extends AppCompatActivity {
             String username = editTextUsername.getText().toString().trim();
             String firstName = editTextFirstName.getText().toString().trim();
             String lastName = editTextLastName.getText().toString().trim();
+            String birthdate = editBirthDate.getText().toString().trim();
 
             // Example for Spinner - get selected item as string
             // Make sure your spinner is populated with PhonePrefix string values
@@ -136,26 +136,20 @@ public class RegisterActivity extends AppCompatActivity {
                 phonePrefixStr = spinnerPhonePrefix.getSelectedItem().toString();
             }
 
-            String phoneNumber = editTextPhoneNumber.getText().toString().trim();
-            String city = spinnerCity.getSelectedItem().toString().trim();
-            String street = editTextStreet.getText().toString().trim();
-//            String genderString = String.valueOf(radioGroupGender.getCheckedRadioButtonId());
-//            Gender gender;
-//            if (genderString.equals("Male"))
-//                gender = Gender.Male;
-//
-//            else
-//                gender = Gender.Female;
+            String city = "";
+            if (spinnerCity.getSelectedItem() != null) {
+                city = spinnerCity.getSelectedItem().toString();
+            }
 
-            Gender gender = Gender.Female;
+            String phoneNumber = editTextPhoneNumber.getText().toString().trim();
+            String street = editTextStreet.getText().toString().trim();
+
+            Gender gender = null;
             if (radioMale.isChecked())
                 gender = Gender.Male;
 
-            // String genderStr = "";
-            // if(spinnerGender.getSelectedItem() != null) {
-            //     genderStr = spinnerGender.getSelectedItem().toString();
-            // }
-            // TODO: Convert genderStr to Gender enum in ViewModel or before calling
+            else
+                gender = Gender.Female;
 
 
             /* Validation is checked in the registration process
@@ -175,8 +169,7 @@ public class RegisterActivity extends AppCompatActivity {
             // Call the ViewModel method to perform registration
             registerViewModel.registerUser(
                     email, password, username, firstName, lastName,
-                    phonePrefixStr, phoneNumber, city, street, gender
-                    // TODO: add gender
+                    phonePrefixStr, phoneNumber, birthdate, city, street, gender
             );
         });
 
