@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="autoClassName" type="id" />
+    <item name="autoClassType" type="id" />
+    <item name="autoCategory" type="id" />
+    <item name="spinnerTime" type="id" />
+    <item name="spinnerAgeRange" type="id" />
+    <item name="buttonSave" type="id" />
+</resources>
