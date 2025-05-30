@@ -87,7 +87,7 @@ public class CourseRepositoryTest
     @Test
     public void queryCourseTest() throws ExecutionException, InterruptedException, TimeoutException
     {
-        Schedule schedule = new Schedule("bla", Day.Sunday, Timestamp.now());
+        Schedule schedule = new Schedule(Day.Sunday, Timestamp.now());
         AgeRange ageRange = new AgeRange(23,50);
 
         // Test insert

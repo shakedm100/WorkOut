@@ -17,6 +17,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -40,6 +42,7 @@ import Model.Schedule;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
+import Model.SearchStrategies.SearchDateStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -87,7 +90,7 @@ public class BusinessRepositoryTest
         ArrayList<Rating> ratings = new ArrayList<>();
         ratings.add(rating);
         followers.add(testHelper);
-        Schedule schedule = new Schedule("bla", Day.Sunday, Timestamp.now());
+        Schedule schedule = new Schedule(Day.Sunday, Timestamp.now());
         Course course = new Course("bla", CourseType.Dou, "TRX", participants, 50, new AgeRange(23,50),
                 schedule, Category.Archery, "Shoot to kill");
         ArrayList<Course> courses = new ArrayList<>();
@@ -161,6 +164,37 @@ public class BusinessRepositoryTest
 
         businesses = (ArrayList<Business>) await(searchStrategy
                 .search(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+
+        assertNotNull(businesses);
+        assertFalse(businesses.isEmpty());
+
+        searchStrategy = new SearchDateStrategy();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2025);
+        calendar.set(Calendar.MONTH, 3); // Months are from 0 - 11
+        calendar.set(Calendar.DAY_OF_MONTH, 23); // Wednesday
+
+        // Set min time at 12:00
+        calendar.set(Calendar.HOUR_OF_DAY, 20);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date minDate = calendar.getTime();
+        Timestamp minTime = new Timestamp(minDate);
+
+        // Set max time at 13:00
+        calendar.set(Calendar.HOUR_OF_DAY, 21);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date maxDate = calendar.getTime();
+        Timestamp maxTime = new Timestamp(maxDate);
+
+        Timestamp[] times = new Timestamp[]{minTime, maxTime};
+
+        businesses = (ArrayList<Business>) await(searchStrategy
+                .search(times), 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
