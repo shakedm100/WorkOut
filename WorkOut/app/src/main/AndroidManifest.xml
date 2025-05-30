@@ -48,6 +48,9 @@
         <activity android:name=".SearchActivity"/>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".MainActivity"/>
+        <activity android:name=".AddOrEditClassActivity"/>
+        <activity android:name=".BusinessHomeActivity"/>
+        <activity android:name=".CoursesActivity"/>
     </application>
 
 </manifest>

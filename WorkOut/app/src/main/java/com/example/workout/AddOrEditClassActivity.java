@@ -15,8 +15,11 @@ import android.widget.Spinner;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.Timestamp;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,14 +39,15 @@ public class AddOrEditClassActivity extends AppCompatActivity
 {
 
     private EditText courseNameEditText, capacityEditText, descriptionEditText;
-    private Spinner timeSpinner, courseTypeSpinner, categorySpinner;
-    private Button saveButton;
+    private Spinner dayOfWeekSpinner, courseTypeSpinner, categorySpinner;
+    private Button saveButton, startTimeButton, endTimeButton;
     private RangeSlider ageSlider;
     private AgeRange ageRange;
     ViewGroup container;
     Course currentCourse;
     Business currentBusiness;
     private CourseRepository courseRepository;
+    private LocalTime startTime, endTime;
 
     // Dummy comment
     @Override
@@ -52,28 +56,38 @@ public class AddOrEditClassActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_or_edit_class);
 
-        currentCourse = this.getIntent().getParcelableExtra("course");
+        try
+        {
+            currentCourse = this.getIntent().getParcelableExtra("course");
+        }
+        catch (Exception e)
+        {
+            currentCourse = null; // Sent "null"
+        }
         currentBusiness = this.getIntent().getParcelableExtra("business");
+
+        courseRepository = new CourseRepository();
+        ageRange = new AgeRange(0, 99);
+        startTime = null;
+        endTime = null;
 
         // Link to views
         courseNameEditText = findViewById(R.id.autoClassName);
         courseTypeSpinner = findViewById(R.id.autoCourseType);
         categorySpinner = findViewById(R.id.autoCategory);
-        timeSpinner = findViewById(R.id.spinnerTime);
+        dayOfWeekSpinner = findViewById(R.id.dayOfWeekSpinner);
         saveButton = findViewById(R.id.buttonSave);
         container = findViewById(R.id.update_course_slider_container);
         capacityEditText = findViewById(R.id.capacityEditText);
         descriptionEditText = findViewById(R.id.descriptionEditText);
         ageSlider = new RangeSlider(this);
-        ageRange = new AgeRange(0, 99);
-        courseRepository = new CourseRepository();
+        startTimeButton = findViewById(R.id.startTimeButton);
+        endTimeButton = findViewById(R.id.endTimeButton);
 
         createCourseTypeSpinner();
         createCategorySpinner();
         createAgeSlider();
-
-        //String[] timeOptions = {"09:00 - 10:00", "10:30 - 11:30", "13:00 - 14:00", "18:00 - 19:00"};
-        //timeSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, timeOptions));
+        createDayOfWeekSpinner();
 
         if (currentCourse != null) // Then it's update course
         {
@@ -92,12 +106,44 @@ public class AddOrEditClassActivity extends AppCompatActivity
         saveButton.setOnClickListener(v ->
         {
             boolean check = buildCourseFromFieldsAndQuery();
-            if(check)
+            if (check)
                 finish();
             else
             {
                 //TODO: Show error
             }
+        });
+
+        MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H).setHour(12).setMinute(0);
+
+        MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
+
+        startPicker.addOnPositiveButtonClickListener(v ->
+        {
+            int hours = startPicker.getHour();
+            int minutes = startPicker.getMinute();
+            startTime = LocalTime.of(hours, minutes);
+        });
+
+        MaterialTimePicker endPicker = builder
+                .setTitleText("Select end time")
+                .build();
+
+        endPicker.addOnPositiveButtonClickListener(v ->
+        {
+            int hours = endPicker.getHour();
+            int minutes = endPicker.getMinute();
+            endTime = LocalTime.of(hours, minutes);
+        });
+
+        findViewById(R.id.startTimeButton).setOnClickListener(v ->
+        {
+            startPicker.show(getSupportFragmentManager(), "START_PICKER");
+        });
+        findViewById(R.id.endTimeButton).setOnClickListener(v ->
+        {
+            endPicker.show(getSupportFragmentManager(), "END_PICKER");
         });
     }
 
@@ -105,7 +151,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     {
         CourseType[] types = CourseType.values();
         String[] typeNames = new String[types.length];
-        for (int i = 0; i <= types.length; i++)
+        for (int i = 0; i < types.length; i++)
         {
             typeNames[i] = types[i].name();
         }
@@ -146,6 +192,30 @@ public class AddOrEditClassActivity extends AppCompatActivity
             String currentCategory = currentCourse.getCategory().toString();
             int index = adapter.getPosition(currentCategory);
             categorySpinner.setSelection(index);
+        }
+    }
+
+    private void createDayOfWeekSpinner()
+    {
+        Day[] types = Day.values();
+        String[] typeNames = new String[types.length];
+        for (int i = 0; i < types.length; i++)
+        {
+            typeNames[i] = types[i].name();
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_dropdown_item,
+                Arrays.asList(typeNames));
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dayOfWeekSpinner.setAdapter(adapter);
+
+        if (currentCourse != null)
+        {
+            String currentDay = currentCourse.getSchedule().getDay().toString();
+            int index = adapter.getPosition(currentDay);
+            dayOfWeekSpinner.setSelection(index);
         }
     }
 
@@ -214,19 +284,20 @@ public class AddOrEditClassActivity extends AppCompatActivity
                 // TODO: Show error on screen
                 return false;
             }
-        } else // Update
+        }
+        else // Update
         {
-            if(courseType != currentCourse.getType())
+            if (courseType != currentCourse.getType())
                 currentCourse.setType(courseType);
-            if(!courseName.equals(currentCourse.getName()))
+            if (!courseName.equals(currentCourse.getName()))
                 currentCourse.setName(courseName);
-            if(capacity != currentCourse.getCapacity())
+            if (capacity != currentCourse.getCapacity())
                 currentCourse.setCapacity(capacity);
-            if(!schedule.equals(currentCourse.getSchedule()))
+            if (!schedule.equals(currentCourse.getSchedule()))
                 currentCourse.setSchedule(schedule);
-            if(category != currentCourse.getCategory())
+            if (category != currentCourse.getCategory())
                 currentCourse.setCategory(category);
-            if(!description.equals(currentCourse.getDescription()))
+            if (!description.equals(currentCourse.getDescription()))
                 currentCourse.setDescription(description);
 
             try
@@ -241,4 +312,3 @@ public class AddOrEditClassActivity extends AppCompatActivity
         }
     }
 }
-
