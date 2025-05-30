@@ -5,43 +5,92 @@
     android:padding="24dp">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/addAndUpdateLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"> <!-- מרווח כללי מלמעלה -->
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/autoClassName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Class Name" />
 
-        <AutoCompleteTextView
-            android:id="@+id/autoClassType"
+        <Spinner
+            android:id="@+id/autoCourseType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Class Type"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:hint="Class Type" />
 
-        <AutoCompleteTextView
+        <Spinner
             android:id="@+id/autoCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Category"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:hint="Category" />
 
         <Spinner
-            android:id="@+id/spinnerTime"
+            android:id="@+id/dayOfWeekSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />
 
-        <Spinner
-            android:id="@+id/spinnerAgeRange"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/timePickerRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <Button
+                android:id="@+id/startTimeButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/azure"
+                android:text="Select Start \n Time" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/endTimeButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/azure"
+                android:text="Select End \n Time" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/update_course_slider_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical" />
+
+        <EditText
+            android:id="@+id/capacityEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Total Capacity"
+            android:inputType="numberSigned" />
+
+        <!-- Dummy comment -->
+        <EditText
+            android:id="@+id/descriptionEditText"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:ems="10"
+            android:hint="Course Description"
+            android:inputType="text" />
 
         <Button
             android:id="@+id/buttonSave"
@@ -56,4 +105,3 @@
             android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>
-

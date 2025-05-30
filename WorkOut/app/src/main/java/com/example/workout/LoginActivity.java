@@ -48,6 +48,7 @@ import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
 import Model.Rating;
+import Model.Repository.BusinessRepository;
 import Model.Repository.ClientRepository;
 import Model.Schedule;
 
@@ -74,20 +75,6 @@ public class LoginActivity extends AppCompatActivity {
         {
             checkIfUserAndPassword();
         });
-//        loginButton.setOnClickListener(click ->
-//        {
-//            testInsertion();
-//        });
-    }
-
-    private void testInsertion()
-    {
-        ClientRepository clientRepository = new ClientRepository();
-        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
-        clientRepository.insertClient("shakedm100", "1234", phone, "shaked1mi@gmail.com", "Shaked",
-                "Michael", address, Gender.Male).addOnSuccessListener(client ->
-                System.out.println("Hello" + client.getUsername()));
     }
 
     private void checkIfUserAndPassword()
@@ -98,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordText.getText().toString();
 
         ClientRepository repository = new ClientRepository();
-        Client current;
         repository.checkLogin(username, password).addOnSuccessListener(client ->
         {
             // Change Activity to Main
@@ -107,11 +93,19 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, MainActivity.class).putExtra("client", client);
                 startActivity(intent);
             }
-        })
-            .addOnFailureListener(e -> {
-            // Login failed (bad credentials or Firestore error)
-                System.out.println(e.toString());
-            // TODO: Add error handling
+        });
+
+        BusinessRepository businessRepository = new BusinessRepository();
+        businessRepository.checkLogin(username, password).addOnSuccessListener(business ->
+        {
+            if(business != null)
+            {
+                Intent intent = new Intent(this, BusinessHomeActivity.class).putExtra("business", business);
+                startActivity(intent);
+            }
+        }).addOnFailureListener(e ->
+        {
+           // TODO: Add error handling, not a client and not a business!
         });
     }
 
