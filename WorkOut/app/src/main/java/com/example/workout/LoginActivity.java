@@ -2,9 +2,12 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,22 +20,52 @@ import androidx.credentials.CredentialManagerCallback;
 import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.gms.common.Scopes;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.checkerframework.checker.units.qual.C;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 import Model.Address;
+import Model.AgeRange;
+import Model.Business;
+import Model.Category;
 import Model.City;
 import Model.Client;
+import Model.Course;
+import Model.CourseType;
+import Model.Day;
 import Model.Gender;
+import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
+import Model.Rating;
 import Model.Repository.BusinessRepository;
 import Model.Repository.ClientRepository;
+import Model.Schedule;
+import ViewModel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
-    //Bla
+    private FirebaseAuth auth;
+    private LoginViewModel loginViewModel;
+    private EditText editTextUsername;
+    private EditText editTextPassword;
+    private Button buttonLogin;
+    private ProgressBar progressBar;
+    private TextView textViewError;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -53,53 +86,114 @@ public class LoginActivity extends AppCompatActivity {
         {
             checkIfUserAndPassword();
         });
-//        loginButton.setOnClickListener(click ->
-//        {
-//            testInsertion();
-//        });
+
+        // initialize Views
+        editTextUsername = findViewById(R.id.usernameTextLogin);
+        editTextPassword = findViewById(R.id.passwordTextLogin);
+        buttonLogin = findViewById(R.id.loginButton);
+        progressBar = findViewById(R.id.loginProgressBar);
+        textViewError = findViewById(R.id.loginStatusText);
+
+        // initialize ViewModel
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+
+        // get LiveData from ViewModel
+        setupObservers();
+
+        // create button click listener
+        setupButtonClickListeners();
     }
 
-    private void testInsertion()
+    // show the respond
+    private void setupObservers() {
+        loginViewModel.getLoginUiState().observe(this, loginUiState -> {
+            // Handle UI changes based on the state
+            switch (loginUiState.getStatus()) {
+                case IDLE:
+                    progressBar.setVisibility(View.GONE);
+                    buttonLogin.setEnabled(true);
+                    textViewError.setVisibility(View.GONE);
+                    break;
+                case LOADING:
+                    progressBar.setVisibility(View.VISIBLE);
+                    buttonLogin.setEnabled(false);
+                    textViewError.setVisibility(View.GONE);
+                    break;
+                case SUCCESS:
+                    progressBar.setVisibility(View.GONE);
+                    buttonLogin.setEnabled(true);
+                    textViewError.setVisibility(View.GONE);
+                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
+                    // navigate to home activity when success occurs
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class); // move to home page
+                    startActivity(intent);
+                    finish(); // Optional: finish LoginActivity so user can't go back
+                    break;
+                case ERROR:
+                    progressBar.setVisibility(View.GONE);
+                    buttonLogin.setEnabled(true);
+                    textViewError.setText(loginUiState.getErrorMessage());
+                    textViewError.setVisibility(View.VISIBLE);
+                    break;
+            }
+        });
+    }
+
+    private void setupButtonClickListeners()
     {
-        ClientRepository clientRepository = new ClientRepository();
-        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        clientRepository.insertClient("shakedm100", "1234", phone, "shaked1mi@gmail.com", "Shaked",
-                "Michael", address, Gender.Male).addOnSuccessListener(client ->
-                System.out.println("Hello" + client.getUsername()));
+        buttonLogin.setOnClickListener(v ->
+        {
+            String username = editTextUsername.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
+
+            // validation
+            if (username.isEmpty())
+            {
+                editTextUsername.setError("Username cannot be empty");
+                return;
+            }
+            if (password.isEmpty())
+            {
+                editTextPassword.setError("Password cannot be empty");
+                return;
+            }
+
+            // Call the ViewModel method
+            loginViewModel.loginClient(username, password);
+        });
     }
 
     private void checkIfUserAndPassword()
-    {
-        EditText userText = findViewById(R.id.usernameTextLogin);
-        String username = userText.getText().toString();
-        EditText passwordText = findViewById(R.id.passwordTextLogin);
-        String password = passwordText.getText().toString();
-
-        ClientRepository repository = new ClientRepository();
-        repository.checkLogin(username, password).addOnSuccessListener(client ->
-                {
-                    // Change Activity to Main
-                    if(client != null)
-                    {
-                        Intent intent = new Intent(this, MainActivity.class).putExtra("client", client);
-                        startActivity(intent);
-                    }
-                });
-
-        BusinessRepository businessRepository = new BusinessRepository();
-        businessRepository.checkLogin(username, password).addOnSuccessListener(business ->
         {
-            if(business != null)
+            EditText userText = findViewById(R.id.usernameTextLogin);
+            String username = userText.getText().toString();
+            EditText passwordText = findViewById(R.id.passwordTextLogin);
+            String password = passwordText.getText().toString();
+
+            ClientRepository repository = new ClientRepository();
+            repository.checkLogin(username, password).addOnSuccessListener(client ->
             {
-                Intent intent = new Intent(this, BusinessHomeActivity.class).putExtra("business", business);
-                startActivity(intent);
-            }
-        }).addOnFailureListener(e ->
-        {
-            //TODO: Handle error here, not a business nor a client!
-        });
-    }
+                // Change Activity to Main
+                if(client != null)
+                {
+                    Intent intent = new Intent(this, MainActivity.class).putExtra("client", client);
+                    startActivity(intent);
+                }
+            });
+
+            BusinessRepository businessRepository = new BusinessRepository();
+            businessRepository.checkLogin(username, password).addOnSuccessListener(business ->
+            {
+                if(business != null)
+                {
+                    Intent intent = new Intent(this, BusinessHomeActivity.class).putExtra("business", business);
+                    startActivity(intent);
+                }
+            }).addOnFailureListener(e ->
+            {
+                //TODO: Handle error here, not a business nor a client!
+            });
+        }
 
 
     private void requestGoogleIdToken()

@@ -89,5 +89,10 @@ public class City implements Parcelable
         }
     };
 
+    @Override
+    public String toString()
+    {
+        return englishName;
+    }
 
 }

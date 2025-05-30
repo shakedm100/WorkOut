@@ -1,18 +1,25 @@
 package com.example.workout;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.bottomnavigation.LabelVisibilityMode;
-import android.view.MenuItem;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+// ViewModel imports
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+//
 
 import Model.Business;
 import Model.Client;
 
 public class MainActivity extends AppCompatActivity {
+
+    private TextView textView;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,18 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        // ViewModel changes
 
+        // get the instance as the MyViewModel class with the functions
+
+        // listen to new data
+
+        // Update ViewModel data on button click
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //viewModel.updateText("Hello from ViewModel!");
+            }
+        });
     }
 }

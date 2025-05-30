@@ -17,6 +17,7 @@ import java.util.Objects;
 import Model.Address;
 import Model.City;
 import Model.Location;
+import Model.PhonePrefix;
 
 public class GeneralRepository
 {
@@ -27,6 +28,48 @@ public class GeneralRepository
     {
         db = FirebaseFirestore.getInstance();
     }
+
+    // DVIR CHANGES - added a function for the prefixes of phone
+
+    /**
+     * Returns all the possible prefixes for a phone number.
+     * @return a Task which will return a list of the prefixes.
+     */
+    public List<String> getAllPhonePrefixes()
+    {
+        List<String> phonePrefixes = new ArrayList<>();
+        phonePrefixes.add("050");
+        phonePrefixes.add("052");
+        phonePrefixes.add("053");
+        phonePrefixes.add("054");
+        phonePrefixes.add("055");
+        phonePrefixes.add("058");
+
+        return phonePrefixes;
+    }
+
+    public Task<List<City>> getAllCities()
+    {
+        Query q = db.collection("cities");
+
+        return q.get().continueWith(task ->
+        {
+            if (!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            List<City> cities = new ArrayList<>();
+            for (DocumentSnapshot snap : task.getResult())
+            {
+                City city = snap.toObject(City.class);
+                if (city != null)
+                    cities.add(city);
+            }
+
+            return cities;
+        });
+    }
+
+    // END OF DVIR CHANGES
 
     /**
      * Returns up to 3 cities whose names start with the given partialName.
@@ -42,6 +85,7 @@ public class GeneralRepository
         // So basically the code states for the db to look at all the range starting at namePrefix
         // And namePrefix + one unicode char
         Query q;
+        // namePrefix.trim(); TODO: consider add this, my resolve future errors (exmaple: "ORANIT " with space) -> couldn't find any
         if (!namePrefix.isEmpty())
         {
             if (namePrefix.charAt(0) > 128)

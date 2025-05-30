@@ -86,8 +86,8 @@
         android:id="@+id/googleOptionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="72dp"
         android:text="Or sign in with google:"
         android:textSize="20sp"
         android:textStyle="italic"
@@ -121,7 +121,7 @@
     <Button
         android:id="@+id/registerButton"
         android:layout_width="218dp"
-        android:layout_height="46dp"
+        android:layout_height="50dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="#00A3A3A3"
@@ -138,12 +138,36 @@
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="44dp"
         android:backgroundTint="@color/material_dynamic_primary90"
         android:text="Login"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/passwordTextView2" />
+
+    <EditText
+        android:id="@+id/loginStatusText"
+        android:layout_width="385dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="text"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginButton" />
+
+    <ProgressBar
+        android:id="@+id/loginProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="56dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/loginButton"
+        app:layout_constraintTop_toBottomOf="@+id/passwordTextView2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

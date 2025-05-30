@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,10 +12,10 @@
     <ImageView
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="60dp"
         android:src="@color/material_dynamic_primary90"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="-7dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/lastNameText"
@@ -33,12 +34,13 @@
         android:id="@+id/registrationTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         android:text="@string/register"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="40sp"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.474"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -63,7 +65,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="30dp"
         android:labelFor="@id/phoneText"
-        android:text="Phone Number:"
+        android:text="Phone:"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,7 +141,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="88dp"
         android:labelFor="@id/usernameText"
         android:text="Username:"
         android:textSize="20sp"
@@ -151,8 +153,8 @@
         android:id="@+id/usernameText"
         android:layout_width="200dp"
         android:layout_height="48dp"
-        android:layout_marginTop="115dp"
-        android:layout_marginEnd="25dp"
+        android:layout_marginTop="76dp"
+        android:layout_marginEnd="24dp"
         android:autofillHints="username"
         android:ems="10"
         android:inputType="text"
@@ -194,14 +196,14 @@
         android:layout_marginEnd="25dp"
         android:autofillHints="emailAddress"
         android:ems="10"
+        android:hint="Israel@gmail.com"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lastNameText"
-        tools:hint="email" />
+        app:layout_constraintTop_toBottomOf="@+id/lastNameText" />
 
     <EditText
         android:id="@+id/phoneText"
-        android:layout_width="200dp"
+        android:layout_width="100dp"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="25dp"
@@ -213,17 +215,19 @@
         tools:hint="phone" />
 
     <EditText
-        android:id="@+id/dateText"
+        android:id="@+id/RegisterBirthDateText"
         android:layout_width="200dp"
         android:layout_height="48dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="25dp"
         android:autofillHints="Birth date"
         android:ems="10"
+        android:hint="DD/MM/YYYY"
         android:inputType="date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneText"
-        tools:hint="birth date" />
+        tools:hint="DD/MM/YYYY" />
+
 
     <RadioGroup
         android:id="@+id/radioGrp"
@@ -236,7 +240,7 @@
         android:paddingTop="0dp"
         android:paddingRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateText">
+        app:layout_constraintTop_toBottomOf="@+id/RegisterBirthDateText">
 
         <RadioButton
             android:id="@+id/radioM"
@@ -262,15 +266,6 @@
             android:textSize="12sp" />
     </RadioGroup>
 
-    <Spinner
-        android:id="@+id/citySpinner"
-        android:layout_width="200dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="25dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/countrySpinner" />
-
     <TextView
         android:id="@+id/addressTextView"
         android:layout_width="wrap_content"
@@ -283,7 +278,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addressText"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.057"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cityTextView"
         app:layout_constraintVertical_bias="0.0" />
@@ -292,63 +287,78 @@
         android:id="@+id/cityTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="30dp"
-        android:labelFor="@id/citySpinner"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="44dp"
+        android:labelFor="@id/RegisterCityAutoComplete"
         android:text="City:"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/countryTextView" />
-
-    <TextView
-        android:id="@+id/countryTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="30dp"
-        android:labelFor="@id/countrySpinner"
-        android:text="Country:"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/genderTextView" />
 
-    <Spinner
-        android:id="@+id/countrySpinner"
-        android:layout_width="200dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="25dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGrp" />
-
     <EditText
         android:id="@+id/addressText"
         android:layout_width="200dp"
         android:layout_height="48dp"
-        android:layout_marginTop="10dp"
         android:layout_marginEnd="24dp"
         android:autofillHints="postalAddress"
         android:ems="10"
         android:inputType="text"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/citySpinner"
-        app:layout_constraintVertical_bias="0.059"
+        app:layout_constraintTop_toBottomOf="@+id/RegisterCityAutoComplete"
         tools:hint="address" />
 
     <Button
         android:id="@+id/registrationButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/material_dynamic_primary90"
         android:text="Register"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.449"
+        app:layout_constraintHorizontal_bias="0.448"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/addressTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/addressText" />
+
+    <Spinner
+        android:id="@+id/prefixSpinner"
+        android:layout_width="106dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/phoneText"
+        app:layout_constraintTop_toBottomOf="@+id/emailText" />
+
+    <TextView
+        android:id="@+id/stateTextView"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="148dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/registrationButton" />
+
+    <ProgressBar
+        android:id="@+id/registerProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="24dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registrationButton" />
+
+    <AutoCompleteTextView
+        android:id="@+id/RegisterCityAutoComplete"
+        android:layout_width="198dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="16dp"
+        android:hint="Enter your city here"
+        app:layout_constraintStart_toEndOf="@+id/cityTextView"
+        app:layout_constraintTop_toBottomOf="@+id/radioGrp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
