@@ -80,5 +80,10 @@ public class City extends Entity implements Parcelable
         }
     };
 
+    @Override
+    public String toString()
+    {
+        return englishName;
+    }
 
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Model.Repository.ClientRepository; // Assuming this handles user creation
@@ -49,13 +50,13 @@ public class RegisterViewModel extends ViewModel
         return generalRepository.getCityByNamePartially(s);
     }
 
-    public Task<List<City>> getBestMatchedCities(String s)
+    public Task<List<City>> getBestMatchedCities(String input)
     {
-        return generalRepository.getCityByNamePartially(s);
+        return generalRepository.getCityByNamePartially(input);
     }
 
     public void registerUser(String email, String password, String username, String firstName, String lastName,
-                             String phonePrefixStr, String phoneNumberStr, String birthday, String cityName, String street, Gender gender)
+                             String phonePrefixStr, String phoneNumberStr, String birthday, City city, String street, Gender gender) // String cityName
     {
 
         _registerUiState.postValue(GenericUiState.loading("Validating input..."));
@@ -126,9 +127,9 @@ public class RegisterViewModel extends ViewModel
             return;
         }
 
-        if (!birthday.matches("\\d{2}-\\d{2}-\\d{4}"))
+        if (!birthday.matches("\\d{2}/\\d{2}/\\d{4}"))
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter birthday with the following template: DD-MM-YYYY"));
+            _registerUiState.postValue(GenericUiState.error("Please enter birthday with the following template: DD/MM/YYYY"));
             return;
         }
 
@@ -177,9 +178,9 @@ public class RegisterViewModel extends ViewModel
             }
         }
 
-        if (cityName == null || cityName.trim().isEmpty())
+        if (city == null)
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a city name."));
+            _registerUiState.postValue(GenericUiState.error("City is null."));
             return;
         }
         if (street == null || street.trim().isEmpty())
@@ -199,10 +200,25 @@ public class RegisterViewModel extends ViewModel
         final String finalFirstName = firstName.trim();
         final String finalLastName = lastName.trim();
         final String finalPhoneNumber = phoneNumberStr.trim();
-        final String finalCityName = cityName.trim();
+        //final String finalCityName = cityName.trim(); -> changed to object
         final String finalStreet = street.trim();
 
         _registerUiState.postValue(GenericUiState.loading("Verifying city information..."));
+
+        Phone phone = new Phone(prefix, finalPhoneNumber);
+        Address address = new Address(city, finalStreet);
+
+        clientRepository.insertClient(finalUsername, password, phone, finalEmail, finalFirstName, finalLastName, address, gender)
+                .addOnSuccessListener(result ->
+                {
+                    _registerUiState.postValue(GenericUiState.success("Registration successful! Welcome " + finalFirstName));
+                })
+                .addOnFailureListener(insertException ->
+                {
+                    _registerUiState.postValue(GenericUiState.error("Registration failed: " + insertException.getMessage()));
+                });
+
+        /*
 
         // Asynchronous City Fetching
         generalRepository.getCityByNamePartially(finalCityName)
@@ -240,6 +256,8 @@ public class RegisterViewModel extends ViewModel
                 {
                     _registerUiState.postValue(GenericUiState.error("Could not verify city: " + cityFetchException.getMessage()));
                 });
+
+         */
     }
 
     public LiveData<GenericUiState<String>> getRegisterUiState()

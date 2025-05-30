@@ -88,6 +88,7 @@ public class GeneralRepository
         // So basically the code states for the db to look at all the range starting at namePrefix
         // And namePrefix + one unicode char
         Query q;
+        // namePrefix.trim(); TODO: consider add this, my resolve future errors (exmaple: "ORANIT " with space) -> couldn't find any
         if (!namePrefix.isEmpty())
         {
             if (namePrefix.charAt(0) > 128)

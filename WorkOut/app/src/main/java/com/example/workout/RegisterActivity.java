@@ -2,6 +2,8 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -97,6 +99,36 @@ public class RegisterActivity extends AppCompatActivity {
 //            Toast.makeText(this, "Failed to load cities: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 //        });
 
+        // TextWatcher basically listens to the user's inputs
+        // this will trigger the firebase and activate the query each time the user inputs at least 3 chars
+        cityAutoComplete.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence string, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence input, int start, int before, int count) {
+                if (input.length() >= 3) {
+                    registerViewModel.getBestMatchedCities(input.toString())
+                            .addOnSuccessListener(cities -> {
+                                ArrayAdapter<City> adapterCities = new ArrayAdapter<>(
+                                        RegisterActivity.this,
+                                        android.R.layout.simple_dropdown_item_1line,
+                                        cities
+                                );
+                                cityAutoComplete.setAdapter(adapterCities);
+                                adapterCities.notifyDataSetChanged();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+
         // Setup Observers for LiveData
         setupObservers();
 
@@ -128,7 +160,7 @@ public class RegisterActivity extends AppCompatActivity {
                             "Registration Successful!", Toast.LENGTH_LONG).show();
                     // navigate to login screen after success
                     intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish(); // Finish RegisterActivity -> can't go back
                     break;
@@ -160,7 +192,19 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             // TODO: make sure that's the correct way to get the string
-            String city = cityAutoComplete.getText().toString().trim();
+            //String city = cityAutoComplete.getText().toString().trim();
+            //City city = (City) cityAutoComplete.getOnItemSelectedListener();
+
+            String cityName = cityAutoComplete.getText().toString().trim();
+            City selectedCity = null;
+            for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++) {
+                City city = (City) cityAutoComplete.getAdapter().getItem(i);
+                String match = city.getEnglishName().trim();
+                if (match.equals(cityName)) {
+                    selectedCity = city;
+                    break;
+                }
+            }
 
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
             String street = editTextStreet.getText().toString().trim();
@@ -172,25 +216,10 @@ public class RegisterActivity extends AppCompatActivity {
             else
                 gender = Gender.Female;
 
-
-            /* Validation is checked in the registration process
-            // Perform basic validation here if needed, or rely on ViewModel validation
-            if (email.isEmpty() || password.isEmpty() || username.isEmpty() || firstName.isEmpty()
-                    || lastName.isEmpty() || phonePrefixStr.isEmpty() || phoneNumber.isEmpty()
-                    || city.isEmpty() || street.isEmpty() ) { // TODO: add gender validation and handle spinners
-                Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show();
-                // Or set error on specific EditTexts
-                // textViewRegisterError.setText("Please fill all required fields.");
-                // textViewRegisterError.setVisibility(View.VISIBLE);
-                return;
-            }
-
-             */
-
             // Call the ViewModel method to perform registration
             registerViewModel.registerUser(
                     email, password, username, firstName, lastName,
-                    phonePrefixStr, phoneNumber, birthdate, city, street, gender
+                    phonePrefixStr, phoneNumber, birthdate, selectedCity, street, gender
             );
         });
 
