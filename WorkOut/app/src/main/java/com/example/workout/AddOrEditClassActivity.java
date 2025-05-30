@@ -45,6 +45,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     Business currentBusiness;
     private CourseRepository courseRepository;
 
+    // Dummy comment
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

@@ -54,6 +54,7 @@
             android:hint="Total Capacity"
             android:inputType="numberSigned" />
 
+        <!-- Dummy comment -->
         <EditText
             android:id="@+id/descriptionEditText"
             android:layout_width="match_parent"
