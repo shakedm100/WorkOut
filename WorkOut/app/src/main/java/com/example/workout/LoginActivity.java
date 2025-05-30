@@ -27,6 +27,7 @@ import Model.Client;
 import Model.Gender;
 import Model.Phone;
 import Model.PhonePrefix;
+import Model.Repository.BusinessRepository;
 import Model.Repository.ClientRepository;
 
 public class LoginActivity extends AppCompatActivity {
@@ -76,7 +77,6 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordText.getText().toString();
 
         ClientRepository repository = new ClientRepository();
-        Client current;
         repository.checkLogin(username, password).addOnSuccessListener(client ->
                 {
                     // Change Activity to Main
@@ -85,12 +85,20 @@ public class LoginActivity extends AppCompatActivity {
                         Intent intent = new Intent(this, MainActivity.class).putExtra("client", client);
                         startActivity(intent);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    // Login failed (bad credentials or Firestore error)
-                    System.out.println(e.toString());
-                    // TODO: Add error handling
                 });
+
+        BusinessRepository businessRepository = new BusinessRepository();
+        businessRepository.checkLogin(username, password).addOnSuccessListener(business ->
+        {
+            if(business != null)
+            {
+                Intent intent = new Intent(this, BusinessHomeActivity.class).putExtra("business", business);
+                startActivity(intent);
+            }
+        }).addOnFailureListener(e ->
+        {
+            //TODO: Handle error here, not a business nor a client!
+        });
     }
 
 
