@@ -7,27 +7,29 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
-public class City extends Entity implements Parcelable
+public class City implements Parcelable
 {
     private String name;
     private String englishName;
 
-    public City() {}
-
-    public City(String id, String name)
+    public City()
     {
-        super(id);
+    }
+
+    public City(String name)
+    {
         this.name = name;
         englishName = "";
     }
 
-    protected City(Parcel in) {
-        super(in);
+    protected City(Parcel in)
+    {
         name = in.readString();
     }
 
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -36,7 +38,10 @@ public class City extends Entity implements Parcelable
         return englishName;
     }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
     @Override
     public boolean equals(Object o)
@@ -58,24 +63,28 @@ public class City extends Entity implements Parcelable
     }
 
     @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
-        super.writeToParcel(dest, flags);
+    public void writeToParcel(@NonNull Parcel dest, int flags)
+    {
         dest.writeString(name);
     }
 
     @Override
-    public int describeContents() {
+    public int describeContents()
+    {
         return 0;
     }
 
-    public static final Creator<City> CREATOR = new Creator<City>() {
+    public static final Creator<City> CREATOR = new Creator<City>()
+    {
         @Override
-        public City createFromParcel(Parcel in) {
+        public City createFromParcel(Parcel in)
+        {
             return new City(in);
         }
 
         @Override
-        public City[] newArray(int size) {
+        public City[] newArray(int size)
+        {
             return new City[size];
         }
     };

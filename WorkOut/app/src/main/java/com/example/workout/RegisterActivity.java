@@ -1,7 +1,6 @@
 package com.example.workout;
 
 import android.os.Bundle;
-import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
         ClientRepository clientRepository = new ClientRepository();
         Client sessionClient = null;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("1","Oranit"), "Hayarkon");
+        Address address = new Address(new City("Oranit"), "Hayarkon");
         clientRepository.insertClient("Alice", "1234", phone, email, "Dvir",
                 "Bento", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername()));

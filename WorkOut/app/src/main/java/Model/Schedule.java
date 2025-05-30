@@ -5,12 +5,6 @@ import android.os.Parcelable;
 
 import com.google.firebase.Timestamp;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Objects;
 
 public class Schedule implements Parcelable
@@ -18,33 +12,12 @@ public class Schedule implements Parcelable
     private Day day;
     private Timestamp occurrence;
 
-    public Schedule()
-    {
-    }
+    public Schedule() {}
 
     public Schedule(Day day, Timestamp occurrence)
     {
         this.day = day;
-        this.occurrence = normalizeToTimeOnly(occurrence);
-    }
-
-    private static Timestamp normalizeToTimeOnly(Timestamp raw)
-    {
-        if (raw == null) return null;
-
-        // Raw seconds/nanos are always in UTC
-        Instant inst = Instant.ofEpochSecond(raw.getSeconds(), raw.getNanoseconds());
-
-        // Extract the UTC time‐of‐day
-        LocalTime time = inst.atZone(ZoneOffset.UTC).toLocalTime();
-
-        // Compute seconds‐of‐day (0..86399) and nanos
-        long secondsOfDay = time.toSecondOfDay();  // e.g. 0h00=0, 1h00=3600, 12h23=443*60+? etc.
-        int nanoOfSecond = time.getNano();
-
-        // Build a Timestamp at Jan 1 1970 00:00:00 UTC + secondsOfDay
-        //    (so seconds==secondsOfDay, date==1970-01-01)
-        return new Timestamp(secondsOfDay, nanoOfSecond);
+        this.occurrence = occurrence;
     }
 
     public Day getDay()
@@ -64,7 +37,7 @@ public class Schedule implements Parcelable
 
     public void setOccurrence(Timestamp occurrence)
     {
-        this.occurrence = normalizeToTimeOnly(occurrence);
+        this.occurrence = occurrence;
     }
 
     protected Schedule(Parcel in)

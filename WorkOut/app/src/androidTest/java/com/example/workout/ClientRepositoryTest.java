@@ -51,7 +51,7 @@ public class ClientRepositoryTest
     public void queryClientTest() throws ExecutionException, InterruptedException, TimeoutException
     {
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("2","Rosh Ha'Ayin"), "Haim Hertzog");
+        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
 
         // Test insert functionality
         testSubject = await(repository.insertClient("testEverything", "1234", phone, "testEverything@gmail.com", "Shaked",

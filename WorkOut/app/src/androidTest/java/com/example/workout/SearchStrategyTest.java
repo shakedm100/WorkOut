@@ -4,13 +4,9 @@ import static com.google.android.gms.tasks.Tasks.await;
 
 import static org.junit.Assert.*;
 
-import com.google.firebase.Timestamp;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -23,7 +19,6 @@ import Model.Location;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
-import Model.SearchStrategies.SearchDateStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -76,41 +71,6 @@ public class SearchStrategyTest
 
         ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
                 .search(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
-
-        assertNotNull(businesses);
-        assertFalse(businesses.isEmpty());
-    }
-
-    @Test
-    public void searchDateTest() throws ExecutionException, InterruptedException, TimeoutException
-    {
-        searchStrategy = new SearchDateStrategy();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 2025);
-        calendar.set(Calendar.MONTH, 3); // Months are from 0 - 11
-        calendar.set(Calendar.DAY_OF_MONTH, 23); // Wednesday
-
-        // Set min time at 12:00
-        calendar.set(Calendar.HOUR_OF_DAY, 20);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date minDate = calendar.getTime();
-        Timestamp minTime = new Timestamp(minDate);
-
-        // Set max time at 13:00
-        calendar.set(Calendar.HOUR_OF_DAY, 21);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date maxDate = calendar.getTime();
-        Timestamp maxTime = new Timestamp(maxDate);
-
-        Timestamp[] times = new Timestamp[]{minTime, maxTime};
-
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
-                .search(times), 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
