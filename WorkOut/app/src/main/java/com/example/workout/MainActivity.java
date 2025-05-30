@@ -64,11 +64,11 @@ public class MainActivity extends AppCompatActivity {
         // listen to new data
 
         // Update ViewModel data on button click
-        button.setOnClickListener(new View.OnClickListener() {
+        /*button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //viewModel.updateText("Hello from ViewModel!");
             }
-        });
+        });*/
     }
 }
