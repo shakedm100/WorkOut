@@ -27,7 +27,6 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.firebase.auth.FirebaseAuth;
 
 import Model.Client;
-import Model.Repository.BusinessRepository;
 import Model.Repository.ClientRepository;
 import ViewModel.LoginViewModel;
 
@@ -62,10 +61,10 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         loginButton = findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(click ->
+        /*loginButton.setOnClickListener(click ->
         {
             checkIfUserAndPassword();
-        });
+        });*/
 
 
         // initialize ViewModel
@@ -75,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         setupObservers();
 
         // create button click listener
-        //setupButtonClickListeners();
+        setupButtonClickListeners();
     }
 
     // show the respond
@@ -98,11 +97,20 @@ public class LoginActivity extends AppCompatActivity {
                     loginButton.setEnabled(true);
                     textViewError.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
-                    // navigate to home activity when success occurs
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class); // move to home page
+                    Intent intent;
+                    if(loginUiState.getData() instanceof Client)
+                    {
+                        // navigate to home activity when success occurs
+                        intent = new Intent(this, MainActivity.class); // move to home page
+                        intent.putExtra("client", loginUiState.getData());
+                    }
+                    else
+                    {
+                        intent = new Intent(this, BusinessHomeActivity.class); // move to home page
+                        intent.putExtra("business", loginUiState.getData());
+                    }
                     startActivity(intent);
-                    finish(); // Optional: finish LoginActivity so user can't go back
-                    break;
+                    finish(); // Finish LoginActivity so user can't go back
                 case ERROR:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
@@ -113,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /*private void setupButtonClickListeners()
+    private void setupButtonClickListeners()
     {
         loginButton.setOnClickListener(v ->
         {
@@ -133,11 +141,11 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             // Call the ViewModel method
-            loginViewModel.loginClient(username, password);
+            loginViewModel.loginUser(username, password);
         });
-    }*/
+    }
 
-    private void checkIfUserAndPassword()
+   /* private void checkIfUserAndPassword()
         {
             String username = editTextUsername.getText().toString();
             String password = editTextPassword.getText().toString();
@@ -165,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
             {
                 //TODO: Handle error here, not a business nor a client!
             });
-        }
+        }*/
 
 
     private void requestGoogleIdToken()
