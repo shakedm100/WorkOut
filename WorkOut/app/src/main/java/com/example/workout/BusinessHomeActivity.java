@@ -51,6 +51,12 @@ public class BusinessHomeActivity extends AppCompatActivity
                 startActivity(intent);
                 return true;
             }
+            else if (id == R.id.nav_status)
+            {
+                Intent intent = new Intent(this, StatusActivity.class);
+                intent.putExtra("business", business);
+                startActivity(intent);
+            }
             else if (id == R.id.nav_calendar)
             {
                 Intent intent = new Intent(this, CalendarActivity.class);

@@ -11,48 +11,56 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.workout.R;
-import com.example.workout.models.Review;
+
+import Model.Rating;
 
 import java.util.List;
 
-public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
+public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.RatingViewHolder>
+{
 
-    private List<Review> reviewList;
+    private List<Rating> RatingList;
 
-    public ReviewAdapter(List<Review> reviewList) {
-        this.reviewList = reviewList;
+    public ReviewAdapter(List<Rating> RatingList)
+    {
+        this.RatingList = RatingList;
     }
 
     @NonNull
     @Override
-    public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RatingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.review_item, parent, false);
-        return new ReviewViewHolder(view);
+        return new RatingViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
-        Review review = reviewList.get(position);
-        holder.username.setText(review.getUsername());
-        holder.reviewText.setText(review.getReviewText());
-        holder.ratingBar.setRating(review.getRating());
+    public void onBindViewHolder(@NonNull RatingViewHolder holder, int position)
+    {
+        Rating rating = RatingList.get(position);
+        holder.username.setText(rating.getClient().getUsername());
+        holder.RatingText.setText(rating.getComment());
+        holder.ratingBar.setRating(rating.getStars());
         // אפשר גם לטעון תמונת פרופיל כאן אם יש לך URL (עם Glide למשל)
     }
 
     @Override
-    public int getItemCount() {
-        return reviewList.size();
+    public int getItemCount()
+    {
+        return RatingList.size();
     }
 
-    static class ReviewViewHolder extends RecyclerView.ViewHolder {
-        TextView username, reviewText;
+    static class RatingViewHolder extends RecyclerView.ViewHolder
+    {
+        TextView username, RatingText;
         RatingBar ratingBar;
         ImageView profileImage;
 
-        public ReviewViewHolder(@NonNull View itemView) {
+        public RatingViewHolder(@NonNull View itemView)
+        {
             super(itemView);
             username = itemView.findViewById(R.id.textUsername);
-            reviewText = itemView.findViewById(R.id.textReview);
+            RatingText = itemView.findViewById(R.id.textReview);
             ratingBar = itemView.findViewById(R.id.ratingBar);
             profileImage = itemView.findViewById(R.id.imageProfile);
         }

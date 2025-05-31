@@ -1,38 +1,91 @@
 package com.example.workout;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import Adapters.ReviewAdapter;
-import com.example.workout.models.Review;
+import Model.Business;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class StatusActivity extends AppCompatActivity {
+public class StatusActivity extends AppCompatActivity
+{
 
     private RecyclerView recyclerView;
     private ReviewAdapter adapter;
-    private List<Review> reviews;
+    Business current;
+    BottomNavigationView bottomNavigationView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.status_business);
 
         recyclerView = findViewById(R.id.reviewRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // הדמיה של נתונים (בשלב זה - סטטיים)
-        reviews = new ArrayList<>();
-        reviews.add(new Review("Noa123", "Great classes, highly recommend!", 5));
-        reviews.add(new Review("AviM", "Instructor was friendly.", 4));
-        reviews.add(new Review("Dana89", "Good but room was a bit crowded.", 3));
+        current = getIntent().getParcelableExtra("business");
 
-        adapter = new ReviewAdapter(reviews);
-        recyclerView.setAdapter(adapter);
+        if (current.getRatings() == null)
+        {
+            //TODO: No ratings yet
+        }
+        else
+        {
+            adapter = new ReviewAdapter(current.getRatings());
+            recyclerView.setAdapter(adapter);
+        }
+
+        setUpBottomNavigationView();
+    }
+
+    private void setUpBottomNavigationView()
+    {
+        bottomNavigationView.setSelectedItemId(R.id.nav_status);
+
+        // Setup event listener
+        bottomNavigationView.setOnItemSelectedListener(item ->
+        {
+            int id = item.getItemId();
+            if (id == R.id.nav_home)
+            {
+                Intent intent = new Intent(this, BusinessHomeActivity.class);
+                intent.putExtra("business", current);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_profile)
+            {
+                Intent intent = new Intent(this, BusinessProfileActivity.class);
+                intent.putExtra("business", current);
+                startActivity(intent);
+            }
+            else if (id == R.id.nav_courses)
+            {
+                Intent intent = new Intent(this, CoursesActivity.class);
+                intent.putExtra("business", current);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_status)
+            {
+                // you’re already here
+                return true;
+            }
+            else if (id == R.id.nav_calendar)
+            {
+                Intent intent = new Intent(this, CalendarActivity.class);
+                intent.putExtra("business", current);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
     }
 }

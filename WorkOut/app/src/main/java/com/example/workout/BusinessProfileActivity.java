@@ -2,6 +2,7 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,8 +33,10 @@ public class BusinessProfileActivity extends AppCompatActivity
         });
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        TextView username = findViewById(R.id.userName);
 
         business = getIntent().getParcelableExtra("business");
+        username.setText(business.getBusinessName());
 
         setUpBottomNavigationView();
     }
@@ -64,6 +67,12 @@ public class BusinessProfileActivity extends AppCompatActivity
                 intent.putExtra("business", business);
                 startActivity(intent);
                 return true;
+            }
+            else if (id == R.id.nav_status)
+            {
+                Intent intent = new Intent(this, StatusActivity.class);
+                intent.putExtra("business", business);
+                startActivity(intent);
             }
             else if (id == R.id.nav_calendar)
             {
