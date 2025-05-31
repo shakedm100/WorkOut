@@ -38,7 +38,7 @@ public class SearchDateStrategy implements SearchStrategyInterface<Timestamp[]>
     }
 
     @Override
-    public Task<List<Business>> search(Timestamp[] times)
+    public Task<List<Business>> searchBusinesses(Timestamp[] times)
     {
         if (times.length != 2)
         {
@@ -133,24 +133,60 @@ public class SearchDateStrategy implements SearchStrategyInterface<Timestamp[]>
                 });
     }
 
-    /*private static Timestamp normalizeToTimeOnly(Timestamp raw)
-    {
-        if (raw == null) return null;
+    @Override
+    public Task<List<Course>> searchCourses(Timestamp[] times) {
+        if (times.length != 2) {
+            throw new IllegalArgumentException("There aren't exactly two timestamps in the array");
+        }
 
-        // Raw seconds/nanos are always in UTC
-        Instant inst = Instant.ofEpochSecond(raw.getSeconds(), raw.getNanoseconds());
+        // 1) Sort the two timestamps into minTime / maxTime
+        Timestamp t0 = times[0], t1 = times[1];
+        Timestamp minTime = (t0.compareTo(t1) <= 0) ? t0 : t1;
+        Timestamp maxTime = (t0.compareTo(t1) <= 0) ? t1 : t0;
 
-        // Extract the UTC time‐of‐day
-        LocalTime time = inst.atZone(ZoneOffset.UTC).toLocalTime();
+        // 2) Extract the Day enum from one of them (they share the same day)
+        Day day = extractDayFromTimestamp(minTime);
 
-        // Compute seconds‐of‐day (0..86399) and nanos
-        long secondsOfDay = time.toSecondOfDay();  // e.g. 0h00=0, 1h00=3600, 12h23=443*60+? etc.
-        int nanoOfSecond = time.getNano();
+        // 3) Normalize both endpoints to “time‐only” (Jan 1 1970 + clock time UTC)
+        Timestamp normMin = normalizeToTimeOnly(minTime);
+        Timestamp normMax = normalizeToTimeOnly(maxTime);
 
-        // Build a Timestamp at Jan 1 1970 00:00:00 UTC + secondsOfDay
-        //    (so seconds==secondsOfDay, date==1970-01-01)
-        return new Timestamp(secondsOfDay, nanoOfSecond);
-    }*/
+        // 4) Query all courses on that day whose occurrence is between normMin and normMax
+        return db.collectionGroup("courses")
+                .whereEqualTo("schedule.day",    day.toString())
+                .whereGreaterThanOrEqualTo("schedule.occurrence", normMin)
+                .whereLessThanOrEqualTo(   "schedule.occurrence", normMax)
+                .get()
+
+                // 5) Map each matching DocumentSnapshot → Course (with businessId set)
+                .continueWith(task -> {
+                    if (!task.isSuccessful()) {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+
+                    List<Course> results = new ArrayList<>();
+                    for (DocumentSnapshot cs : task.getResult()) {
+                        // a) Convert to Course object
+                        Course c = cs.toObject(Course.class);
+                        if (c == null) continue;
+
+                        // b) Set the Course’s Firestore document ID
+                        c.setId(cs.getId());
+
+                        // c) Find the parent business reference and save its ID on the course
+                        DocumentReference bizRef = cs.getReference()
+                                .getParent()   // “courses” collection
+                                .getParent();  // “businesses/{bizId}” doc
+                        if (bizRef != null) {
+                            c.setBusinessId(bizRef.getId());
+                        }
+
+                        results.add(c);
+                    }
+                    return results;
+                });
+    }
+
 
     private static Timestamp normalizeToTimeOnly(Timestamp raw)
     {

@@ -67,7 +67,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
     }
 
     @Override
-    public Task<List<Business>> search(Location current)
+    public Task<List<Business>> searchBusinesses(Location current)
     {
         double lat = current.getLatitude();
         double lon = current.getLongitude();
@@ -144,6 +144,98 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
                     @SuppressWarnings("unchecked")
                     List<Business> result = (List<Business>) finalTask.getResult();
                     return result;
+                });
+    }
+
+    @Override
+    public Task<List<Course>> searchCourses(Location current)
+    {
+        double lat = current.getLatitude();
+        double lon = current.getLongitude();
+
+        // 1) Compute bounding‐box deltas for radius (in kilometers)
+        double latDelta = radius / 110.574;
+        double lonDelta = radius / (111.320 * Math.cos(Math.toRadians(lat)));
+
+        double minLat = lat - latDelta;
+        double maxLat = lat + latDelta;
+        double minLon = lon - lonDelta;
+        double maxLon = lon + lonDelta;
+
+        // 2) Query the “businesses” collection for all businesses in the bounding box
+        return db.collection("businesses")
+                .whereGreaterThanOrEqualTo("location.latitude",  minLat)
+                .whereLessThanOrEqualTo(    "location.latitude",  maxLat)
+                .whereGreaterThanOrEqualTo("location.longitude", minLon)
+                .whereLessThanOrEqualTo(    "location.longitude", maxLon)
+                .get()
+
+                // 3) Filter out any businesses that lie outside the true circle (radius),
+                //    then collect their IDs for the next step
+                .onSuccessTask(bizSnap -> {
+                    List<String> inBoxBizIds = new ArrayList<>();
+                    for (DocumentSnapshot ds : bizSnap) {
+                        Business b = ds.toObject(Business.class);
+                        if (b == null || b.getLocation() == null) continue;
+                        b.setId(ds.getId());
+
+                        double d = distance(current, b.getLocation());
+                        if (d <= radius) {
+                            inBoxBizIds.add(ds.getId());
+                        }
+                    }
+
+                    if (inBoxBizIds.isEmpty()) {
+                        return Tasks.forResult(Collections.emptyList());
+                    }
+
+                    // 4) For each business ID, fetch its “courses” subcollection.
+                    //    This produces a Task<List<Course>> per business.
+                    List<Task<List<Course>>> courseTasks = inBoxBizIds.stream()
+                            .map(bizId -> db.collection("businesses")
+                                    .document(bizId)
+                                    .collection("courses")
+                                    .get()
+                                    .continueWith(courseSnapTask -> {
+                                        if (!courseSnapTask.isSuccessful()) {
+                                            throw Objects.requireNonNull(courseSnapTask.getException());
+                                        }
+
+                                        List<Course> bizCourses = new ArrayList<>();
+                                        for (DocumentSnapshot cs : courseSnapTask.getResult()) {
+                                            Course c = cs.toObject(Course.class);
+                                            if (c == null) continue;
+
+                                            // a) Set this Course’s own Firestore ID
+                                            c.setId(cs.getId());
+                                            // b) Annotate with parent business ID
+                                            c.setBusinessId(bizId);
+
+                                            bizCourses.add(c);
+                                        }
+                                        return bizCourses;
+                                    }))
+                            .collect(Collectors.toList());
+
+                    // 5) Combine all those Task<List<Course>> into one Task<List<Course>>
+                    //    using whenAllSuccess. The result will be a List<Object> where each
+                    //    Object is a List<Course>. We will flatten in the next step.
+                    return Tasks.<List<Course>>whenAllSuccess(courseTasks);
+                })
+
+                // 6) Flatten List<List<Course>> → List<Course>
+                .continueWith(finalTask -> {
+                    if (!finalTask.isSuccessful()) {
+                        throw Objects.requireNonNull(finalTask.getException());
+                    }
+
+                    @SuppressWarnings("unchecked")
+                    List<List<Course>> listOfCourseLists = (List<List<Course>>) finalTask.getResult();
+                    List<Course> allCourses = new ArrayList<>();
+                    for (List<Course> sublist : listOfCourseLists) {
+                        allCourses.addAll(sublist);
+                    }
+                    return allCourses;
                 });
     }
 }

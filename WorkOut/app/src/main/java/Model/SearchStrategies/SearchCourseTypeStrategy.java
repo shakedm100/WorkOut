@@ -28,7 +28,7 @@ public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseT
     }
 
     @Override
-    public Task<List<Business>> search(CourseType type)
+    public Task<List<Business>> searchBusinesses(CourseType type)
     {
         return db.collectionGroup("courses")
                 .whereEqualTo("type", type)
@@ -98,4 +98,38 @@ public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseT
                     return result;
                 });
     }
+
+    @Override
+    public Task<List<Course>> searchCourses(CourseType type) {
+        return db.collectionGroup("courses")
+                .whereEqualTo("type", type)
+                .get()
+                .continueWith(task -> {
+                    if (!task.isSuccessful()) {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+
+                    List<Course> results = new ArrayList<>();
+                    for (DocumentSnapshot cs : task.getResult()) {
+                        // 1) Convert to Course
+                        Course c = cs.toObject(Course.class);
+                        if (c == null) continue;
+
+                        // 2) Set the Course’s own document ID
+                        c.setId(cs.getId());
+
+                        // 3) Find the parent business reference and set its ID on the Course
+                        DocumentReference bizRef = cs.getReference()
+                                .getParent()   // “courses” collection
+                                .getParent();  // “businesses/{bizId}” doc
+                        if (bizRef != null) {
+                            c.setBusinessId(bizRef.getId());
+                        }
+
+                        results.add(c);
+                    }
+                    return results;
+                });
+    }
+
 }

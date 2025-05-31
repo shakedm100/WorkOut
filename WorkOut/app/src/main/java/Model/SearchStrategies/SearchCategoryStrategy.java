@@ -37,7 +37,7 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
      * @return list of businesses that have that category
      */
     @Override
-    public Task<List<Business>> search(Category category)
+    public Task<List<Business>> searchBusinesses(Category category)
     {
         return db.collectionGroup("courses")
                 .whereEqualTo("category", category).get().onSuccessTask(querySnap -> {
@@ -95,4 +95,40 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
                     return result;
                 });
     }
+
+    @Override
+    public Task<List<Course>> searchCourses(Category category) {
+        return db.collectionGroup("courses")
+                .whereEqualTo("category", category)
+                .get()
+                .continueWith(task -> {
+                    if (!task.isSuccessful()) {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+
+                    List<Course> results = new ArrayList<>();
+                    for (DocumentSnapshot cs : task.getResult()) {
+                        // 1) Turn the document into a Course object
+                        Course c = cs.toObject(Course.class);
+                        if (c == null) continue;
+
+                        // 2) Set the Course’s own Firestore ID
+                        c.setId(cs.getId());
+
+                        // 3) Look up the parent business reference
+                        DocumentReference bizRef = cs.getReference()
+                                .getParent()   // the “courses” subcollection
+                                .getParent();  // the “businesses/{bizId}” parent
+                        if (bizRef != null) {
+                            // We assume you have a setBusinessId(String) on Course
+                            c.setBusinessId(bizRef.getId());
+                        }
+
+                        results.add(c);
+                    }
+
+                    return results;
+                });
+    }
+
 }
