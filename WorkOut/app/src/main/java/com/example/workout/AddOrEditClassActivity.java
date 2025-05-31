@@ -56,14 +56,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_or_edit_class);
 
-        try
-        {
-            currentCourse = this.getIntent().getParcelableExtra("course");
-        }
-        catch (Exception e)
-        {
-            currentCourse = null; // Sent "null"
-        }
+        currentCourse = this.getIntent().getParcelableExtra("course");
         currentBusiness = this.getIntent().getParcelableExtra("business");
 
         courseRepository = new CourseRepository();
@@ -98,7 +91,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
             values.add((float) currentCourse.getAgeRange().getMaxAge());
             ageSlider.setValues(values); // Set the current ages to [minAge, maxAge]
 
-            capacityEditText.setText(currentCourse.getCapacity());
+            capacityEditText.setText(String.valueOf(currentCourse.getCapacity()));
             descriptionEditText.setText(currentCourse.getDescription());
         }
 

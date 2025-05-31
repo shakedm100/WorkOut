@@ -51,7 +51,7 @@ public class Schedule implements Parcelable
     {
         dest.writeString(day.name());
         // write as ISO-8601 (e.g. "14:30:00")
-        dest.writeString(occurrence.toString());
+        dest.writeParcelable(occurrence, flags);
     }
 
     @Override
