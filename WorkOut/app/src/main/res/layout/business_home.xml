@@ -1,4 +1,6 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -6,21 +8,20 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
+    <!-- Your top ImageView -->
     <ImageView
         android:id="@+id/myImageView"
-        android:layout_width="413dp"
+        android:layout_width="match_parent"
         android:layout_height="338dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginTop="20dp"
         android:contentDescription="@string/back_image"
         android:scaleType="centerCrop"
         android:src="@drawable/sport_business"
-        app:layout_constraintBottom_toTopOf="@+id/calendarView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- “Workout” label -->
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
@@ -35,12 +36,11 @@
         android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="@+id/myImageView"
         app:layout_constraintEnd_toEndOf="@+id/myImageView"
-        app:layout_constraintHorizontal_bias="0.986"
-        app:layout_constraintStart_toEndOf="@+id/myImageView"
         app:layout_constraintStart_toStartOf="@+id/myImageView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.541" />
 
+    <!-- “Business” label -->
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
@@ -55,26 +55,21 @@
         android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="@+id/myImageView"
         app:layout_constraintEnd_toEndOf="@+id/myImageView"
-        app:layout_constraintHorizontal_bias="0.726"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.833" />
 
-
+    <!-- Centered CalendarView -->
     <CalendarView
         android:id="@+id/calendarView"
-        android:layout_width="364dp"
+        android:layout_width="match_parent"
         android:layout_height="291dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="@id/bottomNavigationView"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@id/myImageView"
-        app:layout_constraintTop_toBottomOf="@+id/myImageView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- Bottom navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
@@ -83,7 +78,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_business_menu"
-        app:labelVisibilityMode="labeled"/>
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_business_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

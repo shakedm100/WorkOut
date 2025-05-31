@@ -12,22 +12,24 @@
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_marginTop="18dp"
         android:src="@color/background"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="2dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/registrationTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:text="@string/register"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="40sp"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/backgroundImage" />
 
     <TextView
         android:id="@+id/phoneNumberTextView"
