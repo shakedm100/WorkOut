@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Pressed state (USER is actively pressing/clicking) -->
+    <item android:state_pressed="true"
+        android:drawable="@drawable/rectangle_border_pressed" />
+
+    <!-- Focused state (if you also want a look when keyboard/tab focus) -->
+    <item android:state_focused="true"
+        android:drawable="@drawable/rectangle_border_pressed" />
+
+    <!-- Default state: not pressed, not focused -->
+    <item android:drawable="@drawable/rectangle_border" />
+</selector>
