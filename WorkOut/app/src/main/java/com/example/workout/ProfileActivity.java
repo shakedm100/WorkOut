@@ -17,31 +17,91 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import Model.Client;
 import Model.Repository.ClientRepository;
 import ViewModel.ClientProfileViewModel;
 import ViewModel.GenericUiState;
 import ViewModel.LoginViewModel;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity
+{
 
     private ClientProfileViewModel clientProfileViewModel;
     private TextView textViewName, textViewEmail;
     private EditText editTextName, editTextEmail;
     private Button buttonSaveChanges;
     private ProgressBar progressBarProfile;
+    private BottomNavigationView bottomNavigationView;
+    Client current;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) ->
+        {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-    } // <- remove this when uncomment
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+
+        current = getIntent().getParcelableExtra("client");
+
+        setUpBottomNavigationView();
+    }
+    private void setUpBottomNavigationView()
+    {
+        bottomNavigationView.setOnItemSelectedListener(item ->
+        {
+            int id = item.getItemId();
+            if (id == R.id.nav_home)
+            {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_profile)
+            {
+                // you’re already here
+                return true;
+            }
+            else if (id == R.id.nav_search)
+            {
+                Intent intent = new Intent(this, SearchActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_ratings)
+            {
+                Intent intent = new Intent(this, RatingsActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_messages)
+            {
+                Intent intent = new Intent(this, MessagesActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    // <- remove this when uncomment
         /*
         // Initialize Views
         textViewFirstName = findViewById(R.id.firstNameText);

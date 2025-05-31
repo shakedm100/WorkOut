@@ -83,19 +83,6 @@ public class BusinessRepositoryTest
     @Test
     public void queryBusinessTest() throws ExecutionException, InterruptedException, TimeoutException
     {
-        ArrayList<Client> participants = new ArrayList<>();
-        participants.add(testHelper);
-        ArrayList<Client> followers = new ArrayList<>();
-        Rating rating = new Rating("1234", 4.9F,"Terribly amazing", testHelper);
-        ArrayList<Rating> ratings = new ArrayList<>();
-        ratings.add(rating);
-        followers.add(testHelper);
-        Schedule schedule = new Schedule(Day.Sunday, Timestamp.now());
-        Course course = new Course("bla", CourseType.Dou, "TRX", participants, 50, new AgeRange(23,50),
-                schedule, Category.Archery, "Shoot to kill");
-        ArrayList<Course> courses = new ArrayList<>();
-        courses.add(course);
-
         // Test insert
         testSubject = await(repository.insertBusiness("testEverything", "1234", testHelper.getPhone(),
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
@@ -139,14 +126,14 @@ public class BusinessRepositoryTest
         searchStrategy = new SearchAgeStrategy();
 
         AgeRange ageRange = new AgeRange(10,70);
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.search(ageRange)
+        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.searchBusinesses(ageRange)
                 , 10, TimeUnit.SECONDS);
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
 
         searchStrategy = new SearchCategoryStrategy();
 
-        businesses = (ArrayList<Business>) await(searchStrategy.search(Category.Baseball)
+        businesses = (ArrayList<Business>) await(searchStrategy.searchBusinesses(Category.Baseball)
                 , 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
@@ -154,7 +141,7 @@ public class BusinessRepositoryTest
 
         searchStrategy = new SearchCourseTypeStrategy();
 
-        businesses = (ArrayList<Business>) await(searchStrategy.search(CourseType.Group)
+        businesses = (ArrayList<Business>) await(searchStrategy.searchBusinesses(CourseType.Group)
                 , 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
@@ -163,7 +150,7 @@ public class BusinessRepositoryTest
         searchStrategy = new SearchRadiusStrategy(10);
 
         businesses = (ArrayList<Business>) await(searchStrategy
-                .search(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+                .searchBusinesses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
@@ -194,7 +181,7 @@ public class BusinessRepositoryTest
         Timestamp[] times = new Timestamp[]{minTime, maxTime};
 
         businesses = (ArrayList<Business>) await(searchStrategy
-                .search(times), 10, TimeUnit.SECONDS);
+                .searchBusinesses(times), 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());

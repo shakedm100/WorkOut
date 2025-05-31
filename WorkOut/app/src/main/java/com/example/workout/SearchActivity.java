@@ -1,6 +1,7 @@
 package com.example.workout;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -26,6 +27,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
@@ -47,10 +49,13 @@ import java.util.Map;
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
+import Model.Client;
+import Model.Course;
 import Model.CourseType;
 import Model.Day;
 import Model.Location;
 import Model.Repository.BusinessRepository;
+import Model.Repository.CourseRepository;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
@@ -61,7 +66,7 @@ import Model.SearchStrategies.SearchStrategyInterface;
 public class SearchActivity extends AppCompatActivity
 {
     SearchStrategyInterface searchStrategy;
-    BusinessRepository businessRepository;
+    CourseRepository courseRepository;
     RangeSlider ageSlider;
     AgeRange ageRange;
     CourseType chosenCourseType;
@@ -72,6 +77,8 @@ public class SearchActivity extends AppCompatActivity
     private LocalTime startTime, endTime;
     private Timestamp[] times;
     final int LOCATION_PERMISSION_REQUEST = 1001;
+    BottomNavigationView bottomNavigationView;
+    Client current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -89,25 +96,33 @@ public class SearchActivity extends AppCompatActivity
         categorySpinner = findViewById(R.id.categorySearchSpinner);
         editTextLocation = findViewById(R.id.locationAuto);
         courseTypeSpinner = findViewById(R.id.typeSpinner);
-        businessRepository = new BusinessRepository();
+        courseRepository = new CourseRepository();
         container = findViewById(R.id.search_slider_container);
         ageRange = new AgeRange(0, 99);
         dayOfWeekSpinner = findViewById(R.id.dayOfWeekSearchSpinner);
         startTime = LocalTime.of(0, 0);
         endTime = LocalTime.of(23, 59);
         times = new Timestamp[2];
-
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_search);
         startTimeButton = findViewById(R.id.startTimeButton);
         endTimeButton = findViewById(R.id.endTimeButton);
+
+        current = getIntent().getParcelableExtra("client");
 
         setUpCourseTypeSpinner();
         setUpCategorySpinner();
         setUpAgeSlider();
         setUpDayOfWeekSpinner();
+        setUpBottomNavigationView();
+        setUpTimePicker();
 
         Button searchButton = findViewById(R.id.searchButton);
         searchButton.setOnClickListener(event -> executeAndGoToResults());
+    }
 
+    private void setUpTimePicker()
+    {
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H).setHour(0).setMinute(0);
         MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
@@ -130,23 +145,71 @@ public class SearchActivity extends AppCompatActivity
             endTime = LocalTime.of(hours, minutes);
         });
 
-        findViewById(R.id.startTimeButton).setOnClickListener(v ->
+        startTimeButton.setOnClickListener(v ->
         {
             startPicker.show(getSupportFragmentManager(), "START_PICKER");
         });
-        findViewById(R.id.endTimeButton).setOnClickListener(v ->
+        endTimeButton.setOnClickListener(v ->
         {
             endPicker.show(getSupportFragmentManager(), "END_PICKER");
         });
     }
 
+    private void setUpBottomNavigationView()
+    {
+        bottomNavigationView.setOnItemSelectedListener(item ->
+        {
+            int id = item.getItemId();
+            if (id == R.id.nav_home)
+            {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_profile)
+            {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_search)
+            {
+                // you’re already here
+                return true;
+            }
+            else if (id == R.id.nav_ratings)
+            {
+                Intent intent = new Intent(this, RatingsActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_messages)
+            {
+                Intent intent = new Intent(this, MessagesActivity.class);
+                intent.putExtra("client", current);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
+    }
+
     private void executeAndGoToResults()
     {
-        executeSearch().addOnSuccessListener(task ->
+        executeSearch().addOnSuccessListener(courses ->
         {
             // TODO: Go to search results page here!
-            /*Intent intent = new Intent(this, )*/
-            String bla = "bla";
+            Intent intent = new Intent(this, SearchResultsActivity.class);
+            ArrayList<Course> courseArrayList = new ArrayList<>(courses);
+            intent.putParcelableArrayListExtra("course_list", courseArrayList);
+            intent.putExtra("client", current);
+            startActivity(intent);
         }).addOnFailureListener(task ->
         {
             // TODO: Show error to user
@@ -276,9 +339,9 @@ public class SearchActivity extends AppCompatActivity
      * This method takes all the searchable elements and finds all corresponding businesses and
      * shows them, it searches only fields in the activity page that were changed by the user
      */
-    private Task<List<Business>> executeSearch()
+    private Task<List<Course>> executeSearch()
     {
-        List<Task<List<Business>>> tasks = new ArrayList<>();
+        List<Task<List<Course>>> tasks = new ArrayList<>();
 
         String category = categorySpinner.getSelectedItem().toString().trim();
         String courseType = courseTypeSpinner.getSelectedItem().toString().trim();
@@ -336,22 +399,22 @@ public class SearchActivity extends AppCompatActivity
         return Tasks.whenAllSuccess(tasks)
                 .continueWith(allDone ->
                 {
-                    // allDone.getResult() is List<Object>, each is a List<Business>
-                    Map<String, Business> byId = new LinkedHashMap<>();
+                    // allDone.getResult() is List<Object>, each is a List<Course>
+                    Map<String, Course> byId = new LinkedHashMap<>();
                     for (Object o : allDone.getResult())
                     {
                         @SuppressWarnings("unchecked")
-                        List<Business> list = (List<Business>) o;
-                        for (Business b : list)
+                        List<Course> list = (List<Course>) o;
+                        for (Course course : list)
                         {
-                            byId.putIfAbsent(b.getId(), b);
+                            byId.putIfAbsent(course.getId(), course);
                         }
                     }
                     return new ArrayList<>(byId.values());
                 });
     }
 
-    private Task<List<Business>> searchCategory()
+    private Task<List<Course>> searchCategory()
     {
         // Category search handling
         String categoryText = categorySpinner.getSelectedItem().toString();
@@ -359,12 +422,12 @@ public class SearchActivity extends AppCompatActivity
         {
             Category category = Category.fromString(categoryText);
             searchStrategy = new SearchCategoryStrategy();
-            return businessRepository.searchByStrategy(searchStrategy, category);
+            return courseRepository.searchByStrategy(searchStrategy, category);
         }
         return null;
     }
 
-    private Task<List<Business>> searchRadius()
+    private Task<List<Course>> searchRadius()
     {
         // Location search handling
         String locationText = editTextLocation.getText().toString().trim();
@@ -387,7 +450,7 @@ public class SearchActivity extends AppCompatActivity
                             Location location = new Location(locatinTask.getResult().getLatitude(),
                                     locatinTask.getResult().getLongitude());
                             searchStrategy = new SearchRadiusStrategy(radius);
-                            return businessRepository.searchByStrategy(searchStrategy, locatinTask.getResult());
+                            return courseRepository.searchByStrategy(searchStrategy, locatinTask.getResult());
                         });
             }
             catch (Exception e)
@@ -399,18 +462,18 @@ public class SearchActivity extends AppCompatActivity
         return null;
     }
 
-    private Task<List<Business>> searchAgeRange()
+    private Task<List<Course>> searchAgeRange()
     {
         searchStrategy = new SearchAgeStrategy();
-        return businessRepository.searchByStrategy(searchStrategy, ageRange);
+        return courseRepository.searchByStrategy(searchStrategy, ageRange);
     }
 
-    private Task<List<Business>> searchCourseType()
+    private Task<List<Course>> searchCourseType()
     {
         try
         {
             searchStrategy = new SearchCourseTypeStrategy();
-            return businessRepository.searchByStrategy(searchStrategy, chosenCourseType);
+            return courseRepository.searchByStrategy(searchStrategy, chosenCourseType);
         }
         catch (Exception e)
         {
@@ -419,12 +482,12 @@ public class SearchActivity extends AppCompatActivity
         }
     }
 
-    private Task<List<Business>> searchDayTime()
+    private Task<List<Course>> searchDayTime()
     {
         try
         {
             searchStrategy = new SearchDateStrategy();
-            return businessRepository.searchByStrategy(searchStrategy, times);
+            return courseRepository.searchByStrategy(searchStrategy, times);
         }
         catch (Exception e)
         {

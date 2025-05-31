@@ -18,6 +18,7 @@ import java.util.concurrent.TimeoutException;
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
+import Model.Course;
 import Model.CourseType;
 import Model.Location;
 import Model.SearchStrategies.SearchAgeStrategy;
@@ -38,10 +39,18 @@ public class SearchStrategyTest
         searchStrategy = new SearchAgeStrategy();
 
         AgeRange ageRange = new AgeRange(10, 70);
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.search(ageRange)
+        @SuppressWarnings("unchecked")
+        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.searchBusinesses(ageRange)
                 , 10, TimeUnit.SECONDS);
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy.searchCourses(ageRange)
+                , 10, TimeUnit.SECONDS);
+
+        assertNotNull(courses);
+        assertFalse(courses.isEmpty());
     }
 
     @Test
@@ -50,11 +59,18 @@ public class SearchStrategyTest
         searchStrategy = new SearchCategoryStrategy();
 
         @SuppressWarnings("unchecked")
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.search(Category.Baseball)
+        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.searchBusinesses(Category.Baseball)
                 , 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy.searchCourses(Category.Baseball)
+                , 10, TimeUnit.SECONDS);
+
+        assertNotNull(courses);
+        assertFalse(courses.isEmpty());
     }
 
     @Test
@@ -62,11 +78,19 @@ public class SearchStrategyTest
     {
         searchStrategy = new SearchCourseTypeStrategy();
 
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.search(CourseType.Group)
+        @SuppressWarnings("unchecked")
+        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy.searchBusinesses(CourseType.Group)
                 , 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy.searchCourses(CourseType.Group)
+                , 10, TimeUnit.SECONDS);
+
+        assertNotNull(courses);
+        assertFalse(courses.isEmpty());
     }
 
     @Test
@@ -74,11 +98,19 @@ public class SearchStrategyTest
     {
         searchStrategy = new SearchRadiusStrategy(10);
 
+        @SuppressWarnings("unchecked")
         ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
-                .search(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+                .searchBusinesses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy.searchCourses(new Location(32.08, 34.7))
+                , 10, TimeUnit.SECONDS);
+
+        assertNotNull(courses);
+        assertFalse(courses.isEmpty());
     }
 
     @Test
@@ -109,10 +141,18 @@ public class SearchStrategyTest
 
         Timestamp[] times = new Timestamp[]{minTime, maxTime};
 
+        @SuppressWarnings("unchecked")
         ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
-                .search(times), 10, TimeUnit.SECONDS);
+                .searchBusinesses(times), 10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy
+                .searchBusinesses(times), 10, TimeUnit.SECONDS);
+
+        assertNotNull(courses);
+        assertFalse(courses.isEmpty());
     }
 }

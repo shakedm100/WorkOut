@@ -19,6 +19,7 @@ import Model.Course;
 import Model.CourseType;
 import Model.Day;
 import Model.Schedule;
+import Model.SearchStrategies.SearchStrategyInterface;
 
 public class CourseRepository
 {
@@ -43,6 +44,7 @@ public class CourseRepository
         course.put("ageRange", ageRange);
         course.put("category", category);
         course.put("description", description);
+        course.put("businessId", business.getId());
 
         return db.collection(collection).document(business.getId()).collection(subCollection)
                 .add(course).continueWith(task ->
@@ -52,7 +54,7 @@ public class CourseRepository
 
                     DocumentReference reference = task.getResult();
                     String id = reference.getId();
-                    Course add = new Course(id, type, name, new ArrayList<>(), capacity, ageRange, schedule, category, description);
+                    Course add = new Course(id, type, name, new ArrayList<>(), capacity, ageRange, schedule, category, description, business.getId());
                     business.addCourse(add);
                     return add;
                 });
@@ -114,6 +116,18 @@ public class CourseRepository
                     }
                     return courses;
                 });
+    }
+
+    /**
+     * This function is responsible for all the search logic. It receives a generic
+     * SearchInterface that decides how to search and an object that acts as a search filter.
+     * @param searchStrategy dictates how to search
+     * @param data the relative search data
+     * @return a list of courses that agree with the search terms
+     */
+    public Task<List<Course>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
+    {
+        return searchStrategy.searchCourses(data);
     }
 
     public Task<List<Course>> getCoursesByDayOfWeek(Business business, Day day)

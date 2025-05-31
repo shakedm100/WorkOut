@@ -9,6 +9,7 @@ import java.util.Objects;
 public class Course extends Entity implements Parcelable
 {
     private CourseType type;
+    private String businessId;
     private String name;
     private ArrayList<Client> participants;
     private int capacity;
@@ -20,7 +21,7 @@ public class Course extends Entity implements Parcelable
     public Course() {}
 
     public Course(String id, CourseType type, String name, ArrayList<Client> participants, int capacity,
-                  AgeRange ageRange, Schedule schedule, Category category, String description)
+                  AgeRange ageRange, Schedule schedule, Category category, String description, String businessId)
     {
         super(id);
         this.type = type;
@@ -31,6 +32,7 @@ public class Course extends Entity implements Parcelable
         this.schedule = schedule;
         this.category = category;
         this.description = description;
+        this.businessId = businessId;
     }
 
     public Course(String id, CourseType type, String name, int capacity,
@@ -45,6 +47,7 @@ public class Course extends Entity implements Parcelable
         this.schedule = schedule;
         this.category = category;
         this.description = description;
+        this.businessId = "";
     }
 
     public CourseType getType()
@@ -87,6 +90,11 @@ public class Course extends Entity implements Parcelable
         return description;
     }
 
+    public String getBusinessId()
+    {
+        return businessId;
+    }
+
     public void setType(CourseType type)
     {
         this.type = type;
@@ -127,6 +135,11 @@ public class Course extends Entity implements Parcelable
         this.description = description;
     }
 
+    public void setBusinessId(String businessId)
+    {
+        this.businessId = businessId;
+    }
+
     protected Course(Parcel in)
     {
         super(in);
@@ -138,6 +151,7 @@ public class Course extends Entity implements Parcelable
         ageRange = in.readParcelable(AgeRange.class.getClassLoader());
         category = Category.valueOf(in.readString());
         type = CourseType.valueOf(in.readString());
+        businessId = in.readString();
     }
 
     @Override
@@ -152,6 +166,7 @@ public class Course extends Entity implements Parcelable
         dest.writeParcelable(ageRange, flags);
         dest.writeString(String.valueOf(category));
         dest.writeString(String.valueOf(type));
+        dest.writeString(businessId);
     }
 
     @Override

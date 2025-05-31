@@ -17,8 +17,7 @@ import Model.City;
  * This Adapter class is a helper to data bind the cities
  * to the recycler view to show the search results
  */
-public class CityAdapter
-        extends RecyclerView.Adapter<CityAdapter.VH>
+public class CityAdapter extends RecyclerView.Adapter<CityAdapter.VH>
 {
 
     private final List<City> cities = new ArrayList<>();

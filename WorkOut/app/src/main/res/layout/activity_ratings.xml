@@ -2,40 +2,49 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- כותרת -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/ratingsActivityToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/azure"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
+
     <TextView
         android:id="@+id/rateBusinessText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="דרג את העסק"
+        android:layout_marginTop="20dp"
+        android:text="Rate a business"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/ratingsActivityToolbar" />
 
-    <!-- כוכבי דירוג -->
     <RatingBar
         android:id="@+id/ratingBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:numStars="5"
-        android:stepSize="1"
+        android:stepSize="0.5"
         app:layout_constraintTop_toBottomOf="@id/rateBusinessText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"/>
 
-    <!-- תגובה -->
     <EditText
         android:id="@+id/commentEditText"
         android:layout_width="0dp"
         android:layout_height="150dp"
-        android:hint="כתוב תגובה על העסק..."
+        android:hint="Write a comment on the business..."
         android:gravity="top|start"
         android:padding="12dp"
         android:inputType="textMultiLine"
@@ -45,12 +54,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"/>
 
-    <!-- כפתור שליחה -->
     <Button
         android:id="@+id/submitRatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="שלח דירוג"
+        android:text="Rate"
+        android:backgroundTint="@color/azure"
         app:layout_constraintTop_toBottomOf="@id/commentEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

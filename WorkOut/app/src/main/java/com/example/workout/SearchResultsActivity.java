@@ -1,0 +1,233 @@
+package com.example.workout;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import android.graphics.Typeface;
+import android.util.TypedValue;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+
+import Model.AgeRange;
+import Model.Client;
+import Model.Course;
+import Model.Repository.BusinessRepository;
+import Model.Schedule;
+
+public class SearchResultsActivity extends AppCompatActivity
+{
+
+    private LinearLayout coursesContainer;
+    private TextView emptyStateText;
+    private Client current;
+
+    // Keep track of which “item” is currently expanded, so we can collapse it
+    private LinearLayout currentlyExpandedItem = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search_results);
+
+        // Toolbar setup
+        Toolbar toolbar = findViewById(R.id.searchResultsToolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        current = getIntent().getParcelableExtra("client");
+
+        // Find our container & empty-state TextView
+        coursesContainer = findViewById(R.id.coursesSearchResultsContainer);
+        emptyStateText = findViewById(R.id.emptyStateText);
+
+        // Call showBusinesses() to inflate everything
+        showCourses();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp()
+    {
+        finish();
+        return true;
+    }
+
+    private void showCourses()
+    {
+        // Grab the List<Course> from the Intent extras
+        ArrayList<Course> courses = getIntent().getParcelableArrayListExtra("course_list");
+
+        // Clear any old child views
+        coursesContainer.removeAllViews();
+
+        if (courses == null || courses.isEmpty())
+        {
+            // Show the “no courses” message
+            emptyStateText.setText("No courses found.");
+            emptyStateText.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        emptyStateText.setVisibility(View.GONE);
+
+        // For each Course, create:
+        // [ TextView (course info) ]
+        // [ Button “Sign Up” (initially GONE) ]
+        // [ Button “Review”   (initially GONE) ]
+        for (Course course : courses)
+        {
+            // --- Parent “card” layout for this single course ---
+            LinearLayout itemLayout = new LinearLayout(SearchResultsActivity.this);
+            itemLayout.setOrientation(LinearLayout.VERTICAL);
+            itemLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            itemLayout.setPadding(
+                    dpToPx(8),  // left
+                    dpToPx(8),  // top
+                    dpToPx(8),  // right
+                    dpToPx(8));   // bottom
+
+            itemLayout.setBackgroundResource(R.drawable.rectangle_background_selector);
+
+            // --- TEXTVIEW showing the course details ---
+            TextView courseTv = new TextView(SearchResultsActivity.this);
+            courseTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            courseTv.setTypeface(Typeface.DEFAULT_BOLD);
+            courseTv.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+
+            // Build a multi-line string with: name, type, age range, day & time, category, description
+            StringBuilder sb = new StringBuilder();
+            sb.append("Name: ").append(course.getName()).append("\n");
+            sb.append("Type: ").append(course.getType().name()).append("\n");
+
+            AgeRange ar = course.getAgeRange();
+            sb.append("Age Range: ")
+                    .append(ar.getMinAge()).append(" - ")
+                    .append(ar.getMaxAge()).append("\n");
+
+            Schedule s = course.getSchedule();
+            String dayString = s.getDay().toString();
+            Date occurrenceDate = s.getOccurrence().toDate();
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String timeOnly = timeFormat.format(occurrenceDate);
+            sb.append("Schedule: ")
+                    .append(dayString).append(" at ")
+                    .append(timeOnly).append("\n");
+
+            sb.append("Category: ").append(course.getCategory().name()).append("\n");
+            sb.append("Description: ").append(course.getDescription()).append("\n");
+
+            courseTv.setText(sb.toString());
+
+            // --- “Sign Up” button (initially GONE) ---
+            Button signUpBtn = new Button(SearchResultsActivity.this);
+            signUpBtn.setText("Sign Up");
+            signUpBtn.setVisibility(View.GONE);
+            signUpBtn.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            signUpBtn.setId(View.generateViewId());
+            signUpBtn.setOnClickListener(v ->
+            {
+                // TODO: Launch sign-up flow for this `course`
+            });
+
+            // 3) “Review” button (initially GONE) ---
+            Button reviewBtn = new Button(SearchResultsActivity.this);
+            reviewBtn.setText("Review");
+            reviewBtn.setVisibility(View.GONE);
+            reviewBtn.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            reviewBtn.setId(View.generateViewId());
+            reviewBtn.setOnClickListener(v ->
+            {
+                BusinessRepository businessRepository = new BusinessRepository();
+                businessRepository.getBusinessesById(course.getBusinessId())
+                        .addOnSuccessListener(business ->
+                {
+                    Intent intent = new Intent(SearchResultsActivity.this, RatingsActivity.class);
+                    intent.putExtra("business", business);
+                    intent.putExtra("client", current);
+                    startActivity(intent);
+                }).addOnFailureListener(e ->
+                {
+                    // TODO: Add failure handling
+                });
+            });
+
+            // --- Handle tapping the courseTv itself to toggle these two buttons ---
+            courseTv.setOnClickListener(v ->
+            {
+                // If some other item's buttons are currently visible, hide them first:
+                if (currentlyExpandedItem != null && currentlyExpandedItem != itemLayout)
+                {
+                    Button oldSignUp = currentlyExpandedItem.findViewById(signUpBtn.getId());
+                    Button oldReview = currentlyExpandedItem.findViewById(reviewBtn.getId());
+                    if (oldSignUp != null) oldSignUp.setVisibility(View.GONE);
+                    if (oldReview != null) oldReview.setVisibility(View.GONE);
+                }
+
+                // Toggle this item’s own buttons:
+                if (signUpBtn.getVisibility() == View.GONE)
+                {
+                    signUpBtn.setVisibility(View.VISIBLE);
+                    reviewBtn.setVisibility(View.VISIBLE);
+                    currentlyExpandedItem = itemLayout;
+                }
+                else
+                {
+                    signUpBtn.setVisibility(View.GONE);
+                    reviewBtn.setVisibility(View.GONE);
+                    currentlyExpandedItem = null;
+                }
+            });
+
+            // --- Add TextView + Buttons to the parent “card” layout in order ---
+            itemLayout.addView(courseTv);
+            itemLayout.addView(signUpBtn);
+            itemLayout.addView(reviewBtn);
+
+            // Add a bottom‐margin so items aren’t jammed together
+            LinearLayout.LayoutParams wrapperParams =
+                    (LinearLayout.LayoutParams) itemLayout.getLayoutParams();
+            wrapperParams.setMargins(0, 0, 0, dpToPx(12));
+            itemLayout.setLayoutParams(wrapperParams);
+
+            // Finally, add this “card” to the container ---
+            coursesContainer.addView(itemLayout);
+        }
+    }
+
+
+    /**
+     * Utility: convert dp → px so that padding/margin is density‐aware.
+     */
+    private int dpToPx(int dp)
+    {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+}

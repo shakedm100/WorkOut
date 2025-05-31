@@ -16,13 +16,15 @@ import android.widget.TextView;
 import Model.Business;
 import Model.Client;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
     private TextView textView;
     private Button button;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page); // Choose the correct XML
 
@@ -30,28 +32,46 @@ public class MainActivity extends AppCompatActivity {
 
         // Find the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         // Setup event listener
-        bottomNavigationView.setOnItemSelectedListener(item -> {
+        bottomNavigationView.setOnItemSelectedListener(item ->
+        {
             int id = item.getItemId();
-            if (id == R.id.nav_home) {
+            if (id == R.id.nav_home)
+            {
                 // you’re already here
                 return true;
             }
-            else if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, ProfileActivity.class));
+            else if (id == R.id.nav_profile)
+            {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_search) {
-                startActivity(new Intent(this, SearchActivity.class));
+            else if (id == R.id.nav_search)
+            {
+                Intent intent = new Intent(this, SearchActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_ratings) {
-                startActivity(new Intent(this, RatingsActivity.class));
+            else if (id == R.id.nav_ratings)
+            {
+                Intent intent = new Intent(this, RatingsActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_messages) {
-                startActivity(new Intent(this, MessagesActivity.class));
+            else if (id == R.id.nav_messages)
+            {
+                Intent intent = new Intent(this, MessagesActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                startActivity(intent);
                 return true;
             }
             return false;

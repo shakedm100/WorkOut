@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -15,8 +16,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import Model.Business;
-import Model.Client;
-import Model.Course;
 import Model.Location;
 import Model.Phone;
 import Model.Rating;
@@ -164,13 +163,107 @@ public class BusinessRepository
      */
     public Task<List<Business>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
     {
-        return searchStrategy.search(data);
+        return searchStrategy.searchBusinesses(data);
     }
 
-    public Task<Business> addRatingToBusiness(Rating rating, Business business)
+    public Task<List<Business>> getBusinessesByNamePartially(String namePrefix)
+    {
+        if(namePrefix.isEmpty())
+            return null;
+
+        Query query = db.collection(collection)
+                .orderBy("businessName")
+                .startAt(namePrefix)
+                .endAt(namePrefix + "\uf8ff") // Signal an ending with UTF-8 encoding
+                .limit(8);
+
+        return query.get().continueWith(task ->
+        {
+            if (!task.isSuccessful())
+            {
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            List<Business> businesses = new ArrayList<>();
+
+            for (DocumentSnapshot snap : task.getResult())
+            {
+                Business business = snap.toObject(Business.class);
+                if (business != null)
+                {
+                    business.setId(snap.getId());
+                    businesses.add(business);
+                }
+            }
+
+            return businesses;
+        });
+    }
+
+    public Task<Business> getBusinessesById(String id)
+    {
+        return db.collection(collection).document(id).get().continueWith(task ->
+        {
+            if (!task.isSuccessful())
+            {
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            DocumentSnapshot snap = task.getResult();
+            if (snap == null || !snap.exists())
+            {
+                throw new NoSuchElementException("No such business: " + id);
+            }
+
+            Business business = snap.toObject(Business.class);
+            if (business == null)
+            {
+                throw new IllegalStateException("Failed to map document to Business");
+            }
+
+            business.setId(snap.getId());
+            return business;
+        });
+    }
+
+    public Task<Business> addRatingToBusiness(Business business, Rating rating)
     {
         if(!business.addRating(rating))
             throw new RuntimeException("Insert to business failed!");
+
+        return updateBusiness(business).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+            {
+                business.deleteRating(rating);
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            return business;
+        });
+    }
+
+    public Task<Business> deleteRatingFromBusiness(Business business, Rating rating)
+    {
+        if(!business.deleteRating(rating))
+            throw new RuntimeException("Delete from business failed!");
+
+        return updateBusiness(business).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+            {
+                business.deleteRating(rating);
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            return business;
+        });
+    }
+
+    public Task<Business> updateRatingFromBusiness(Business business, Rating rating)
+    {
+        if(!business.updateRating(rating))
+            throw new RuntimeException("Delete from business failed!");
 
         return updateBusiness(business).continueWith(task ->
         {
