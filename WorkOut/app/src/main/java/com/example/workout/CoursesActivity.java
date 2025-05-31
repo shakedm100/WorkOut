@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -25,6 +26,8 @@ public class CoursesActivity extends AppCompatActivity
 {
     LinearLayout coursesContainer;
     Course chosenCourse;
+    Business business;
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -32,12 +35,13 @@ public class CoursesActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.classes_business);
 
-        Business business = getIntent().getParcelableExtra("business");
+        business = getIntent().getParcelableExtra("business");
 
         //TODO: Need to show all the business's courses
 
         FloatingActionButton addUpdateCourse = findViewById(R.id.fabAddClass);
         coursesContainer = findViewById(R.id.coursesContainer);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
         chosenCourse = null;
 
         addUpdateCourse.setOnClickListener(v ->
@@ -48,7 +52,46 @@ public class CoursesActivity extends AppCompatActivity
             startActivity(intent);
         });
 
+        setUpBottomNavigationView();
         showCourses(business);
+    }
+
+    private void setUpBottomNavigationView()
+    {
+        bottomNavigationView.setSelectedItemId(R.id.nav_courses);
+
+        // Setup event listener
+        bottomNavigationView.setOnItemSelectedListener(item ->
+        {
+            int id = item.getItemId();
+            if (id == R.id.nav_home)
+            {
+                Intent intent = new Intent(this, BusinessHomeActivity.class);
+                intent.putExtra("business", business);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_profile)
+            {
+                Intent intent = new Intent(this, BusinessProfileActivity.class);
+                intent.putExtra("business", business);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_courses)
+            {
+                // you’re already here
+                return true;
+            }
+            else if (id == R.id.nav_calendar)
+            {
+                Intent intent = new Intent(this, CalendarActivity.class);
+                intent.putExtra("business", business);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void showCourses(Business business)

@@ -52,6 +52,7 @@
         <activity android:name=".BusinessHomeActivity"/>
         <activity android:name=".CoursesActivity"/>
         <activity android:name=".SearchResultsActivity"/>
+        <activity android:name=".BusinessProfileActivity"/>
     </application>
 
 </manifest>

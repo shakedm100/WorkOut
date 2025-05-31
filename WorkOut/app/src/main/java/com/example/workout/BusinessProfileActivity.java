@@ -2,31 +2,45 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import Model.Business;
-import Model.Client;
 
-public class BusinessHomeActivity extends AppCompatActivity
+public class BusinessProfileActivity extends AppCompatActivity
 {
+    BottomNavigationView bottomNavigationView;
+    Business business;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.business_home);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.profile_business);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) ->
+        {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-        Business business = getIntent().getParcelableExtra("business");
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Find the BottomNavigationView
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        business = getIntent().getParcelableExtra("business");
 
-        TextView businessName = findViewById(R.id.businessNameHomePageTextView);
-        businessName.setText(business.getBusinessName());
+        setUpBottomNavigationView();
+    }
+
+    private void setUpBottomNavigationView()
+    {
+        bottomNavigationView.setSelectedItemId(R.id.nav_profile);
 
         // Setup event listener
         bottomNavigationView.setOnItemSelectedListener(item ->
@@ -34,14 +48,14 @@ public class BusinessHomeActivity extends AppCompatActivity
             int id = item.getItemId();
             if (id == R.id.nav_home)
             {
-                // you’re already here
+                Intent intent = new Intent(this, BusinessHomeActivity.class);
+                intent.putExtra("business", business);
+                startActivity(intent);
                 return true;
             }
             else if (id == R.id.nav_profile)
             {
-                Intent intent = new Intent(this, BusinessProfileActivity.class);
-                intent.putExtra("business", business);
-                startActivity(intent);
+                // you’re already here
                 return true;
             }
             else if (id == R.id.nav_courses)
@@ -60,7 +74,5 @@ public class BusinessHomeActivity extends AppCompatActivity
             }
             return false;
         });
-
-
     }
 }

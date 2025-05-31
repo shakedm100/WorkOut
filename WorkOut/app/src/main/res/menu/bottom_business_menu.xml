@@ -12,17 +12,17 @@
         android:title="@string/profile" />
 
     <item
-        android:id="@+id/nav_search"
+        android:id="@+id/nav_status"
         android:icon="@drawable/status"
         android:title="@string/reviews" />
 
     <item
-        android:id="@+id/nav_ratings"
+        android:id="@+id/nav_courses"
         android:icon="@drawable/classes"
         android:title="@string/classes" />
 
     <item
-        android:id="@+id/nav_messages"
+        android:id="@+id/nav_calendar"
         android:icon="@drawable/businesscalendar"
         android:title="@string/calendar" />
 
