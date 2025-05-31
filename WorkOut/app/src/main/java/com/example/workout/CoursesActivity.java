@@ -12,7 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import Model.Business;
 import Model.Course;
@@ -78,9 +80,12 @@ public class CoursesActivity extends AppCompatActivity
                         .append(course.getAgeRange().getMaxAge()).append("\n");
                 Schedule schedule = course.getSchedule();
                 String dayString = schedule.getDay().toString();
+                // Show only time
                 Date occurrenceDate = schedule.getOccurrence().toDate();
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String timeOnly = timeFormat.format(occurrenceDate);
                 builder.append("Schedule: ").append(dayString).append(" at ")
-                        .append(occurrenceDate.toString()).append("\n");
+                        .append(timeOnly).append("\n");
                 builder.append("Category: ").append(course.getCategory().name()).append("\n");
                 builder.append("Description: ").append(course.getDescription()).append("\n");
 
@@ -89,13 +94,13 @@ public class CoursesActivity extends AppCompatActivity
                 courseTextView.setText(builder.toString());
                 courseTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                 courseTextView.setLineSpacing(0f, 1.2f); // slight line spacing
-                courseTextView.setPadding(16, 16, 16, 16);
-                courseTextView.setBackgroundResource(R.drawable.rectangle_border);
+                courseTextView.setPadding(5, 1, 5, 1);
+                courseTextView.setBackgroundResource(R.drawable.rectangle_background_selector);
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                params.setMargins(0, 0, 0, 24); // 24px bottom margin between course items
+                params.setMargins(0, 0, 0, 6); // 24px bottom margin between course items
                 courseTextView.setLayoutParams(params);
 
                 courseTextView.setOnClickListener(v ->
@@ -105,9 +110,6 @@ public class CoursesActivity extends AppCompatActivity
 
                 // Add to the container
                 coursesContainer.addView(courseTextView);
-
-
-
             }
         }).addOnFailureListener(e ->
         {

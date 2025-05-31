@@ -19,9 +19,15 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.Timestamp;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +54,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     Business currentBusiness;
     private CourseRepository courseRepository;
     private LocalTime startTime, endTime;
+    private int initialHour, initialMinute;
 
     // Dummy comment
     @Override
@@ -76,6 +83,8 @@ public class AddOrEditClassActivity extends AppCompatActivity
         ageSlider = new RangeSlider(this);
         startTimeButton = findViewById(R.id.startTimeButton);
         endTimeButton = findViewById(R.id.endTimeButton);
+        initialHour = 12;
+        initialMinute = 0;
 
         createCourseTypeSpinner();
         createCategorySpinner();
@@ -93,6 +102,14 @@ public class AddOrEditClassActivity extends AppCompatActivity
 
             capacityEditText.setText(String.valueOf(currentCourse.getCapacity()));
             descriptionEditText.setText(currentCourse.getDescription());
+
+            Date date = currentCourse.getSchedule().getOccurrence().toDate();
+
+            // Use a Calendar to extract hour/minute
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            initialHour = calendar.get(Calendar.HOUR_OF_DAY);   // 0–23
+            initialMinute = calendar.get(Calendar.MINUTE);      // 0–59
         }
 
         // Press on save
@@ -108,9 +125,9 @@ public class AddOrEditClassActivity extends AppCompatActivity
         });
 
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_24H).setHour(12).setMinute(0);
-
+                .setTimeFormat(TimeFormat.CLOCK_24H).setHour(initialHour).setMinute(initialMinute);
         MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
+        MaterialTimePicker endPicker = builder.setTitleText("Select end time").build();
 
         startPicker.addOnPositiveButtonClickListener(v ->
         {
@@ -118,10 +135,6 @@ public class AddOrEditClassActivity extends AppCompatActivity
             int minutes = startPicker.getMinute();
             startTime = LocalTime.of(hours, minutes);
         });
-
-        MaterialTimePicker endPicker = builder
-                .setTitleText("Select end time")
-                .build();
 
         endPicker.addOnPositiveButtonClickListener(v ->
         {
@@ -260,8 +273,21 @@ public class AddOrEditClassActivity extends AppCompatActivity
         String courseName = courseNameEditText.getText().toString().trim();
         int capacity = Integer.parseInt(capacityEditText.getText().toString());
         // Use the page's age range
-        // TODO: Need to implement Schedule
-        Schedule schedule = new Schedule(Day.Saturday, Timestamp.now());
+        // Convert LocalDate to TimeStamp
+        Schedule schedule = null;
+        if(startTime != null)
+        {
+            Day dayOfWeek = Day.valueOf(dayOfWeekSpinner.getSelectedItem().toString());
+            LocalDate epochDate = LocalDate.of(1970, 1, 1);
+            LocalDateTime combined = LocalDateTime.of(epochDate, startTime);
+            Instant instant = combined.toInstant(ZoneOffset.UTC);
+            long secondsSinceEpoch = instant.getEpochSecond();
+            int nanos = instant.getNano();
+            Timestamp startTimestamp = new Timestamp(secondsSinceEpoch, nanos);
+
+            schedule = new Schedule(dayOfWeek, startTimestamp);
+        }
+
         Category category = Category.valueOf(categorySpinner.getSelectedItem().toString());
         String description = descriptionEditText.getText().toString();
         if (currentCourse == null) // Insert
@@ -280,14 +306,19 @@ public class AddOrEditClassActivity extends AppCompatActivity
         }
         else // Update
         {
+            if(schedule == null)
+                schedule = currentCourse.getSchedule();
+            
             if (courseType != currentCourse.getType())
                 currentCourse.setType(courseType);
-            if (!courseName.equals(currentCourse.getName()))
+            if (!courseName.equals(currentCourse.getName()) && !courseName.isEmpty())
                 currentCourse.setName(courseName);
             if (capacity != currentCourse.getCapacity())
                 currentCourse.setCapacity(capacity);
             if (!schedule.equals(currentCourse.getSchedule()))
                 currentCourse.setSchedule(schedule);
+            if(!ageRange.equals(currentCourse.getAgeRange()))
+                currentCourse.setAgeRange(ageRange);
             if (category != currentCourse.getCategory())
                 currentCourse.setCategory(category);
             if (!description.equals(currentCourse.getDescription()))
