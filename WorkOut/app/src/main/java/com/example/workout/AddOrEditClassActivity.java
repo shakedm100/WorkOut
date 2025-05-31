@@ -72,9 +72,9 @@ public class AddOrEditClassActivity extends AppCompatActivity
         endTime = null;
 
         // Link to views
-        courseNameEditText = findViewById(R.id.autoClassName);
-        courseTypeSpinner = findViewById(R.id.autoCourseType);
-        categorySpinner = findViewById(R.id.autoCategory);
+        courseNameEditText = findViewById(R.id.courseNameEditText);
+        courseTypeSpinner = findViewById(R.id.courseTypeSpinner);
+        categorySpinner = findViewById(R.id.categorySpinner);
         dayOfWeekSpinner = findViewById(R.id.dayOfWeekSpinner);
         saveButton = findViewById(R.id.buttonSave);
         container = findViewById(R.id.update_course_slider_container);
@@ -308,7 +308,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         {
             if(schedule == null)
                 schedule = currentCourse.getSchedule();
-            
+
             if (courseType != currentCourse.getType())
                 currentCourse.setType(courseType);
             if (!courseName.equals(currentCourse.getName()) && !courseName.isEmpty())
