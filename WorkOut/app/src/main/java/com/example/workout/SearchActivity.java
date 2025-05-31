@@ -27,7 +27,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.Timestamp;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,11 +48,13 @@ import Model.AgeRange;
 import Model.Business;
 import Model.Category;
 import Model.CourseType;
+import Model.Day;
 import Model.Location;
 import Model.Repository.BusinessRepository;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
+import Model.SearchStrategies.SearchDateStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -55,8 +65,12 @@ public class SearchActivity extends AppCompatActivity
     RangeSlider ageSlider;
     AgeRange ageRange;
     CourseType chosenCourseType;
-    EditText editTextCategory;
+    Spinner categorySpinner, courseTypeSpinner, dayOfWeekSpinner;
     EditText editTextLocation;
+    ViewGroup container;
+    private Button startTimeButton, endTimeButton;
+    private LocalTime startTime, endTime;
+    private Timestamp[] times;
     final int LOCATION_PERMISSION_REQUEST = 1001;
 
     @Override
@@ -72,18 +86,75 @@ public class SearchActivity extends AppCompatActivity
             return insets;
         });
 
-        editTextCategory = findViewById(R.id.categoryAuto);
+        categorySpinner = findViewById(R.id.categorySearchSpinner);
         editTextLocation = findViewById(R.id.locationAuto);
+        courseTypeSpinner = findViewById(R.id.typeSpinner);
         businessRepository = new BusinessRepository();
-        ageRange = new AgeRange(0,99);
+        container = findViewById(R.id.search_slider_container);
+        ageRange = new AgeRange(0, 99);
+        dayOfWeekSpinner = findViewById(R.id.dayOfWeekSearchSpinner);
+        startTime = LocalTime.of(0, 0);
+        endTime = LocalTime.of(23, 59);
+        times = new Timestamp[2];
 
-        /*
-         * /////////////////////////
-         * CourseType Spinner Setup
-         * /////////////////////////
-         */
+        startTimeButton = findViewById(R.id.startTimeButton);
+        endTimeButton = findViewById(R.id.endTimeButton);
 
-        Spinner typeSpinner = findViewById(R.id.typeSpinner);
+        setUpCourseTypeSpinner();
+        setUpCategorySpinner();
+        setUpAgeSlider();
+        setUpDayOfWeekSpinner();
+
+        Button searchButton = findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(event -> executeAndGoToResults());
+
+        MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H).setHour(0).setMinute(0);
+        MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
+
+        builder = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H)
+                .setHour(23).setMinute(59);
+        MaterialTimePicker endPicker = builder.setTitleText("Select end time").build();
+
+        startPicker.addOnPositiveButtonClickListener(v ->
+        {
+            int hours = startPicker.getHour();
+            int minutes = startPicker.getMinute();
+            startTime = LocalTime.of(hours, minutes);
+        });
+
+        endPicker.addOnPositiveButtonClickListener(v ->
+        {
+            int hours = endPicker.getHour();
+            int minutes = endPicker.getMinute();
+            endTime = LocalTime.of(hours, minutes);
+        });
+
+        findViewById(R.id.startTimeButton).setOnClickListener(v ->
+        {
+            startPicker.show(getSupportFragmentManager(), "START_PICKER");
+        });
+        findViewById(R.id.endTimeButton).setOnClickListener(v ->
+        {
+            endPicker.show(getSupportFragmentManager(), "END_PICKER");
+        });
+    }
+
+    private void executeAndGoToResults()
+    {
+        executeSearch().addOnSuccessListener(task ->
+        {
+            // TODO: Go to search results page here!
+            /*Intent intent = new Intent(this, )*/
+            String bla = "bla";
+        }).addOnFailureListener(task ->
+        {
+            // TODO: Show error to user
+        });
+    }
+
+    private void setUpCourseTypeSpinner()
+    {
         CourseType[] types = CourseType.values();
         String[] typeNames = new String[types.length + 1];
         typeNames[0] = "Choose Course Type";
@@ -98,9 +169,9 @@ public class SearchActivity extends AppCompatActivity
         );
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        typeSpinner.setAdapter(adapter);
+        courseTypeSpinner.setAdapter(adapter);
 
-        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        courseTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
@@ -118,15 +189,28 @@ public class SearchActivity extends AppCompatActivity
                 chosenCourseType = null;
             }
         });
+    }
 
-        /*
-         * /////////////////////////
-         * Range Slider setup
-         * /////////////////////////
-         */
+    private void setUpCategorySpinner()
+    {
+        Category[] types = Category.values();
+        String[] typeNames = new String[types.length + 1];
+        typeNames[0] = "Choose Category";
+        for (int i = 1; i <= types.length; i++)
+        {
+            typeNames[i] = types[i - 1].name();
+        }
 
-        ViewGroup container = findViewById(R.id.search_slider_container);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_dropdown_item,
+                Arrays.asList(typeNames));
 
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+    }
+
+    private void setUpAgeSlider()
+    {
         // Create the RangeSlider
         ageSlider = new RangeSlider(this);
 
@@ -168,21 +252,24 @@ public class SearchActivity extends AppCompatActivity
 
         // Finally—add it into your container
         container.addView(ageSlider);
-
-        Button searchButton = findViewById(R.id.searchButton);
-        searchButton.setOnClickListener(event -> executeAndGoToResults());
     }
 
-    private void executeAndGoToResults()
+    private void setUpDayOfWeekSpinner()
     {
-        executeSearch().addOnSuccessListener(task ->
+        Day[] types = Day.values();
+        String[] typeNames = new String[types.length + 1];
+        typeNames[0] = "Choose Day";
+        for (int i = 1; i <= types.length; i++)
         {
-            // TODO: Go to search results page here!
-            /*Intent intent = new Intent(this, )*/
-        }).addOnFailureListener(task ->
-        {
-            // TODO: Show error to user
-        });
+            typeNames[i] = types[i - 1].name();
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_dropdown_item,
+                Arrays.asList(typeNames));
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        dayOfWeekSpinner.setAdapter(adapter);
     }
 
     /**
@@ -191,10 +278,33 @@ public class SearchActivity extends AppCompatActivity
      */
     private Task<List<Business>> executeSearch()
     {
-        // TODO: Currently it's just a template how it can be implemented
         List<Task<List<Business>>> tasks = new ArrayList<>();
 
-        if (!editTextCategory.getText().toString().trim().isEmpty())
+        String category = categorySpinner.getSelectedItem().toString().trim();
+        String courseType = courseTypeSpinner.getSelectedItem().toString().trim();
+        String dayOfWeek = dayOfWeekSpinner.getSelectedItem().toString().trim();
+
+        if(startTime.getHour() != 0 || startTime.getMinute() != 0 ||
+        endTime.getHour() != 23 || endTime.getMinute() != 59)
+        {
+            LocalDate epochDate = LocalDate.of(1970, 1, 1);
+            LocalDateTime combined = LocalDateTime.of(epochDate, startTime);
+            Instant instant = combined.toInstant(ZoneOffset.UTC);
+            long secondsSinceEpoch = instant.getEpochSecond();
+            int nanos = instant.getNano();
+            Timestamp starTimeTimestamp = new Timestamp(secondsSinceEpoch, nanos);
+
+            combined = LocalDateTime.of(epochDate, endTime);
+            instant = combined.toInstant(ZoneOffset.UTC);
+            secondsSinceEpoch = instant.getEpochSecond();
+            nanos = instant.getNano();
+            Timestamp endTimeTimestamp = new Timestamp(secondsSinceEpoch, nanos);
+
+            times[0] = starTimeTimestamp;
+            times[1] = endTimeTimestamp;
+        }
+
+        if (!category.equals("Choose Category"))
         {
             tasks.add(searchCategory());
         }
@@ -206,10 +316,15 @@ public class SearchActivity extends AppCompatActivity
         {
             tasks.add(searchAgeRange());
         }
-        if (chosenCourseType != null)
+        if (!courseType.equals("Choose Course Type"))
         {
             tasks.add(searchCourseType());
         }
+        if(times[0] != null && times[1] != null && !dayOfWeek.equals("Choose Day"))
+        {
+            tasks.add(searchDayTime());
+        }
+
 
         // If no filters, return empty immediately
         if (tasks.isEmpty())
@@ -239,7 +354,7 @@ public class SearchActivity extends AppCompatActivity
     private Task<List<Business>> searchCategory()
     {
         // Category search handling
-        String categoryText = editTextCategory.getText().toString();
+        String categoryText = categorySpinner.getSelectedItem().toString();
         if (!categoryText.isEmpty())
         {
             Category category = Category.fromString(categoryText);
@@ -301,6 +416,19 @@ public class SearchActivity extends AppCompatActivity
         {
             System.out.println("ERRORRRRRRRRRRR");
             return null;
+        }
+    }
+
+    private Task<List<Business>> searchDayTime()
+    {
+        try
+        {
+            searchStrategy = new SearchDateStrategy();
+            return businessRepository.searchByStrategy(searchStrategy, times);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
         }
     }
 }

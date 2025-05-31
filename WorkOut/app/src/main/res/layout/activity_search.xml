@@ -35,11 +35,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/backgroundImage" />
 
-    <AutoCompleteTextView
-        android:id="@+id/categoryAuto"
+    <Spinner
+        android:id="@+id/categorySearchSpinner"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="110dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/rectangle_border"
         android:hint="Category"
         android:inputType="text"
         android:textSize="20sp"
@@ -48,30 +51,69 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchTitle" />
 
-    <AutoCompleteTextView
+    <EditText
         android:id="@+id/locationAuto"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:background="@drawable/rectangle_border"
         android:layout_marginTop="20dp"
-        android:hint="Location"
-        android:inputType="text"
+        android:layout_marginEnd="5dp"
+        android:hint="Distance (km)"
+        android:ems="10"
+        android:inputType="numberDecimal"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/categoryAuto" />
+        app:layout_constraintTop_toBottomOf="@+id/typeSpinner" />
 
-    <Button
-        android:id="@+id/dateButton"
+    <Spinner
+        android:id="@+id/dayOfWeekSearchSpinner"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="20dp"
-        android:backgroundTint="@color/background"
-        android:text="Date"
-        android:textColor="@color/black"
+        android:layout_marginEnd="5dp"
+        android:background="@drawable/rectangle_border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/locationAuto" />
+
+    <LinearLayout
+        android:id="@+id/timePickerRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="5dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dayOfWeekSearchSpinner">
+
+        <Button
+            android:id="@+id/startTimeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/azure"
+            android:text="Select Start \n Time" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/endTimeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/azure"
+            android:text="Select End \n Time" />
+
+    </LinearLayout>
 
     <Spinner
         android:id="@+id/typeSpinner"
@@ -83,7 +125,7 @@
         android:background="@drawable/rectangle_border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dateButton" />
+        app:layout_constraintTop_toBottomOf="@+id/categorySearchSpinner" />
 
     <Button
         android:id="@+id/searchButton"
@@ -95,18 +137,21 @@
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/typeSpinner" />
+        app:layout_constraintTop_toBottomOf="@id/timePickerRow" />
 
     <LinearLayout
         android:id="@+id/search_slider_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="20dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/searchButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typeSpinner"/>
+        app:layout_constraintTop_toBottomOf="@+id/timePickerRow" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
