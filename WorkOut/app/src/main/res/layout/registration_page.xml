@@ -13,7 +13,7 @@
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:src="@color/material_dynamic_primary90"
+        android:src="@color/background"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -313,7 +313,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:backgroundTint="@color/material_dynamic_primary90"
+        android:backgroundTint="@color/background"
         android:text="Register"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"

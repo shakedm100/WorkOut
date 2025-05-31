@@ -14,7 +14,7 @@
         android:layout_height="114dp"
         android:layout_marginTop="16dp"
         android:scaleType="centerCrop"
-        android:src="@color/material_dynamic_primary90"
+        android:src="@color/background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
