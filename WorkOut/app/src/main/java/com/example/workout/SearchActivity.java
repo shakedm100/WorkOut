@@ -28,6 +28,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
@@ -79,6 +80,8 @@ public class SearchActivity extends AppCompatActivity
     final int LOCATION_PERMISSION_REQUEST = 1001;
     BottomNavigationView bottomNavigationView;
     Client current;
+    MaterialButtonToggleGroup toggleGroup;
+    private boolean isList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -107,6 +110,19 @@ public class SearchActivity extends AppCompatActivity
         bottomNavigationView.setSelectedItemId(R.id.nav_search);
         startTimeButton = findViewById(R.id.startTimeButton);
         endTimeButton = findViewById(R.id.endTimeButton);
+        toggleGroup = findViewById(R.id.viewModeToggle);
+        isList = true;
+
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
+        {
+           if(!isChecked)
+               return;
+
+           if(checkedId == R.id.toggle_map)
+               isList = false;
+           else
+               isList = true;
+        });
 
         current = getIntent().getParcelableExtra("client");
 
@@ -204,9 +220,13 @@ public class SearchActivity extends AppCompatActivity
     {
         executeSearch().addOnSuccessListener(courses ->
         {
-            // TODO: Go to search results page here!
-            Intent intent = new Intent(this, SearchResultsActivity.class);
             ArrayList<Course> courseArrayList = new ArrayList<>(courses);
+            Intent intent;
+            if(isList)
+                intent = new Intent(this, SearchResultsActivity.class);
+            else
+                intent = new Intent(this, MapActivity.class);
+
             intent.putParcelableArrayListExtra("course_list", courseArrayList);
             intent.putExtra("client", current);
             startActivity(intent);
