@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -129,10 +130,15 @@ public class SearchResultsActivity extends AppCompatActivity
             String dayString = s.getDay().toString();
             Date occurrenceDate = s.getOccurrence().toDate();
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String timeOnly = timeFormat.format(occurrenceDate);
+            String startTime = timeFormat.format(occurrenceDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(occurrenceDate);
+            calendar.add(Calendar.MINUTE, course.getDuration());
+            Date endTime = calendar.getTime();
+            String endTimeString = timeFormat.format(endTime);
             sb.append("Schedule: ")
                     .append(dayString).append(" at ")
-                    .append(timeOnly).append("\n");
+                    .append(startTime).append(" - ").append(endTimeString).append("\n");
 
             sb.append("Category: ").append(course.getCategory().name()).append("\n");
             sb.append("Description: ").append(course.getDescription()).append("\n");

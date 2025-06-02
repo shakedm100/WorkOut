@@ -1,10 +1,8 @@
 package com.example.workout.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
@@ -17,8 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.workout.R;
-import Adapters.ClassAdapter;
-import com.example.workout.models.ClassItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +24,6 @@ public class DayScheduleFragment extends Fragment {
     private static final String ARG_DAY_NAME = "dayName";
     private String dayName;
     private RecyclerView recyclerView;
-    private ClassAdapter adapter;
-    private List<ClassItem> classList = new ArrayList<>();
 
     public static DayScheduleFragment newInstance(String dayName) {
         DayScheduleFragment fragment = new DayScheduleFragment();
@@ -57,24 +51,24 @@ public class DayScheduleFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // דמו של שיעורים
-        classList = loadClassesForDay(dayName);
+       /* classList = loadClassesForDay(dayName);
 
         adapter = new ClassAdapter(classList, getContext(), this::showPopupMenu);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);*/
 
         return view;
     }
 
-    private List<ClassItem> loadClassesForDay(String dayName) {
+    /*private List<ClassItem> loadClassesForDay(String dayName) {
         // כאן אמורים לטעון את השיעורים בפועל (מ־Repository או Firebase)
         // בינתיים ניצור רשימה לדוגמה
         List<ClassItem> list = new ArrayList<>();
         list.add(new ClassItem("Yoga", "13:00 - 14:00"));
         list.add(new ClassItem("Zumba", "14:30 - 15:30"));
         return list;
-    }
+    }*/
 
-    private void showPopupMenu(View view, ClassItem item) {
+    /*private void showPopupMenu(View view, ClassItem item) {
         PopupMenu popup = new PopupMenu(requireContext(), view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.class_item_menu, popup.getMenu());
@@ -91,5 +85,5 @@ public class DayScheduleFragment extends Fragment {
             return false;
         });
         popup.show();
-    }
+    }*/
 }

@@ -64,6 +64,13 @@ public class BusinessCalendarActivity extends AppCompatActivity
         });
 
         setUpBottomNavigationView();
+
+        long selectedDate = calendarView.getDate();
+        Calendar initCalendar = Calendar.getInstance(Locale.getDefault());
+        initCalendar.setTimeInMillis(selectedDate);
+        int dayOfWeek = initCalendar.get(Calendar.DAY_OF_WEEK);
+        Day openingDay = mapCalendarDowToDayEnum(dayOfWeek);
+        loadCoursesByDay(openingDay);
     }
 
     // Convert Calendar.SUNDAY=1,… SATURDAY=7 into your Day enum
