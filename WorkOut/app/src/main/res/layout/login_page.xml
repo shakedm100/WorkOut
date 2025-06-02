@@ -168,4 +168,16 @@
         app:layout_constraintEnd_toStartOf="@+id/loginButton"
         app:layout_constraintTop_toBottomOf="@+id/passwordTextView2" />
 
+    <Button
+        android:id="@+id/BusinessRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:text="Business"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/registerButton"
+        app:layout_constraintTop_toBottomOf="@+id/noHaveAnAccountLabel" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
