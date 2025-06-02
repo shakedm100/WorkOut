@@ -34,8 +34,8 @@ import ViewModel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    // UI elements
     private RegisterViewModel registerViewModel;
-    // Declare UI elements
     private EditText editTextEmail, editTextPassword, editTextUsername, editTextFirstName, editTextLastName;
     private EditText editTextPhoneNumber, editTextStreet, editBirthDate;
     private Spinner spinnerPhonePrefix;

@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import Model.Client;
 import Model.Repository.ClientRepository;
 import ViewModel.LoginViewModel;
+import ViewModel.RegisterBusinessViewModel;
 
 public class LoginActivity extends AppCompatActivity {
     private CredentialManager credentialManager;
@@ -57,6 +58,12 @@ public class LoginActivity extends AppCompatActivity {
         Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(task -> {
             Intent newIntent = new Intent(this, RegisterActivity.class);
+            startActivity(newIntent);
+        });
+
+        Button registerBusinessButton = findViewById(R.id.BusinessRegister);
+        registerBusinessButton.setOnClickListener(task -> {
+            Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
             startActivity(newIntent);
         });
 

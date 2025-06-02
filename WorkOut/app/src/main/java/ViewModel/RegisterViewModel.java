@@ -45,11 +45,6 @@ public class RegisterViewModel extends ViewModel
         return generalRepository.getAllPhonePrefixes();
     }
 
-    public Task<List<City>> getAllCities(String s)
-    {
-        return generalRepository.getCityByNamePartially(s);
-    }
-
     public Task<List<City>> getBestMatchedCities(String input)
     {
         return generalRepository.getCityByNamePartially(input);

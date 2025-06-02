@@ -54,6 +54,8 @@
         <activity android:name=".SearchResultsActivity"/>
         <activity android:name=".BusinessProfileActivity"/>
         <activity android:name=".StatusActivity"/>
+        <activity android:name=".BusinessRegisterActivity"/>
+
     </application>
 
 </manifest>
