@@ -14,6 +14,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -133,8 +135,13 @@ public class CoursesActivity extends AppCompatActivity
                 Date occurrenceDate = schedule.getOccurrence().toDate();
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeOnly = timeFormat.format(occurrenceDate);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(occurrenceDate);
+                calendar.add(Calendar.MINUTE, course.getDuration());
+                Date endDate = calendar.getTime();
+                String endTimeOnly = timeFormat.format(endDate);
                 builder.append("Schedule: ").append(dayString).append(" at ")
-                        .append(timeOnly).append("\n");
+                        .append(timeOnly).append(" - ").append(endTimeOnly).append("\n");
                 builder.append("Category: ").append(course.getCategory().name()).append("\n");
                 builder.append("Description: ").append(course.getDescription()).append("\n");
 

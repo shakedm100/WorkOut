@@ -19,6 +19,7 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.Timestamp;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,7 +55,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     Business currentBusiness;
     private CourseRepository courseRepository;
     private LocalTime startTime, endTime;
-    private int initialHour, initialMinute;
+    private int initialHour, initialMinute, endHour, endMinute;
 
     // Dummy comment
     @Override
@@ -110,6 +111,10 @@ public class AddOrEditClassActivity extends AppCompatActivity
             calendar.setTime(date);
             initialHour = calendar.get(Calendar.HOUR_OF_DAY);   // 0–23
             initialMinute = calendar.get(Calendar.MINUTE);      // 0–59
+
+            calendar.add(Calendar.MINUTE, currentCourse.getDuration());
+            endHour = calendar.get(Calendar.HOUR_OF_DAY);
+            endMinute = calendar.get(Calendar.MINUTE);
         }
 
         // Press on save
@@ -127,6 +132,9 @@ public class AddOrEditClassActivity extends AppCompatActivity
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H).setHour(initialHour).setMinute(initialMinute);
         MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
+
+        builder = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H).setHour(endHour).setMinute(endMinute);
         MaterialTimePicker endPicker = builder.setTitleText("Select end time").build();
 
         startPicker.addOnPositiveButtonClickListener(v ->
@@ -290,12 +298,15 @@ public class AddOrEditClassActivity extends AppCompatActivity
 
         Category category = Category.valueOf(categorySpinner.getSelectedItem().toString());
         String description = descriptionEditText.getText().toString();
+
+        int duration = (int)Duration.between(startTime, endTime).toMinutes();
+
         if (currentCourse == null) // Insert
         {
             try
             {
                 currentCourse = await(courseRepository.insertCourse(currentBusiness, courseName, schedule,
-                        capacity, courseType, ageRange, category, description), 8, TimeUnit.SECONDS);
+                        capacity, courseType, ageRange, category, description, duration), 8, TimeUnit.SECONDS);
                 return true;
             }
             catch (Exception e)

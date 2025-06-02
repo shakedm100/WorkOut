@@ -17,11 +17,13 @@ public class Course extends Entity implements Parcelable
     private Schedule schedule;
     private Category category;
     private String description;
+    private int duration;
 
     public Course() {}
 
     public Course(String id, CourseType type, String name, ArrayList<Client> participants, int capacity,
-                  AgeRange ageRange, Schedule schedule, Category category, String description, String businessId)
+                  AgeRange ageRange, Schedule schedule, Category category, String description,
+                  String businessId, int duration)
     {
         super(id);
         this.type = type;
@@ -33,10 +35,12 @@ public class Course extends Entity implements Parcelable
         this.category = category;
         this.description = description;
         this.businessId = businessId;
+        this.duration = duration;
+        this.businessId = "";
     }
 
-    public Course(String id, CourseType type, String name, int capacity,
-                  AgeRange ageRange, Schedule schedule, Category category, String description)
+    public Course(String id, CourseType type, String name, int capacity, AgeRange ageRange,
+                  int duration, Schedule schedule, Category category, String description)
     {
         super(id);
         this.type = type;
@@ -47,6 +51,7 @@ public class Course extends Entity implements Parcelable
         this.schedule = schedule;
         this.category = category;
         this.description = description;
+        this.duration = duration;
         this.businessId = "";
     }
 
@@ -90,10 +95,9 @@ public class Course extends Entity implements Parcelable
         return description;
     }
 
-    public String getBusinessId()
-    {
-        return businessId;
-    }
+    public String getBusinessId() { return businessId; }
+
+    public int getDuration() { return duration; }
 
     public void setType(CourseType type)
     {
@@ -105,10 +109,7 @@ public class Course extends Entity implements Parcelable
         this.name = name;
     }
 
-    public void setParticipants(ArrayList<Client> participants)
-    {
-        this.participants = participants;
-    }
+    public void setParticipants(ArrayList<Client> participants) { this.participants = participants; }
 
     public void setCapacity(int capacity)
     {
@@ -135,10 +136,9 @@ public class Course extends Entity implements Parcelable
         this.description = description;
     }
 
-    public void setBusinessId(String businessId)
-    {
-        this.businessId = businessId;
-    }
+    public void setBusinessId(String businessId) { this.businessId = businessId; }
+
+    public void setDuration(int duration) { this.duration = duration; }
 
     protected Course(Parcel in)
     {
@@ -152,6 +152,7 @@ public class Course extends Entity implements Parcelable
         category = Category.valueOf(in.readString());
         type = CourseType.valueOf(in.readString());
         businessId = in.readString();
+        duration = in.readInt();
     }
 
     @Override
@@ -167,6 +168,7 @@ public class Course extends Entity implements Parcelable
         dest.writeString(String.valueOf(category));
         dest.writeString(String.valueOf(type));
         dest.writeString(businessId);
+        dest.writeInt(duration);
     }
 
     @Override
@@ -195,12 +197,12 @@ public class Course extends Entity implements Parcelable
     {
         if (o == null || getClass() != o.getClass()) return false;
         Course course = (Course) o;
-        return capacity == course.capacity && type == course.type && Objects.equals(name, course.name) && Objects.equals(participants, course.participants) && Objects.equals(ageRange, course.ageRange) && Objects.equals(schedule, course.schedule) && category == course.category && Objects.equals(description, course.description);
+        return capacity == course.capacity && duration == course.duration && type == course.type && Objects.equals(businessId, course.businessId) && Objects.equals(name, course.name) && Objects.equals(participants, course.participants) && Objects.equals(ageRange, course.ageRange) && Objects.equals(schedule, course.schedule) && category == course.category && Objects.equals(description, course.description);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(type, name, participants, capacity, ageRange, schedule, category, description);
+        return Objects.hash(type, businessId, name, participants, capacity, ageRange, schedule, category, description, duration);
     }
 }

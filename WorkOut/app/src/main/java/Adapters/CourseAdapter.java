@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.workout.R;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -44,12 +45,17 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
         holder.courseNameText.setText(course.getName());
 
-        // Suppose your Course has an occurrence: a Firestore Timestamp or a Java Date
-        // Here we format it into “HH:mm” just as an example.
         Date occurrence = course.getSchedule().getOccurrence().toDate();
+        int duration = course.getDuration();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(occurrence);
+        calendar.add(Calendar.MINUTE, duration);
+        Date endTime = calendar.getTime();
+        String startTimeString = timeFormat.format(occurrence);
+        String endTimeString = timeFormat.format(endTime);
         if (occurrence != null)
         {
-            holder.courseTimeText.setText("Start: " + timeFormat.format(occurrence));
+            holder.courseTimeText.setText(startTimeString + " - " + endTimeString);
         }
         else
         {

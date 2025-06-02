@@ -33,7 +33,8 @@ public class CourseRepository
     }
 
     public Task<Course> insertCourse(Business business, String name, Schedule schedule, int capacity,
-                                     CourseType type, AgeRange ageRange, Category category, String description)
+                                     CourseType type, AgeRange ageRange, Category category, String description,
+                                     int duration)
     {
         Map<String, Object> course = new HashMap<>();
         course.put("name", name);
@@ -45,6 +46,7 @@ public class CourseRepository
         course.put("category", category);
         course.put("description", description);
         course.put("businessId", business.getId());
+        course.put("duration", duration);
 
         return db.collection(collection).document(business.getId()).collection(subCollection)
                 .add(course).continueWith(task ->
@@ -54,7 +56,8 @@ public class CourseRepository
 
                     DocumentReference reference = task.getResult();
                     String id = reference.getId();
-                    Course add = new Course(id, type, name, new ArrayList<>(), capacity, ageRange, schedule, category, description, business.getId());
+                    Course add = new Course(id, type, name, new ArrayList<>(), capacity, ageRange
+                            , schedule, category, description, business.getId(), duration);
                     business.addCourse(add);
                     return add;
                 });

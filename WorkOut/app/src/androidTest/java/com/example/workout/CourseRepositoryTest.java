@@ -92,7 +92,7 @@ public class CourseRepositoryTest
 
         // Test insert
         testSubject = await(courseRepository.insertCourse(testBusiness,"TRX", schedule, 50, CourseType.Dou,
-                ageRange, Category.Archery, "Shoot to kill"), 10, TimeUnit.SECONDS);
+                ageRange, Category.Archery, "Shoot to kill", 120), 10, TimeUnit.SECONDS);
 
         assertNotNull(testSubject.getId());
         assertEquals("TRX", testSubject.getName());
@@ -102,6 +102,7 @@ public class CourseRepositoryTest
         assertEquals(ageRange, testSubject.getAgeRange());
         assertEquals(Category.Archery, testSubject.getCategory());
         assertEquals("Shoot to kill", testSubject.getDescription());
+        assertEquals(120, testSubject.getDuration());
 
         // Test get course
         ArrayList<Course> courses = (ArrayList<Course>)
@@ -119,6 +120,7 @@ public class CourseRepositoryTest
         assertEquals(testSubject.getAgeRange(), checkCourse.getAgeRange());
         assertEquals(testSubject.getCategory(), checkCourse.getCategory());
         assertEquals(testSubject.getDescription(), checkCourse.getDescription());
+        assertEquals(testSubject.getDuration(), checkCourse.getDuration());
 
         // Test day of week
         ArrayList<Course> daysOfWeek = (ArrayList<Course>) await(courseRepository.getCoursesByDayOfWeek(testBusiness,

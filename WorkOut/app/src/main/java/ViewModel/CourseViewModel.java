@@ -31,10 +31,10 @@ public class CourseViewModel extends ViewModel {
     }
 
     public void insertCourse(@NonNull Business business, String name, Schedule schedule, int capacity,
-                             CourseType type, AgeRange ageRange, Category category, String description) {
+                             CourseType type, AgeRange ageRange, Category category, String description, int duration) {
         _courseUiState.postValue(GenericUiState.loading("Inserting course..."));
 
-        courseRepository.insertCourse(business, name, schedule, capacity, type, ageRange, category, description)
+        courseRepository.insertCourse(business, name, schedule, capacity, type, ageRange, category, description, duration)
                 .addOnSuccessListener(client -> {
                     _courseUiState.postValue(GenericUiState.success("Course inserted!"));
 
