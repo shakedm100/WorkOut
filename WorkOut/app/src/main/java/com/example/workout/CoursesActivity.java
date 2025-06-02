@@ -91,7 +91,7 @@ public class CoursesActivity extends AppCompatActivity
             }
             else if (id == R.id.nav_calendar)
             {
-                Intent intent = new Intent(this, CalendarActivity.class);
+                Intent intent = new Intent(this, BusinessCalendarActivity.class);
                 intent.putExtra("business", business);
                 startActivity(intent);
                 return true;

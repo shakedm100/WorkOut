@@ -80,7 +80,7 @@ public class StatusActivity extends AppCompatActivity
             }
             else if (id == R.id.nav_calendar)
             {
-                Intent intent = new Intent(this, CalendarActivity.class);
+                Intent intent = new Intent(this, BusinessCalendarActivity.class);
                 intent.putExtra("business", current);
                 startActivity(intent);
                 return true;

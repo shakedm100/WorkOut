@@ -21,7 +21,7 @@ public class CalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_business); // ודא שזה שם הקובץ XML
 
-        // מציאת רכיבי תצוגה
+       /* // מציאת רכיבי תצוגה
         calendarView = findViewById(R.id.calendarView);
         activityTextView = findViewById(R.id.activityExampleTextView);
 
@@ -29,7 +29,7 @@ public class CalendarActivity extends AppCompatActivity {
         courseRepository = new CourseRepository();
 
         // מאזין לבחירת תאריך בלוח השנה
-        /* calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
+        *//* calendarView.setOnDateChangeListener((view, year, month, dayOfMonth) -> {
             // יצירת מפתח תאריך בפורמט YYYY-MM-DD
             String dateKey = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
 
