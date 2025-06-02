@@ -58,6 +58,15 @@ public class CoursesActivity extends AppCompatActivity
         showCourses(business);
     }
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        // If the user goes back to this page and wants to insert
+        // then we need to delete the chosen course so it send the same course again
+        chosenCourse = null;
+    }
+
     private void setUpBottomNavigationView()
     {
         bottomNavigationView.setSelectedItemId(R.id.nav_courses);

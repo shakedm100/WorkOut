@@ -16,6 +16,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.Manifest;
 import android.text.Editable;
@@ -25,11 +26,17 @@ import android.view.View;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import Adapters.CityAdapter;
+import Model.Business;
+import Model.Location;
+import Model.Repository.BusinessRepository;
 import Model.Repository.GeneralRepository;
+import Model.SearchStrategies.SearchRadiusStrategy;
+import Model.SearchStrategies.SearchStrategyInterface;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
@@ -40,10 +47,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
-    private EditText mapViewSearchTextBox;
-    private RecyclerView citiesRv;
-    private CityAdapter adapter;
-    private GeneralRepository generalRepository;
+    private BusinessRepository businessRepository;
+    private int defaultRadius = 100;
+    private Location modelLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +66,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
 
+        businessRepository = new BusinessRepository();
+
         // Create a location service instance
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -74,55 +82,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             );
         }
 
-        mapViewSearchTextBox = findViewById(R.id.mapViewSearchTextBox);
-        citiesRv = findViewById(R.id.citiesRecyclerView);
-        generalRepository = new GeneralRepository();
-        adapter = new CityAdapter(city -> // What happens when you press on a row
-        {
-
-        });
-
-        citiesRv.setLayoutManager(new LinearLayoutManager(this));
-        citiesRv.setAdapter(adapter);
-
-        mapViewSearchTextBox.addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void beforeTextChanged(CharSequence s, int st, int c, int a)
-            {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int st, int b, int c)
-            {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-                String q = s.toString().trim();
-                adapter.setQuery(q);
-                if (q.isEmpty() || s.toString().isEmpty())
-                {
-                    adapter.setCities(new ArrayList<>());
-                    citiesRv.setVisibility(View.GONE);
-                }
-                else
-                {
-                    generalRepository.getCityByNamePartially(q)
-                            .addOnSuccessListener(cities ->
-                            {
-                                adapter.setCities(cities);
-                                // show or hide based on results
-                                citiesRv.setVisibility(cities.isEmpty()
-                                        ? View.GONE
-                                        : View.VISIBLE);
-                            });
-                }
-            }
-        });
-
-
+        modelLocation = null;
     }
 
     @Override
@@ -130,6 +90,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         this.googleMap = map;
         enableMyLocation();
+        showNearbyBusinesses();
+    }
+
+    private void showNearbyBusinesses()
+    {
+        if (modelLocation == null)
+        {
+            Toast.makeText(this, "Cannot find user location", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        SearchStrategyInterface distance = new SearchRadiusStrategy(defaultRadius);
+        businessRepository.searchByStrategy(distance, modelLocation).addOnSuccessListener(businesses ->
+        {
+            for(Business current : businesses)
+            {
+                Location location = current.getLocation();
+                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(position);
+                markerOptions.title(current.getBusinessName());
+                googleMap.addMarker(markerOptions);
+            }
+        });
     }
 
     private void enableMyLocation()
@@ -163,6 +147,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             googleMap.animateCamera(
                                     CameraUpdateFactory.newLatLngZoom(ll, 15f)
                             );
+
+                            modelLocation = new Location(location.getLongitude(), location.getLatitude());
                         }
                     });
         }

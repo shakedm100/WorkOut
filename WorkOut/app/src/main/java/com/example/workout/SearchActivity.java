@@ -66,21 +66,22 @@ import Model.SearchStrategies.SearchStrategyInterface;
 
 public class SearchActivity extends AppCompatActivity
 {
-    SearchStrategyInterface searchStrategy;
-    CourseRepository courseRepository;
-    RangeSlider ageSlider;
-    AgeRange ageRange;
-    CourseType chosenCourseType;
-    Spinner categorySpinner, courseTypeSpinner, dayOfWeekSpinner;
-    EditText editTextLocation;
-    ViewGroup container;
+    private SearchStrategyInterface searchStrategy;
+    private CourseRepository courseRepository;
+    private RangeSlider ageSlider;
+    private AgeRange ageRange;
+    private CourseType chosenCourseType;
+    private Spinner categorySpinner, courseTypeSpinner, dayOfWeekSpinner;
+    private EditText editTextLocation;
+    private ViewGroup container;
     private Button startTimeButton, endTimeButton;
     private LocalTime startTime, endTime;
     private Timestamp[] times;
-    final int LOCATION_PERMISSION_REQUEST = 1001;
-    BottomNavigationView bottomNavigationView;
-    Client current;
-    MaterialButtonToggleGroup toggleGroup;
+    private final int LOCATION_PERMISSION_REQUEST = 1001;
+    private BottomNavigationView bottomNavigationView;
+    private Client current;
+    private MaterialButtonToggleGroup toggleGroup;
+    private Button searchButton;
     private boolean isList;
 
     @Override
@@ -111,8 +112,10 @@ public class SearchActivity extends AppCompatActivity
         startTimeButton = findViewById(R.id.startTimeButton);
         endTimeButton = findViewById(R.id.endTimeButton);
         toggleGroup = findViewById(R.id.viewModeToggle);
-        isList = true;
+        searchButton = findViewById(R.id.searchButton);
 
+        isList = true;
+        toggleGroup.check(R.id.toggle_list);
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
         {
            if(!isChecked)
@@ -133,7 +136,6 @@ public class SearchActivity extends AppCompatActivity
         setUpBottomNavigationView();
         setUpTimePicker();
 
-        Button searchButton = findViewById(R.id.searchButton);
         searchButton.setOnClickListener(event -> executeAndGoToResults());
     }
 
