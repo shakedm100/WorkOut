@@ -62,15 +62,21 @@ public class BusinessRegisterActivity extends AppCompatActivity
         adapterPhonePrefixes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPhonePrefix.setAdapter(adapterPhonePrefixes);
 
-        cityAutoComplete.addTextChangedListener(new TextWatcher() {
+        cityAutoComplete.addTextChangedListener(new TextWatcher()
+        {
             @Override
-            public void beforeTextChanged(CharSequence string, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence string, int start, int count, int after)
+            {
+            }
 
             @Override
-            public void onTextChanged(CharSequence input, int start, int before, int count) {
-                if (input.length() >= 3) {
+            public void onTextChanged(CharSequence input, int start, int before, int count)
+            {
+                if (input.length() >= 3)
+                {
                     registerBusinessViewModel.getBestMatchedCities(input.toString())
-                            .addOnSuccessListener(cities -> {
+                            .addOnSuccessListener(cities ->
+                            {
                                 ArrayAdapter<City> adapterCities = new ArrayAdapter<>(
                                         BusinessRegisterActivity.this,
                                         android.R.layout.simple_dropdown_item_1line,
@@ -79,14 +85,17 @@ public class BusinessRegisterActivity extends AppCompatActivity
                                 cityAutoComplete.setAdapter(adapterCities);
                                 adapterCities.notifyDataSetChanged();
                             })
-                            .addOnFailureListener(e -> {
+                            .addOnFailureListener(e ->
+                            {
                                 Toast.makeText(BusinessRegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s)
+            {
+            }
         });
 
         // observers
@@ -96,12 +105,15 @@ public class BusinessRegisterActivity extends AppCompatActivity
         setupClickListeners();
     }
 
-    private void setupObservers() {
-        registerBusinessViewModel.getRegisterUiState().observe(this, registerUiState -> {
+    private void setupObservers()
+    {
+        registerBusinessViewModel.getRegisterUiState().observe(this, registerUiState ->
+        {
             if (registerUiState == null) return; // should not happen if initialized
             Intent intent;
 
-            switch (registerUiState.getStatus()) {
+            switch (registerUiState.getStatus())
+            {
                 case IDLE:
                     statusProgressBar.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
@@ -134,8 +146,10 @@ public class BusinessRegisterActivity extends AppCompatActivity
         });
     }
 
-    private void setupClickListeners() {
-        buttonRegister.setOnClickListener(v -> {
+    private void setupClickListeners()
+    {
+        buttonRegister.setOnClickListener(v ->
+        {
             // extract data
             String email = editTextEmail.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();
@@ -145,15 +159,17 @@ public class BusinessRegisterActivity extends AppCompatActivity
             String phoneNumberStr = editTextPhoneNumber.getText().toString().trim();
             String policy = editPolicyText.getText().toString().trim();
 
-            PhonePrefix phonePrefix = (PhonePrefix) spinnerPhonePrefix.getSelectedItem();
+            PhonePrefix phonePrefix = PhonePrefix.fromString(spinnerPhonePrefix.getSelectedItem().toString());
 
             String cityName = cityAutoComplete.getText().toString().trim();
             City selectedCity = null;
-            for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++) {
+            for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++)
+            {
                 City city = (City) cityAutoComplete.getAdapter().getItem(i);
                 // TODO: expand it to work for hebrew also
                 String match = city.getEnglishName().trim();
-                if (match.equals(cityName)) {
+                if (match.equals(cityName))
+                {
                     selectedCity = city;
                     break;
                 }

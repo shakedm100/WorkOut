@@ -59,6 +59,14 @@ public class CoursesActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if(business != null)
+            showCourses(business);
+    }
+
+    @Override
     public void onStop()
     {
         super.onStop();

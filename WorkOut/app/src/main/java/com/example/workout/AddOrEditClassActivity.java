@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,13 +122,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         // Press on save
         saveButton.setOnClickListener(v ->
         {
-            boolean check = buildCourseFromFieldsAndQuery();
-            if (check)
-                finish();
-            else
-            {
-                //TODO: Show error
-            }
+            buildCourseFromFieldsAndQuery();
         });
 
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
@@ -275,7 +271,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         container.addView(ageSlider);
     }
 
-    private boolean buildCourseFromFieldsAndQuery()
+    private void buildCourseFromFieldsAndQuery()
     {
         CourseType courseType = CourseType.valueOf(courseTypeSpinner.getSelectedItem().toString());
         String courseName = courseNameEditText.getText().toString().trim();
@@ -283,9 +279,10 @@ public class AddOrEditClassActivity extends AppCompatActivity
         // Use the page's age range
         // Convert LocalDate to TimeStamp
         Schedule schedule = null;
+        Day dayOfWeek = Day.valueOf(dayOfWeekSpinner.getSelectedItem().toString());
+
         if(startTime != null)
         {
-            Day dayOfWeek = Day.valueOf(dayOfWeekSpinner.getSelectedItem().toString());
             LocalDate epochDate = LocalDate.of(1970, 1, 1);
             LocalDateTime combined = LocalDateTime.of(epochDate, startTime);
             Instant instant = combined.toInstant(ZoneOffset.UTC);
@@ -299,26 +296,45 @@ public class AddOrEditClassActivity extends AppCompatActivity
         Category category = Category.valueOf(categorySpinner.getSelectedItem().toString());
         String description = descriptionEditText.getText().toString();
 
-        int duration = (int)Duration.between(startTime, endTime).toMinutes();
 
         if (currentCourse == null) // Insert
         {
-            try
+            int duration = (int)Duration.between(startTime, endTime).toMinutes();
+            courseRepository.insertCourse(currentBusiness, courseName, schedule,
+                    capacity, courseType, ageRange, category, description, duration).addOnSuccessListener(task ->
             {
-                currentCourse = await(courseRepository.insertCourse(currentBusiness, courseName, schedule,
-                        capacity, courseType, ageRange, category, description, duration), 8, TimeUnit.SECONDS);
-                return true;
-            }
-            catch (Exception e)
+                if(task != null)
+                {
+                    Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }).addOnFailureListener(e ->
             {
+                Toast.makeText(this, "Failed to add the course", Toast.LENGTH_LONG).show();
                 // TODO: Show error on screen
-                return false;
-            }
+            });
         }
         else // Update
         {
+            int duration;
+            if(startTime == null)
+            {
+                Date date = currentCourse.getSchedule().getOccurrence().toDate();
+                Instant instant = date.toInstant();
+                startTime = instant.atZone(ZoneOffset.UTC).toLocalTime();
+                duration = currentCourse.getDuration();
+            }
+            else
+            {
+                duration = (int)Duration.between(startTime, endTime).toMinutes();
+            }
+
+
             if(schedule == null)
+            {
                 schedule = currentCourse.getSchedule();
+                schedule.setDay(dayOfWeek);
+            }
 
             if (courseType != currentCourse.getType())
                 currentCourse.setType(courseType);
@@ -334,16 +350,21 @@ public class AddOrEditClassActivity extends AppCompatActivity
                 currentCourse.setCategory(category);
             if (!description.equals(currentCourse.getDescription()))
                 currentCourse.setDescription(description);
+            if(duration != currentCourse.getDuration())
+                currentCourse.setDuration(duration);
 
-            try
+            courseRepository.updateCourse(currentCourse, currentBusiness).addOnSuccessListener(task ->
             {
-                return await(courseRepository.updateCourse(currentCourse, currentBusiness), 8, TimeUnit.SECONDS);
-            }
-            catch (Exception e)
+                if(task != null)
+                {
+                    Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }).addOnFailureListener(e ->
             {
+                Toast.makeText(this, "Failed to add the course", Toast.LENGTH_LONG).show();
                 // TODO: Show error on screen
-                return false;
-            }
+            });
         }
     }
 }
