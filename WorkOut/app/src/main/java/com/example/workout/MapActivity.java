@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -19,22 +18,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.Manifest;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.View;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import Adapters.CityAdapter;
 import Model.Business;
+import Model.Client;
+import Model.Course;
 import Model.Location;
 import Model.Repository.BusinessRepository;
-import Model.Repository.GeneralRepository;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -50,6 +43,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private BusinessRepository businessRepository;
     private int defaultRadius = 100;
     private Location modelLocation;
+    private Client client;
+    private ArrayList<Course> courses;
+    private ArrayList<Business> businessesFromCourses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -82,6 +78,19 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             );
         }
 
+        client = getIntent().getParcelableExtra("client");
+        courses = getIntent().getParcelableArrayListExtra("course_list");
+        businessesFromCourses = new ArrayList<>();
+        if(courses == null)
+            courses = new ArrayList<>();
+
+        for (Course course : courses)
+        {
+            businessRepository.getBusinessesById(course.getBusinessId()).addOnSuccessListener(business ->
+            {
+                businessesFromCourses.add(business);
+            });
+        }
         modelLocation = null;
     }
 
@@ -90,7 +99,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         this.googleMap = map;
         enableMyLocation();
-        showNearbyBusinesses();
     }
 
     private void showNearbyBusinesses()
@@ -104,16 +112,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SearchStrategyInterface distance = new SearchRadiusStrategy(defaultRadius);
         businessRepository.searchByStrategy(distance, modelLocation).addOnSuccessListener(businesses ->
         {
-            for(Business current : businesses)
+            for (Business current : businesses)
             {
-                Location location = current.getLocation();
-                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(position);
-                markerOptions.title(current.getBusinessName());
-                googleMap.addMarker(markerOptions);
+                if(existInBusinessesFromCourses(current))
+                {
+                    Location location = current.getLocation();
+                    LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(position);
+                    markerOptions.title(current.getBusinessName());
+                    googleMap.addMarker(markerOptions);
+                }
             }
         });
+    }
+
+    private boolean existInBusinessesFromCourses(Business business)
+    {
+        for(Business current : businessesFromCourses)
+        {
+            if(business.getId().equals(current.getId()))
+                return true;
+        }
+
+        return false;
     }
 
     private void enableMyLocation()
@@ -125,8 +147,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST);
-        }
-        else
+        } else
         {
             // Disable google's UI button because you can't align it where you want
             // And because it's stupid
@@ -149,6 +170,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             );
 
                             modelLocation = new Location(location.getLongitude(), location.getLatitude());
+                            showNearbyBusinesses();
                         }
                     });
         }
