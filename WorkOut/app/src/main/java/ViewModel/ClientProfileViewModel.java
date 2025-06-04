@@ -29,7 +29,7 @@ public class ClientProfileViewModel extends ViewModel {
 
     /**
      * Fetches the client profile data.
-     * @param clientId The ID of the client to fetch.
+     * @param clientUsername The ID of the client to fetch.
      */
     public void fetchClientProfile(String clientUsername) {
         _profileDataState.postValue(GenericUiState.loading());

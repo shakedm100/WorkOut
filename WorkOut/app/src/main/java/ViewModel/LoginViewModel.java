@@ -56,6 +56,7 @@ public class LoginViewModel extends ViewModel
                             })
                             .addOnFailureListener(businessError ->
                             {
+                                //TODO: Change the error message
                                 _loginUiState.postValue(GenericUiState.error(e.getMessage()));
                             });
                 });

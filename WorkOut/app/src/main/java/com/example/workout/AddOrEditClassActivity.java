@@ -67,6 +67,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         setContentView(R.layout.activity_add_or_edit_class);
 
         currentCourse = this.getIntent().getParcelableExtra("course");
+
         currentBusiness = this.getIntent().getParcelableExtra("business");
 
         courseRepository = new CourseRepository();
