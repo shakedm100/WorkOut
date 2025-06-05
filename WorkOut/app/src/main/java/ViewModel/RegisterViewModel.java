@@ -40,16 +40,28 @@ public class RegisterViewModel extends ViewModel
         this.generalRepository = new GeneralRepository();
     }
 
+    /**
+     * Returns all the available phone prefixes.
+     * @return all the phone prefixes.
+     */
     public List<String> getAllPhonePrefixes()
     {
         return generalRepository.getAllPhonePrefixes();
     }
 
+    /**
+     * Returns the best 3 matches of cities by a given string.
+     * @param input the partial name (or full name) of the city.
+     * @return a list of the best 3 cities matched.
+     */
     public Task<List<City>> getBestMatchedCities(String input)
     {
         return generalRepository.getCityByNamePartially(input);
     }
 
+    /**
+     * Attempts to register a new User with the given parameters.
+     */
     public void registerUser(String email, String password, String username, String firstName, String lastName,
                              String phonePrefixStr, String phoneNumberStr, String birthday, City city, String street, Gender gender) // String cityName
     {
@@ -64,7 +76,7 @@ public class RegisterViewModel extends ViewModel
         }
 
         if (password == null || password.isEmpty() || password.length() < 6)
-        { // Example: password length check
+        {
             _registerUiState.postValue(GenericUiState.error("Password must be at least 6 characters."));
             return;
         }
@@ -74,9 +86,24 @@ public class RegisterViewModel extends ViewModel
             _registerUiState.postValue(GenericUiState.error("Please enter a first name."));
             return;
         }
+
+        boolean isNameValid = firstName.chars().allMatch(Character::isLetter);
+        if (!isNameValid)
+        {
+            _registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
+            return;
+        }
+
         if (lastName == null || lastName.trim().isEmpty())
         {
             _registerUiState.postValue(GenericUiState.error("Please enter a last name."));
+            return;
+        }
+
+        isNameValid = lastName.chars().allMatch(Character::isLetter);
+        if (!isNameValid)
+        {
+            _registerUiState.postValue(GenericUiState.error("Last name must contain only letters."));
             return;
         }
 
@@ -85,6 +112,17 @@ public class RegisterViewModel extends ViewModel
             _registerUiState.postValue(GenericUiState.error("Please enter a valid email address."));
             return;
         }
+
+        // check if the username or email are already taken by other user
+        generalRepository.canRegisterUser("clients", username, email)
+                .addOnSuccessListener(exists -> {
+                    if (exists) {
+                        _registerUiState.postValue(GenericUiState.error("Username or Email are already taken!"));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    _registerUiState.postValue(GenericUiState.error("Something went wrong!"));
+                });
 
         if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty())
         {
@@ -204,7 +242,7 @@ public class RegisterViewModel extends ViewModel
         Address address = new Address(city, finalStreet);
 
         clientRepository.insertClient(finalUsername, password, phone, finalEmail, finalFirstName, finalLastName, address, gender)
-                .addOnSuccessListener(result ->
+                .addOnSuccessListener(regResult ->
                 {
                     _registerUiState.postValue(GenericUiState.success("Registration successful! Welcome " + finalFirstName));
                 })

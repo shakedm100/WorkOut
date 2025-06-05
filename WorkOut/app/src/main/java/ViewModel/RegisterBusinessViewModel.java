@@ -56,17 +56,109 @@ public class RegisterBusinessViewModel extends ViewModel
      * Inserts a new business if all the given parameters are valid.
      * The result of the registration will appear on the screen.
      */
-    public void registerBusiness(Context context, String name, String password, PhonePrefix phonePrefix, String phoneNumber, String email,
-                                 String businessName, City city, String addressStr, String policy)
+    public void registerBusiness(Context context, String username, String password, String phonePrefixStr, String phoneNumber,
+                                 String email, String businessName, City city, String addressStr, String policy)
     {
+        // basic validation checks
+        if (username == null || username.trim().isEmpty())
+        {
+            registerUiState.postValue(GenericUiState.error("Please enter a username."));
+            return;
+        }
+
+        if (password == null || password.isEmpty() || password.length() < 6)
+        {
+            registerUiState.postValue(GenericUiState.error("Password must be at least 6 characters."));
+            return;
+        }
+
+        if (businessName == null || businessName.trim().isEmpty())
+        {
+            registerUiState.postValue(GenericUiState.error("Please enter the name of the business."));
+            return;
+        }
+
+        if (email == null || email.trim().isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches())
+        {
+            registerUiState.postValue(GenericUiState.error("Please enter a valid email address."));
+            return;
+        }
+
+        // check if the username or email are already taken by other user
+        generalRepository.canRegisterUser("businesses", username, email)
+                .addOnSuccessListener(exists -> {
+                    if (exists) {
+                        registerUiState.postValue(GenericUiState.error("Username or Email are already taken!"));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    registerUiState.postValue(GenericUiState.error("Something went wrong!"));
+                });
+
+        if (phonePrefixStr.trim().isEmpty())
+        {
+            registerUiState.postValue(GenericUiState.error("Please select a phone prefix."));
+            return;
+        }
+
+        PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
+        if (prefix == null)
+        {
+            registerUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
+            return;
+        }
+
+        if (phoneNumber == null || phoneNumber.trim().isEmpty() || !phoneNumber.trim().matches("\\d+"))
+        {
+            registerUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
+            return;
+        }
+        if (!phoneNumber.trim().matches("[0-9]+"))
+        {
+            registerUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
+            return;
+        }
+
+        if (phoneNumber.trim().length() != 7)
+        {
+            registerUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
+            return;
+        }
+
+        // phone is valid
+        PhonePrefix phonePrefix = PhonePrefix.fromString(phonePrefixStr.trim());
         Phone phone = new Phone(phonePrefix, phoneNumber);
+
+        if (city == null)
+        {
+            registerUiState.postValue(GenericUiState.error("City is null."));
+            return;
+        }
+
+        if (addressStr == null || addressStr.trim().isEmpty())
+        {
+            registerUiState.postValue(GenericUiState.error("Please enter a street address."));
+            return;
+        }
+
         Address address = new Address(city, addressStr);
         Geocoder geocoder = new Geocoder(context, new Locale("en", "IL"));
         Location location = generalRepository.convertAddressToLocation(geocoder, address);
 
-        // TODO: add validations
+        // failed to get the long/lat of the given address
+        if (location == null)
+        {
+            registerUiState.postValue(GenericUiState.error("Invalid address."));
+            return;
+        }
 
-        businessRepository.insertBusiness(name, password, phone, email, businessName, location, policy)
+        if (policy == null || policy.trim().isEmpty())
+        {
+            registerUiState.postValue(GenericUiState.error("Please declare the policy."));
+            return;
+        }
+
+        businessRepository.insertBusiness(username, password, phone, email, businessName, location, policy)
                 .addOnSuccessListener(business ->
                 {
                     registerUiState.postValue(GenericUiState.success("Register success!"));

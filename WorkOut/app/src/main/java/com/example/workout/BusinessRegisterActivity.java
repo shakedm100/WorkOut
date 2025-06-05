@@ -145,23 +145,30 @@ public class BusinessRegisterActivity extends AppCompatActivity
             String phoneNumberStr = editTextPhoneNumber.getText().toString().trim();
             String policy = editPolicyText.getText().toString().trim();
 
-            PhonePrefix phonePrefix = (PhonePrefix) spinnerPhonePrefix.getSelectedItem();
+            String phonePrefixStr = "";
+            if (spinnerPhonePrefix.getSelectedItem() != null)
+                phonePrefixStr = spinnerPhonePrefix.getSelectedItem().toString();
 
             String cityName = cityAutoComplete.getText().toString().trim();
             City selectedCity = null;
-            for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++) {
-                City city = (City) cityAutoComplete.getAdapter().getItem(i);
-                // TODO: expand it to work for hebrew also
-                String match = city.getEnglishName().trim();
-                if (match.equals(cityName)) {
-                    selectedCity = city;
-                    break;
+            if (cityAutoComplete.getAdapter() != null)
+            {
+                for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++)
+                {
+                    City city = (City) cityAutoComplete.getAdapter().getItem(i);
+                    String match = city.getEnglishName().trim();
+                    if (match.equals(cityName))
+                    {
+                        selectedCity = city;
+                        break;
+                    }
                 }
+
             }
 
             // try to register
             registerBusinessViewModel.registerBusiness(this.getApplicationContext(),
-                    username, password, phonePrefix, phoneNumberStr, email, name, selectedCity, addressStr, policy
+                    username, password, phonePrefixStr, phoneNumberStr, email, name, selectedCity, addressStr, policy
             );
         });
 
