@@ -125,10 +125,9 @@ public class RegisterActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) { }
         });
 
-
         // Setup Observers for LiveData
-        setupObservers();
 
+        setupObservers();
         // Setup Click Listeners for buttons
         setupClickListeners();
     }
@@ -194,14 +193,18 @@ public class RegisterActivity extends AppCompatActivity {
 
             String cityName = cityAutoComplete.getText().toString().trim();
             City selectedCity = null;
-            for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++) {
-                City city = (City) cityAutoComplete.getAdapter().getItem(i);
-                String match = city.getEnglishName().trim();
-                if (match.equals(cityName)) {
-                    selectedCity = city;
-                    break;
+            if (cityAutoComplete.getAdapter() != null)
+            {
+                for (int i = 0; i < cityAutoComplete.getAdapter().getCount(); i++) {
+                    City city = (City) cityAutoComplete.getAdapter().getItem(i);
+                    String match = city.getEnglishName().trim();
+                    if (match.equals(cityName)) {
+                        selectedCity = city;
+                        break;
+                    }
                 }
             }
+
 
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
             String street = editTextStreet.getText().toString().trim();
