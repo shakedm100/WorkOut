@@ -14,10 +14,16 @@ import Model.Gender;
 import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.ClientRepository;
+
 import static com.google.android.gms.tasks.Tasks.await;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -38,7 +44,8 @@ public class ClientRepositoryTest
             Client testBusiness = await(repository.getClientByUsername("testEverything"), 10, TimeUnit.SECONDS);
             await(repository.deleteClientByID(testBusiness), 10, TimeUnit.SECONDS);
         }
-        catch (Exception e) { /*User doesn't exist in db, good!*/ }
+        catch (Exception e)
+        { /*User doesn't exist in db, good!*/ }
     }
 
     @AfterClass
@@ -53,9 +60,14 @@ public class ClientRepositoryTest
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
 
-        // Test insert functionality
-        testSubject = await(repository.insertClient("testEverything", "1234", phone, "testEverything@gmail.com", "Shaked",
-                "Michael", address, Gender.Male), 10, TimeUnit.SECONDS);
+        try
+        {
+            // Test insert functionality
+            testSubject = await(repository.insertClient("testEverything", "1234", phone, "testEverything@gmail.com", "Shaked",
+                    "Michael", address, Gender.Male), 10, TimeUnit.SECONDS);
+        }
+        catch (Exception e)
+        { /*Anoter method already added him*/ }
 
         assertNotNull(testSubject);
 
@@ -69,7 +81,7 @@ public class ClientRepositoryTest
         assertEquals(Gender.Male, testSubject.getGender());
 
         // Fail by username
-        assertThrows(Exception.class,()-> await(repository.insertClient("testEverything", "1234", phone, "bla@gmail.com", "Shaked",
+        assertThrows(Exception.class, () -> await(repository.insertClient("testEverything", "1234", phone, "bla@gmail.com", "Shaked",
                 "Michael", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
 
@@ -97,5 +109,74 @@ public class ClientRepositoryTest
         Client check = await(repository.getClientByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
         assertNotNull(check);
         assertEquals(check.getFirstName(), updateClient.getFirstName());
+    }
+
+    @Test
+    public void checkLogin() throws ExecutionException, InterruptedException
+    {
+        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
+        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
+        String username = "testEverything";
+        String password = "1234";
+        try
+        {
+            // Check if the user already exists
+            when(repository.insertClient(username, password, phone, "testEverything@gmail.com", "Shaked",
+                    "Michael", address, Gender.Male)).thenReturn(Tasks.forResult(testSubject));
+        }
+        catch (Exception e)
+        { /*Anoter method already added him*/ }
+
+        // Act
+        Task<Client> loginTask = repository.checkLogin(username, password);
+        Client result = Tasks.await(loginTask);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(username, result.getUsername());
+        assertEquals(password, result.getPassword());
+
+        // Now test with wrong password
+        Task<Client> passwordFailLoginTask = repository.checkLogin(username, password + "12");
+
+        // Assert
+        try
+        {
+            Tasks.await(passwordFailLoginTask);
+            fail("Expected IllegalArgumentException due to invalid password");
+        }
+        catch (ExecutionException ee)
+        {
+            // unwrap the cause
+            Throwable cause = ee.getCause();
+            assertTrue(cause instanceof IllegalArgumentException);
+            assertEquals("Invalid password", cause.getMessage());
+        }
+        catch (InterruptedException ie)
+        {
+            fail("Test interrupted unexpectedly");
+        }
+
+        // Now test with wrong password
+        Task<Client> usernameFailLoginTask = repository.checkLogin(username + "12", password);
+
+        // Assert
+        try
+        {
+            Tasks.await(usernameFailLoginTask);
+            fail("Expected NoSuchElementException for missing user");
+        }
+        catch (ExecutionException ee)
+        {
+            Throwable cause = ee.getCause();
+            assertTrue(cause instanceof IllegalArgumentException);
+            assertEquals( "No client with username: " + username + "12", cause.getMessage());
+        }
+        catch (InterruptedException ie)
+        {
+            fail("Test interrupted unexpectedly");
+        }
+
+
     }
 }
