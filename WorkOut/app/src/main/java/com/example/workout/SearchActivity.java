@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,15 +48,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import Model.Address;
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
+import Model.City;
 import Model.Client;
 import Model.Course;
 import Model.CourseType;
 import Model.Day;
+import Model.Gender;
 import Model.Location;
-import Model.Repository.BusinessRepository;
+import Model.Phone;
+import Model.PhonePrefix;
 import Model.Repository.CourseRepository;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
@@ -82,7 +87,7 @@ public class SearchActivity extends AppCompatActivity
     private Client current;
     private MaterialButtonToggleGroup toggleGroup;
     private Button searchButton;
-    private boolean isList;
+    private boolean isList, isTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -97,8 +102,9 @@ public class SearchActivity extends AppCompatActivity
             return insets;
         });
 
+        isTest = false;
         categorySpinner = findViewById(R.id.categorySearchSpinner);
-        editTextLocation = findViewById(R.id.locationAuto);
+        editTextLocation = findViewById(R.id.locationSearchEditText);
         courseTypeSpinner = findViewById(R.id.typeSpinner);
         courseRepository = new CourseRepository();
         container = findViewById(R.id.search_slider_container);
@@ -224,14 +230,25 @@ public class SearchActivity extends AppCompatActivity
         {
             ArrayList<Course> courseArrayList = new ArrayList<>(courses);
             Intent intent;
+            TextView tempTextView = findViewById(R.id.searchTestTextView);
+
             if(isList)
+            {
                 intent = new Intent(this, SearchResultsActivity.class);
+                if(isTest)
+                    tempTextView.setText("Successfully searching and showing list");
+            }
             else
+            {
                 intent = new Intent(this, MapActivity.class);
+                if(isTest)
+                    tempTextView.setText("Successfully searching and showing map");
+            }
 
             intent.putParcelableArrayListExtra("course_list", courseArrayList);
             intent.putExtra("client", current);
-            startActivity(intent);
+            if(!isTest)
+                startActivity(intent);
         }).addOnFailureListener(task ->
         {
             // TODO: Show error to user
@@ -515,5 +532,15 @@ public class SearchActivity extends AppCompatActivity
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setTestingConditions(CourseRepository repo, Course course)
+    {
+        this.courseRepository = repo;
+        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
+        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
+        current = new Client("esdrg","shakedm100", "1234", phone,
+                "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
+        isTest = true;
     }
 }

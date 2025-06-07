@@ -176,7 +176,5 @@ public class ClientRepositoryTest
         {
             fail("Test interrupted unexpectedly");
         }
-
-
     }
 }

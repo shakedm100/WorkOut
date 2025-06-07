@@ -82,6 +82,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation("org.mockito:mockito-android:5.+")
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
@@ -98,7 +99,5 @@ dependencies {
 
     // Fused Location Provider (high-accuracy, battery-optimized)
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    // Mockito for testing purposes
-    androidTestImplementation("org.mockito:mockito-android:4.6.1")
 
 }
