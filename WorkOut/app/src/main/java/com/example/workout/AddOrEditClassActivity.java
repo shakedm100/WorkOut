@@ -52,7 +52,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     private boolean isTest;
     private EditText courseNameEditText, capacityEditText, descriptionEditText;
     private Spinner dayOfWeekSpinner, courseTypeSpinner, categorySpinner;
-    private Button saveButton, startTimeButton, endTimeButton;
+    private Button saveButton, startTimeButton, endTimeButton, deleteButton;
     private RangeSlider ageSlider;
     private AgeRange ageRange;
     ViewGroup container;
@@ -84,6 +84,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         categorySpinner = findViewById(R.id.categorySpinner);
         dayOfWeekSpinner = findViewById(R.id.dayOfWeekSpinner);
         saveButton = findViewById(R.id.buttonSave);
+        deleteButton = findViewById(R.id.buttonDelete);
         container = findViewById(R.id.update_course_slider_container);
         capacityEditText = findViewById(R.id.capacityEditText);
         descriptionEditText = findViewById(R.id.descriptionEditText);
@@ -126,8 +127,27 @@ public class AddOrEditClassActivity extends AppCompatActivity
         // Press on save
         saveButton.setOnClickListener(v ->
         {
-            buildCourseFromFieldsAndQuery();
+            buildCourseFromFieldsAndQuery(false);
         });
+
+        // Press on Delete
+        deleteButton.setOnClickListener(v -> {
+            courseRepository.deleteCourse(currentCourse, currentBusiness)
+                    .addOnSuccessListener(result -> {
+                        if (Boolean.TRUE.equals(result)) {
+                            Toast.makeText(this, "Successfully deleted the course", Toast.LENGTH_LONG).show();
+                            buildCourseFromFieldsAndQuery(true);
+                        } else {
+                            Toast.makeText(this, "Failed to delete the course", Toast.LENGTH_LONG).show();
+                            // TODO: Show error on screen
+                        }
+                    })
+                    .addOnFailureListener(this, e -> {
+                        Toast.makeText(this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+            finish();
+        });
+
 
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H).setHour(initialHour).setMinute(initialMinute);
@@ -275,7 +295,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         container.addView(ageSlider);
     }
 
-    private void buildCourseFromFieldsAndQuery()
+    private void buildCourseFromFieldsAndQuery(boolean deleteClass)
     {
         CourseType courseType = CourseType.valueOf(courseTypeSpinner.getSelectedItem().toString());
         String courseName = courseNameEditText.getText().toString().trim();
@@ -323,6 +343,9 @@ public class AddOrEditClassActivity extends AppCompatActivity
         }
         else // Update
         {
+            if (deleteClass)
+                return;
+
             int duration;
             if(startTime == null)
             {
@@ -364,12 +387,12 @@ public class AddOrEditClassActivity extends AppCompatActivity
             {
                 if(task != null)
                 {
-                    Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Successfully updated the course", Toast.LENGTH_LONG).show();
                     finish();
                 }
             }).addOnFailureListener(e ->
             {
-                Toast.makeText(this, "Failed to add the course", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Failed to update the course", Toast.LENGTH_LONG).show();
                 // TODO: Show error on screen
             });
         }
