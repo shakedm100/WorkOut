@@ -1,6 +1,9 @@
 package Model.Repository;
 
+import android.util.Log;
+
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -80,14 +83,20 @@ public class CourseRepository
 
     public Task<Boolean> deleteCourse(Course course, Business business)
     {
-        return deleteHelper(course, business).addOnSuccessListener(task ->
-        {
-           business.deleteCourse(course);
-        });
+        return deleteHelper(course, business);
+//        return deleteHelper(course, business).addOnSuccessListener(task ->
+//        {
+//           business.deleteCourse(course);
+//        });
     }
 
     private Task<Boolean> deleteHelper(Course course, Business business)
     {
+        if (course == null || business == null)
+        {
+            return Tasks.forException(new IllegalArgumentException("Course or Business is null"));
+        }
+
         DocumentReference current = db.collection(collection).document(business.getId())
                 .collection(subCollection).document(course.getId());
         return current.delete().continueWith(Task::isSuccessful);
