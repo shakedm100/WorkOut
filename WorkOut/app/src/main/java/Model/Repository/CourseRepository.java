@@ -68,10 +68,28 @@ public class CourseRepository
 
     public Task<Boolean> updateCourse(Course course, Business business)
     {
-        return updateHelper(course, business).addOnSuccessListener(task ->
-        {
-            business.updateCourse(course);
-        });
+        return checkIfCourseExist(business, course)
+                .continueWithTask(existsTask ->
+                {
+                    if (!existsTask.isSuccessful())
+                    {
+                        return Tasks.forResult(false);
+                    }
+                    if (!existsTask.getResult())
+                    {
+                        return Tasks.forResult(false);
+                    }
+                    return updateHelper(course, business)
+                            .continueWithTask(updateTask ->
+                            {
+                                if (!updateTask.isSuccessful())
+                                {
+                                    return Tasks.forResult(false);
+                                }
+                                boolean ok = business.updateCourse(course);
+                                return Tasks.forResult(ok);
+                            });
+                });
     }
 
     private Task<Boolean> updateHelper(Course course, Business business)
@@ -83,11 +101,37 @@ public class CourseRepository
 
     public Task<Boolean> deleteCourse(Course course, Business business)
     {
-        return deleteHelper(course, business);
+        return checkIfCourseExist(business, course)
+                .continueWithTask(existsTask ->
+                        {
+                            if (!existsTask.isSuccessful())
+                            {
+                                return Tasks.forResult(false);
+                            }
+                            if (!existsTask.getResult())
+                            {
+                                return Tasks.forResult(false);
+                            }
+                            return deleteHelper(course, business);
+                        });
+    }
 //        return deleteHelper(course, business).addOnSuccessListener(task ->
 //        {
 //           business.deleteCourse(course);
 //        });
+
+    private Task<Boolean> checkIfCourseExist(Business business, Course course)
+    {
+        return db.collection(collection).document(business.getId()).collection(subCollection).
+                document(course.getId()).get().continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                        return false;
+                    if (task.getResult() == null)
+                        return false;
+
+                    return task.getResult().exists();
+                });
     }
 
     private Task<Boolean> deleteHelper(Course course, Business business)
@@ -133,8 +177,9 @@ public class CourseRepository
     /**
      * This function is responsible for all the search logic. It receives a generic
      * SearchInterface that decides how to search and an object that acts as a search filter.
+     *
      * @param searchStrategy dictates how to search
-     * @param data the relative search data
+     * @param data           the relative search data
      * @return a list of courses that agree with the search terms
      */
     public Task<List<Course>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
@@ -147,15 +192,15 @@ public class CourseRepository
         return db.collection(collection).document(business.getId()).collection(subCollection)
                 .whereEqualTo("schedule.day", day).get().continueWith(task ->
                 {
-                    if(!task.isSuccessful())
+                    if (!task.isSuccessful())
                         throw Objects.requireNonNull(task.getException());
 
                     QuerySnapshot querySnapshot = task.getResult();
                     List<Course> courses = new ArrayList<>();
-                    for(DocumentSnapshot documentSnapshot : querySnapshot)
+                    for (DocumentSnapshot documentSnapshot : querySnapshot)
                     {
                         Course current = documentSnapshot.toObject(Course.class);
-                        if(current != null)
+                        if (current != null)
                             courses.add(current);
 
                     }
