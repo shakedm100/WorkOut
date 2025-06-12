@@ -34,6 +34,7 @@ public class CourseRepository
     {
         db = FirebaseFirestore.getInstance();
     }
+    public CourseRepository(FirebaseFirestore db) { this.db = db; }
 
     public Task<Course> insertCourse(Business business, String name, Schedule schedule, int capacity,
                                      CourseType type, AgeRange ageRange, Category category, String description,
@@ -92,7 +93,7 @@ public class CourseRepository
                 });
     }
 
-    private Task<Boolean> updateHelper(Course course, Business business)
+    public Task<Boolean> updateHelper(Course course, Business business)
     {
         DocumentReference current = db.collection(collection).document(business.getId())
                 .collection(subCollection).document(course.getId());
@@ -115,12 +116,8 @@ public class CourseRepository
                             return deleteHelper(course, business);
                         });
     }
-//        return deleteHelper(course, business).addOnSuccessListener(task ->
-//        {
-//           business.deleteCourse(course);
-//        });
 
-    private Task<Boolean> checkIfCourseExist(Business business, Course course)
+    public Task<Boolean> checkIfCourseExist(Business business, Course course)
     {
         return db.collection(collection).document(business.getId()).collection(subCollection).
                 document(course.getId()).get().continueWith(task ->
@@ -134,7 +131,7 @@ public class CourseRepository
                 });
     }
 
-    private Task<Boolean> deleteHelper(Course course, Business business)
+    public Task<Boolean> deleteHelper(Course course, Business business)
     {
         if (course == null || business == null)
         {

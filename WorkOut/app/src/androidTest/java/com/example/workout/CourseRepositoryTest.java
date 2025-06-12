@@ -1,149 +1,172 @@
 package com.example.workout;
 
-import static com.google.android.gms.tasks.Tasks.await;
-
 import static org.junit.Assert.*;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.google.firebase.Timestamp;
+import static com.google.android.gms.tasks.Tasks.forResult;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import org.checkerframework.checker.units.qual.C;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import Model.Address;
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
-import Model.City;
-import Model.Client;
 import Model.Course;
 import Model.CourseType;
 import Model.Day;
-import Model.Gender;
 import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
-import Model.Repository.BusinessRepository;
 import Model.Repository.CourseRepository;
 import Model.Schedule;
 
 @RunWith(AndroidJUnit4.class)
 public class CourseRepositoryTest
 {
-    private static CourseRepository courseRepository;
-    private static BusinessRepository businessRepository;
-    private Course testSubject;
-    private static Business testBusiness;
-    private static Client testClient;
+    @Mock
+    FirebaseFirestore mockDb;
+    @Mock
+    CollectionReference mockBusinessCollection;
+    @Mock
+    DocumentReference mockBusinessDoc;
+    @Mock
+    CollectionReference mockCourseCollection;
+    @Mock
+    Task<DocumentReference> mockAddTask;
+    @Mock
+    DocumentReference mockCourseDocRef;
+    private CourseRepository repo;
+    private Business business;
+    private Course sampleCourse;
+    private Phone testPhone;
 
-    @BeforeClass
-    public static void setUp()
+    @Before
+    public void setUp()
     {
-        courseRepository = new CourseRepository();
-        businessRepository = new BusinessRepository();
+        testPhone = new Phone(PhonePrefix.PREFIX_052, "5265777");
 
-        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        testClient = new Client("esdrg","shakedm100", phone,
-                "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
+        MockitoAnnotations.openMocks(this);
+        // build a repo with overridden db
+        repo = new CourseRepository(mockDb);
 
-        try
-        {
-            testBusiness = await(businessRepository.insertBusiness("testEverything", "1234", testClient.getPhone(),
-                    "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                    "Policy"), 10, TimeUnit.SECONDS);
-        }catch (Exception e)
-        {
-            System.out.println("ERROR: Business should already exists");
-        }
+        // common mocks
+        when(mockDb.collection("businesses")).thenReturn(mockBusinessCollection);
+        when(mockBusinessCollection.document(anyString())).thenReturn(mockBusinessDoc);
+        when(mockBusinessDoc.collection("courses")).thenReturn(mockCourseCollection);
 
-        try
-        {
-            if(testBusiness == null)
-                testBusiness = await(businessRepository.getBusinessByUsername("testEverything"), 10, TimeUnit.SECONDS);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("ERROR: Business insertion failed on setUp");
-        }
-    }
-
-    @AfterClass
-    public static void setDown() throws ExecutionException, InterruptedException, TimeoutException
-    {
-        await(businessRepository.deleteBusiness(testBusiness), 30, TimeUnit.SECONDS);
+        // sample business
+        business = new Business("bid", "testEverything", testPhone,
+                "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
+                "Policy");
+        Schedule schedule = new Schedule(Day.Wednesday, Timestamp.now());
+        sampleCourse = new Course("cid", CourseType.Group, "YogaClass", new ArrayList<>(),
+                10, new AgeRange(20, 40), schedule,
+                Category.Archery, "Desc", business.getId(), 60);
     }
 
     @Test
-    public void queryCourseTest() throws ExecutionException, InterruptedException, TimeoutException
+    public void insertCourse_success() throws Exception
     {
-        Schedule schedule = new Schedule(Day.Sunday, Timestamp.now());
-        AgeRange ageRange = new AgeRange(23,50);
+        // stub add(...) to return a DocumentReference
+        when(mockCourseCollection.add(anyMap()))
+                .thenReturn(Tasks.forResult(mockCourseDocRef));
+        when(mockAddTask.isSuccessful()).thenReturn(true);
+        when(mockAddTask.getResult()).thenReturn(mockCourseDocRef);
+        when(mockCourseDocRef.getId()).thenReturn("cid");
 
-        // Test insert
-        testSubject = await(courseRepository.insertCourse(testBusiness,"TRX", schedule, 50, CourseType.Dou,
-                ageRange, Category.Archery, "Shoot to kill", 120), 10, TimeUnit.SECONDS);
+        CourseRepository spyRepo = spy(repo);
 
-        assertNotNull(testSubject.getId());
-        assertFalse(testSubject.getId().isEmpty());
-        assertEquals("TRX", testSubject.getName());
-        assertEquals(schedule, testSubject.getSchedule());
-        assertEquals(50, testSubject.getCapacity());
-        assertEquals(CourseType.Dou, testSubject.getType());
-        assertEquals(ageRange, testSubject.getAgeRange());
-        assertEquals(Category.Archery, testSubject.getCategory());
-        assertEquals("Shoot to kill", testSubject.getDescription());
-        assertEquals(120, testSubject.getDuration());
+        doReturn(Tasks.forResult(false))
+                .when(spyRepo)
+                .checkIfCourseExist(business, sampleCourse);
 
-        // Test get course
-        ArrayList<Course> courses = (ArrayList<Course>)
-                await(courseRepository.getAllBusinessesCourses(testBusiness), 10, TimeUnit.SECONDS);
+        Course result = Tasks.await(spyRepo.insertCourse(
+                business, "YogaClass", sampleCourse.getSchedule(),
+                sampleCourse.getCapacity(), sampleCourse.getType(),
+                sampleCourse.getAgeRange(), sampleCourse.getCategory(),
+                sampleCourse.getDescription(), sampleCourse.getDuration()));
 
-        // Should be one course
-        assertEquals(1, courses.size());
+        assertNotNull(result);
+        assertEquals("cid", result.getId());
+        // verify business had the course added
+        assertTrue(business.getCourses().stream()
+                .anyMatch(c -> c.getId().equals("cid")));
+    }
 
-        Course checkCourse = courses.get(0);
-        assertNotNull(checkCourse.getId());
-        assertEquals(testSubject.getName(), checkCourse.getName());
-        assertEquals(testSubject.getSchedule(), checkCourse.getSchedule());
-        assertEquals(testSubject.getCapacity(), checkCourse.getCapacity());
-        assertEquals(testSubject.getType(), checkCourse.getType());
-        assertEquals(testSubject.getAgeRange(), checkCourse.getAgeRange());
-        assertEquals(testSubject.getCategory(), checkCourse.getCategory());
-        assertEquals(testSubject.getDescription(), checkCourse.getDescription());
-        assertEquals(testSubject.getDuration(), checkCourse.getDuration());
+    @Test
+    public void updateCourse_success() throws Exception
+    {
+        Business spyBusiness = spy(business);
 
-        // Test day of week
-        ArrayList<Course> daysOfWeek = (ArrayList<Course>) await(courseRepository.getCoursesByDayOfWeek(testBusiness,
-                Day.Sunday), 10, TimeUnit.SECONDS);
+        // spy repo to stub existence and helper
+        CourseRepository spyRepo = spy(repo);
+        doReturn(Tasks.forResult(true))
+                .when(spyRepo)
+                .checkIfCourseExist(spyBusiness, sampleCourse);
 
-        assertNotNull(daysOfWeek);
-        assertFalse(daysOfWeek.isEmpty());
+        // stub updateHelper to succeed
+        doReturn(Tasks.forResult(true))
+                .when(spyRepo)
+                .updateHelper(sampleCourse, spyBusiness);
 
-        // Test update
-        Course updateCourse = new Course(testSubject);
-        updateCourse.setCapacity(45);
-        boolean check = await(courseRepository.updateCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
-        assertTrue(check);
+        // stub business.updateCourse() returns true
+        when(spyBusiness.updateCourse(sampleCourse)).thenReturn(true);
 
-        updateCourse.setId("dfshg");
-        check = await(courseRepository.updateCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
-        assertFalse(check);
+        Boolean ok = Tasks.await(spyRepo.updateCourse(sampleCourse, spyBusiness));
+        assertTrue(ok);
+    }
 
-        // Test delete
-        boolean checkDelete = await(courseRepository.deleteCourse(testSubject, testBusiness), 10, TimeUnit.SECONDS);
-        assertTrue(checkDelete);
+    @Test
+    public void updateCourse_notExists_returnsFalse() throws Exception
+    {
+        CourseRepository spyRepo = spy(repo);
+        doReturn(Tasks.forResult(false))
+                .when(spyRepo)
+                .checkIfCourseExist(business, sampleCourse);
+        Boolean ok = Tasks.await(spyRepo.updateCourse(sampleCourse, business));
+        assertFalse(ok);
+    }
 
-        checkDelete = await(courseRepository.deleteCourse(testSubject, testBusiness), 10, TimeUnit.SECONDS);
-        assertFalse(checkDelete);
+    @Test
+    public void deleteCourse_success() throws Exception
+    {
+        CourseRepository spyRepo = spy(repo);
+        doReturn(Tasks.forResult(true))
+                .when(spyRepo)
+                .checkIfCourseExist(business, sampleCourse);
+        // stub deleteHelper, which returns Task<Boolean>
+        doReturn(forResult(true))
+                .when(spyRepo).deleteHelper(sampleCourse, business);
+
+        Boolean ok = Tasks.await(spyRepo.deleteCourse(sampleCourse, business));
+        assertTrue(ok);
+    }
+
+    @Test
+    public void deleteCourse_notExists_returnsFalse() throws Exception
+    {
+        CourseRepository spyRepo = spy(repo);
+        doReturn(Tasks.forResult(false))
+                .when(spyRepo)
+                .checkIfCourseExist(business, sampleCourse);
+
+        Boolean ok = Tasks.await(spyRepo.deleteCourse(sampleCourse, business));
+        assertFalse(ok);
     }
 }

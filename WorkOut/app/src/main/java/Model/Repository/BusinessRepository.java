@@ -28,20 +28,27 @@ public class BusinessRepository
 {
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
+    private final GeneralRepository generalRepository;
     private final String collection = "businesses";
 
     public BusinessRepository()
     {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        generalRepository = new GeneralRepository();
+    }
+
+    public BusinessRepository(FirebaseFirestore db, FirebaseAuth auth, GeneralRepository generalRepository)
+    {
+        this.db = db;
+        this.auth = auth;
+        this.generalRepository = generalRepository;
     }
 
     public Task<Business> insertBusiness(String username, String password, Phone phone, String email,
                                          String businessName, Location location,
                                          String policy)
     {
-        GeneralRepository generalRepository = new GeneralRepository();
-
         return generalRepository.canRegisterUser(collection, username, email).continueWithTask(checkTask ->
         {
             if (!checkTask.isSuccessful())

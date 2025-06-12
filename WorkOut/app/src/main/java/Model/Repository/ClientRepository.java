@@ -32,12 +32,22 @@ public class ClientRepository
     private final FirebaseFirestore db;
     private final FirebaseAuth auth;
     private final String collection = "clients";
+    private final GeneralRepository generalRepository;
 
     public ClientRepository()
     {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        generalRepository = new GeneralRepository();
     }
+
+    public ClientRepository(FirebaseAuth auth, FirebaseFirestore db, GeneralRepository generalRepo)
+    {
+        this.auth = auth;
+        this.db = db;
+        this.generalRepository = generalRepo;
+    }
+
 
     /**
      * This function is responsible for the logic of client insertion to the database.
@@ -58,7 +68,6 @@ public class ClientRepository
     public Task<Client> insertClient(String username, String password, Phone phone, String email, String firstName,
                                      String lastName, Address address, Gender gender)
     {
-        GeneralRepository generalRepository = new GeneralRepository();
         // check existence
         return generalRepository.canRegisterUser(collection, username, email)
                 // depending on the check, either fail or go add()
@@ -288,6 +297,7 @@ public class ClientRepository
                     googleClient.getEmail(), firstName, lastName, null, null);
         });
     }
+
 
 
 }
