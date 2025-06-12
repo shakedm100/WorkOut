@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextUsername;
     private EditText editTextPassword;
     private ProgressBar progressBar;
-    private TextView textViewError;
+    private TextView loginStatusTextView;
     Button loginButton;
 
     @Override
@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextUsername = findViewById(R.id.usernameTextLogin);
         editTextPassword = findViewById(R.id.passwordTextLogin);
         progressBar = findViewById(R.id.loginProgressBar);
-        textViewError = findViewById(R.id.loginStatusText);
+        loginStatusTextView = findViewById(R.id.loginStatusTextView);
         credentialManager = CredentialManager.create(getApplicationContext());
         ImageButton googleAuth = findViewById(R.id.googleRegisterButton);
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
@@ -62,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         Button registerBusinessButton = findViewById(R.id.BusinessRegister);
+        // TODO: move to suitable function
         registerBusinessButton.setOnClickListener(task -> {
             Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
             startActivity(newIntent);
@@ -92,17 +93,17 @@ public class LoginActivity extends AppCompatActivity {
                 case IDLE:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
-                    textViewError.setVisibility(View.GONE);
+                    loginStatusTextView.setVisibility(View.GONE);
                     break;
                 case LOADING:
                     progressBar.setVisibility(View.VISIBLE);
                     loginButton.setEnabled(false);
-                    textViewError.setVisibility(View.GONE);
+                    loginStatusTextView.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
-                    textViewError.setVisibility(View.GONE);
+                    loginStatusTextView.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
                     Intent intent;
                     if(loginUiState.getData() instanceof Client)
@@ -121,8 +122,8 @@ public class LoginActivity extends AppCompatActivity {
                 case ERROR:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
-                    textViewError.setText(loginUiState.getErrorMessage());
-                    textViewError.setVisibility(View.VISIBLE);
+                    loginStatusTextView.setText(loginUiState.getErrorMessage());
+                    loginStatusTextView.setVisibility(View.VISIBLE);
                     break;
             }
         });
@@ -141,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                 editTextUsername.setError("Username cannot be empty");
                 return;
             }
+
             if (password.isEmpty())
             {
                 editTextPassword.setError("Password cannot be empty");

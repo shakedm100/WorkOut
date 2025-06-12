@@ -19,12 +19,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import Model.Business;
 import Model.City;
 import Model.Client;
 import Model.Gender;
 import Model.Phone;
 import Model.Address;
 import Model.PhonePrefix;
+import Model.Rating;
 
 
 public class ClientRepository
@@ -216,6 +218,12 @@ public class ClientRepository
             return new Client(googleClient.getUid(), "", "", phone,
                     googleClient.getEmail(), firstName, lastName, null, null);
         });
+    }
+
+    // TODO: add a rating by client function
+    public void addRatingByClient(Rating rating, Business business)
+    {
+        business.addRating(rating);
     }
 
 
