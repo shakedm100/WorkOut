@@ -46,6 +46,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Client client;
     private ArrayList<Course> courses;
     private ArrayList<Business> businessesFromCourses;
+    private boolean isFromSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -82,7 +83,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         courses = getIntent().getParcelableArrayListExtra("course_list");
         businessesFromCourses = new ArrayList<>();
         if(courses == null)
+        {
+            isFromSearch = false;
             courses = new ArrayList<>();
+        }
 
         for (Course course : courses)
         {
@@ -114,7 +118,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         {
             for (Business current : businesses)
             {
-                if(existInBusinessesFromCourses(current))
+                if(existInBusinessesFromCourses(current) || !isFromSearch)
                 {
                     Location location = current.getLocation();
                     LatLng position = new LatLng(location.getLatitude(), location.getLongitude());

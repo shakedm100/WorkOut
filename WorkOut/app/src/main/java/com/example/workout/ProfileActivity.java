@@ -2,28 +2,22 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.lifecycle.ViewModelProvider;
 
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import Model.Client;
-import Model.Repository.ClientRepository;
 import ViewModel.ClientProfileViewModel;
-import ViewModel.GenericUiState;
-import ViewModel.LoginViewModel;
 
 public class ProfileActivity extends AppCompatActivity
 {
@@ -81,17 +75,17 @@ public class ProfileActivity extends AppCompatActivity
                 startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_ratings)
+            else if (id == R.id.nav_map)
             {
-                Intent intent = new Intent(this, RatingsActivity.class);
+                Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
                 startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_messages)
+            else if (id == R.id.nav_Calendar)
             {
-                Intent intent = new Intent(this, MessagesActivity.class);
+                Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
                 startActivity(intent);

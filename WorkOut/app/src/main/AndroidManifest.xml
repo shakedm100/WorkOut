@@ -51,6 +51,7 @@
         <activity android:name=".AddOrEditClassActivity"/>
         <activity android:name=".BusinessHomeActivity"/>
         <activity android:name=".CoursesActivity"/>
+        <activity android:name=".CalendarActivity"/>
         <activity android:name=".SearchResultsActivity"/>
         <activity android:name=".BusinessProfileActivity"/>
         <activity android:name=".StatusActivity"/>

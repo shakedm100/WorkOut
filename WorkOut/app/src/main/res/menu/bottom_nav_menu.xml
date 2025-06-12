@@ -17,13 +17,13 @@
         android:title="@string/search_button" />
 
     <item
-        android:id="@+id/nav_ratings"
-        android:icon="@drawable/ratings"
-        android:title="@string/ratings" />
+        android:id="@+id/nav_map"
+        android:icon="@drawable/map_icon_transparent"
+        android:title="@string/map" />
 
     <item
-        android:id="@+id/nav_messages"
-        android:icon="@drawable/message"
-        android:title="@string/messages" />
+        android:id="@+id/nav_Calendar"
+        android:icon="@drawable/businesscalendar"
+        android:title="@string/calendar" />
 
 </menu>

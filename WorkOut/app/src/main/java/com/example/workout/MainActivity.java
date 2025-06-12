@@ -8,12 +8,10 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 // ViewModel imports
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 //
 
-import Model.Business;
 import Model.Client;
 
 public class MainActivity extends AppCompatActivity
@@ -58,17 +56,17 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_ratings)
+            else if (id == R.id.nav_map)
             {
-                Intent intent = new Intent(this, RatingsActivity.class);
+                Intent intent = new Intent(this, MapActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_messages)
+            else if (id == R.id.nav_Calendar)
             {
-                Intent intent = new Intent(this, MessagesActivity.class);
+                Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 startActivity(intent);

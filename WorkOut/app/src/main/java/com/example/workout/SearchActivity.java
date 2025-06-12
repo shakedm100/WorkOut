@@ -50,7 +50,6 @@ import java.util.Map;
 
 import Model.Address;
 import Model.AgeRange;
-import Model.Business;
 import Model.Category;
 import Model.City;
 import Model.Client;
@@ -204,17 +203,17 @@ public class SearchActivity extends AppCompatActivity
                 // you’re already here
                 return true;
             }
-            else if (id == R.id.nav_ratings)
+            else if (id == R.id.nav_map)
             {
-                Intent intent = new Intent(this, RatingsActivity.class);
+                Intent intent = new Intent(this, MapActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
                 startActivity(intent);
                 return true;
             }
-            else if (id == R.id.nav_messages)
+            else if (id == R.id.nav_Calendar)
             {
-                Intent intent = new Intent(this, MessagesActivity.class);
+                Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
                 startActivity(intent);
