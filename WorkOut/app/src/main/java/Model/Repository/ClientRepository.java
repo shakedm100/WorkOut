@@ -30,11 +30,13 @@ import Model.PhonePrefix;
 public class ClientRepository
 {
     private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
     private final String collection = "clients";
 
     public ClientRepository()
     {
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
     }
 
     /**
@@ -56,17 +58,6 @@ public class ClientRepository
     public Task<Client> insertClient(String username, String password, Phone phone, String email, String firstName,
                                      String lastName, Address address, Gender gender)
     {
-        // prepare your user data
-        Map<String, Object> user = new HashMap<>();
-        user.put("username", username);
-        user.put("password", password);
-        user.put("email", email);
-        user.put("phone", phone);
-        user.put("firstName", firstName);
-        user.put("lastName", lastName);
-        user.put("address", address);
-        user.put("gender", gender);
-
         GeneralRepository generalRepository = new GeneralRepository();
         // check existence
         return generalRepository.canRegisterUser(collection, username, email)
@@ -85,22 +76,49 @@ public class ClientRepository
                         return Tasks.forException(
                                 new IllegalArgumentException("Username already exists"));
                     }
+                    return auth.createUserWithEmailAndPassword(email, password);
                     // username free add the new document
-                    return db.collection(collection).add(user);
                 })
                 // map the DocumentReference into your Client
-                .continueWith(addTask ->
+                .continueWithTask(authTask ->
                 {
-                    if (!addTask.isSuccessful())
+                    if (!authTask.isSuccessful())
                     {
-                        throw Objects.requireNonNull(addTask.getException());
+                        throw Objects.requireNonNull(authTask.getException());
                     }
-                    DocumentReference ref = addTask.getResult();
-                    String id = ref.getId();
-                    return new Client(id, username, password, phone, email, firstName, lastName, address, gender);
+
+                    String uid = authTask.getResult().getUser().getUid();
+
+                    // Prepare user data
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("uid", uid);
+                    user.put("username", username);
+                    user.put("email", email);
+                    user.put("phone", phone);
+                    user.put("firstName", firstName);
+                    user.put("lastName", lastName);
+                    user.put("address", address);
+                    user.put("gender", gender);
+
+                    return db.collection(collection).document(uid).set(user).continueWith(addTask ->
+                    {
+                        if (!addTask.isSuccessful())
+                        {
+                            throw Objects.requireNonNull(addTask.getException());
+                        }
+                        return new Client(uid, username, phone, email, firstName, lastName, address, gender);
+                    });
                 });
+
     }
 
+    /**
+     * This method updates client's data excluding email, username and password
+     * those will be updated separately if needed
+     *
+     * @param client the client to update
+     * @return Task<True> if succeeded, Task<False> if failed
+     */
     public Task<Boolean> updateClientByID(Client client)
     {
         // Get the client's DocumentReference
@@ -111,26 +129,73 @@ public class ClientRepository
 
     public Task<Boolean> deleteClientByID(Client client)
     {
-        DocumentReference currentClient = db.collection(collection).document(client.getId());
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null)
+        {
+            // no user signed in
+            return Tasks.forException(
+                    new IllegalStateException("No user is currently signed in"));
+        }
+        if (!user.getUid().equals(client.getId()))
+        {
+            throw new IllegalArgumentException("Error trying to delete a user that is not the current active user");
+        }
 
-        return currentClient.delete().continueWith(task -> task.isSuccessful());
+        DocumentReference currentClient = db.collection(collection).document(client.getId());
+        return currentClient.delete().continueWithTask(task ->
+        {
+            if (!task.isSuccessful())
+            {
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            return user.delete();
+        }).continueWith(isSuccessful ->
+        {
+            if (!isSuccessful.isSuccessful())
+            {
+                throw Objects.requireNonNull(isSuccessful.getException());
+            }
+            return Boolean.TRUE;
+        });
     }
 
     public Task<Client> checkLogin(String username, String password)
     {
-        return getClientByUsername(username).continueWith(task ->
-        {
-            if (!task.isSuccessful())
-                throw Objects.requireNonNull(task.getException());
+        return getClientByUsername(username)
+                .continueWithTask(fetchTask ->
+                {
+                    if (!fetchTask.isSuccessful())
+                    {
+                        throw Objects.requireNonNull(fetchTask.getException());
+                    }
+                    Client client = fetchTask.getResult();
+                    if (client == null)
+                    {
+                        // no such user
+                        return Tasks.forException(
+                                new NoSuchElementException("No such user: " + username));
+                    }
 
-            Client client = task.getResult();
-            if (client == null)
-                throw new NoSuchElementException("No such user: " + username);
-
-            if (client.getPassword().equals(password))
-                return client;
-            throw new IllegalArgumentException("Invalid password");
-        });
+                    client.setId(fetchTask.getResult().getId());
+                    // Check the password using FirebaseAuth
+                    return auth.signInWithEmailAndPassword(client.getEmail(), password)
+                            .continueWithTask(authTask ->
+                            {
+                                if (!authTask.isSuccessful())
+                                {
+                                    throw Objects.requireNonNull(authTask.getException());
+                                }
+                                FirebaseUser user = authTask.getResult().getUser();
+                                if (user == null || !user.getUid().equals(client.getId()))
+                                {
+                                    return Tasks.forException(
+                                            new SecurityException("Authenticated UID mismatch"));
+                                }
+                                // If we get here, the login succeeded
+                                return Tasks.forResult(client);
+                            });
+                });
     }
 
     public Task<Client> getClientByUsername(String username)
@@ -192,7 +257,9 @@ public class ClientRepository
         return auth.signInWithCredential(firebaseCredential).continueWith(task ->
         {
             if (!task.isSuccessful())
+            {
                 throw Objects.requireNonNull(task.getException());
+            }
 
             FirebaseUser googleClient = task.getResult().getUser();
             if (googleClient == null)
@@ -206,14 +273,18 @@ public class ClientRepository
                 String[] firstAndLast = googleClient.getDisplayName().split(" ", 2);
                 firstName = firstAndLast[0];
                 if (firstAndLast.length > 1)
+                {
                     lastName = firstAndLast[1];
+                }
             }
 
             String phoneNumber = googleClient.getPhoneNumber();
             Phone phone = null;
             if (PhonePrefix.fromString(phoneNumber) != null)
+            {
                 phone = new Phone(PhonePrefix.fromString(phoneNumber), phoneNumber);
-            return new Client(googleClient.getUid(), "", "", phone,
+            }
+            return new Client(googleClient.getUid(), "", phone,
                     googleClient.getEmail(), firstName, lastName, null, null);
         });
     }

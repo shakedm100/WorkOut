@@ -53,7 +53,7 @@ public class CourseRepositoryTest
 
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        testClient = new Client("esdrg","shakedm100", "1234", phone,
+        testClient = new Client("esdrg","shakedm100", phone,
                 "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
 
         try

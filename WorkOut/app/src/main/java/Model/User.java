@@ -9,16 +9,14 @@ import java.util.Objects;
 
 public class User extends Entity implements Parcelable {
     private String username;
-    private String password;
     private Phone phone;
     private String email;
 
     public User() {}
-    public User(String id, String username, String password, Phone phone, String email)
+    public User(String id, String username, Phone phone, String email)
     {
         super(id);
         this.username = username;
-        this.password = password;
         this.phone = phone;
         this.email = email;
     }
@@ -26,17 +24,12 @@ public class User extends Entity implements Parcelable {
     public User(Parcel in) {
         super(in);
         username = in.readString();
-        password = in.readString();
         phone = in.readParcelable(Phone.class.getClassLoader());
         email = in.readString();
     }
 
     public String getUsername() {
         return username;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getEmail() {
@@ -49,10 +42,6 @@ public class User extends Entity implements Parcelable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public void setEmail(String email) {
@@ -72,7 +61,6 @@ public class User extends Entity implements Parcelable {
     public void writeToParcel(@NonNull Parcel parcel, int i) {
         super.writeToParcel(parcel, i);
         parcel.writeString(username);
-        parcel.writeString(password);
         parcel.writeParcelable(phone, i);
         parcel.writeString(email);
     }
@@ -94,12 +82,12 @@ public class User extends Entity implements Parcelable {
     {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(username, user.username) && Objects.equals(password, user.password) && Objects.equals(phone, user.phone) && Objects.equals(email, user.email);
+        return Objects.equals(username, user.username) && Objects.equals(phone, user.phone) && Objects.equals(email, user.email);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(username, password, phone, email);
+        return Objects.hash(username, phone, email);
     }
 }

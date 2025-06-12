@@ -41,8 +41,12 @@ public class ClientRepositoryTest
 
         try
         {
-            Client testBusiness = await(repository.getClientByUsername("testEverything"), 10, TimeUnit.SECONDS);
-            await(repository.deleteClientByID(testBusiness), 10, TimeUnit.SECONDS);
+            Client testClient = await(repository.getClientByUsername("testEverything"), 10, TimeUnit.SECONDS);
+            if(testClient != null)
+            {
+                await(repository.checkLogin("testEverything", "123456"),10,TimeUnit.SECONDS);
+            }
+            await(repository.deleteClientByID(testClient), 10, TimeUnit.SECONDS);
         }
         catch (Exception e)
         { /*User doesn't exist in db, good!*/ }
@@ -51,6 +55,7 @@ public class ClientRepositoryTest
     @AfterClass
     public static void setDown() throws ExecutionException, InterruptedException, TimeoutException
     {
+        await(repository.checkLogin("testEverything", "123456"),10,TimeUnit.SECONDS);
         await(repository.deleteClientByID(testSubject), 30, TimeUnit.SECONDS);
     }
 
@@ -63,7 +68,7 @@ public class ClientRepositoryTest
         try
         {
             // Test insert functionality
-            testSubject = await(repository.insertClient("testEverything", "1234", phone, "testEverything@gmail.com", "Shaked",
+            testSubject = await(repository.insertClient("testEverything", "12345656", phone, "testEverything@gmail.com", "Shaked",
                     "Michael", address, Gender.Male), 10, TimeUnit.SECONDS);
         }
         catch (Exception e)
@@ -72,7 +77,6 @@ public class ClientRepositoryTest
         assertNotNull(testSubject);
 
         assertEquals("testEverything", testSubject.getUsername());
-        assertEquals("1234", testSubject.getPassword());
         assertEquals(phone, testSubject.getPhone());
         assertEquals("testEverything@gmail.com", testSubject.getEmail());
         assertEquals("Shaked", testSubject.getFirstName());
@@ -81,12 +85,12 @@ public class ClientRepositoryTest
         assertEquals(Gender.Male, testSubject.getGender());
 
         // Fail by username
-        assertThrows(Exception.class, () -> await(repository.insertClient("testEverything", "1234", phone, "bla@gmail.com", "Shaked",
+        assertThrows(Exception.class, () -> await(repository.insertClient("testEverything", "123456", phone, "bla@gmail.com", "Shaked",
                 "Michael", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
 
         // Fail by email
-        assertThrows(Exception.class, () -> await(repository.insertClient("bla", "1234", phone, "testEverything@gmail.com", "Shaked",
+        assertThrows(Exception.class, () -> await(repository.insertClient("bla", "123456", phone, "testEverything@gmail.com", "Shaked",
                 "Michael", address, Gender.Male).addOnSuccessListener(client ->
                 System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
 
@@ -94,7 +98,6 @@ public class ClientRepositoryTest
         Client checkGet = await(repository.getClientByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
 
         assertEquals("testEverything", checkGet.getUsername());
-        assertEquals("1234", checkGet.getPassword());
         assertEquals(phone, checkGet.getPhone());
         assertEquals("testEverything@gmail.com", checkGet.getEmail());
         assertEquals("Shaked", checkGet.getFirstName());
@@ -117,7 +120,7 @@ public class ClientRepositoryTest
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
         String username = "testEverything";
-        String password = "1234";
+        String password = "123456";
         try
         {
             // Check if the user already exists
@@ -134,7 +137,6 @@ public class ClientRepositoryTest
         // Assert
         assertNotNull(result);
         assertEquals(username, result.getUsername());
-        assertEquals(password, result.getPassword());
 
         // Now test with wrong password
         Task<Client> passwordFailLoginTask = repository.checkLogin(username, password + "12");

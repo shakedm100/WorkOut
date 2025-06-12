@@ -59,7 +59,7 @@ public class BusinessRepositoryTest
         repository = new BusinessRepository();
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        testHelper = new Client("esdrg","shakedm100", "1234", phone,
+        testHelper = new Client("esdrg","shakedm100", phone,
                 "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
 
         try
@@ -90,7 +90,6 @@ public class BusinessRepositoryTest
 
         assertNotNull(testSubject);
         assertEquals("testEverything", testSubject.getUsername());
-        assertEquals("1234", testSubject.getPassword());
         assertEquals(testHelper.getPhone(), testSubject.getPhone());
         assertEquals("testEverything@mail", testSubject.getEmail());
         assertEquals(new Location(12345, 2145435), testSubject.getLocation());

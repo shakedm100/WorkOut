@@ -539,7 +539,7 @@ public class SearchActivity extends AppCompatActivity
         this.courseRepository = repo;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        current = new Client("esdrg","shakedm100", "1234", phone,
+        current = new Client("esdrg","shakedm100", phone,
                 "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
         isTest = true;
     }

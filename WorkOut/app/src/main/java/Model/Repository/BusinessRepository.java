@@ -2,6 +2,8 @@ package Model.Repository;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -16,6 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import Model.Business;
+import Model.Client;
 import Model.Location;
 import Model.Phone;
 import Model.Rating;
@@ -24,28 +27,19 @@ import Model.SearchStrategies.SearchStrategyInterface;
 public class BusinessRepository
 {
     private final FirebaseFirestore db;
+    private final FirebaseAuth auth;
     private final String collection = "businesses";
 
     public BusinessRepository()
     {
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
     }
 
     public Task<Business> insertBusiness(String username, String password, Phone phone, String email,
                                          String businessName, Location location,
                                          String policy)
     {
-        Map<String, Object> business = new HashMap<>();
-        business.put("username", username);
-        business.put("password", password);
-        business.put("phone", phone);
-        business.put("email", email);
-        business.put("businessName", businessName);
-        business.put("location", location);
-        business.put("ratings", new ArrayList<>()); // No ratings for new business
-        business.put("followers", new ArrayList<>()); // No followers for new business
-        business.put("policy", policy);
-
         GeneralRepository generalRepository = new GeneralRepository();
 
         return generalRepository.canRegisterUser(collection, username, email).continueWithTask(checkTask ->
@@ -63,19 +57,34 @@ public class BusinessRepository
                         new IllegalArgumentException("Username already exists"));
             }
 
-            return db.collection(collection).add(business);
-        }).continueWith(task ->
-        {
-            if (!task.isSuccessful())
+            return auth.createUserWithEmailAndPassword(email, password);
+            }).continueWithTask(task ->
             {
-                throw Objects.requireNonNull(task.getException());
-            }
+                if(!task.isSuccessful())
+                    throw Objects.requireNonNull(task.getException());
 
-            DocumentReference ref = task.getResult();
-            String id = ref.getId();
-            return new Business(id, username, password, phone, email, businessName, new ArrayList<>(), location,
-                    new ArrayList<>(), new ArrayList<>(), policy);
-        });
+                String uid = task.getResult().getUser().getUid();
+                Map<String, Object> business = new HashMap<>();
+                business.put("uid", uid);
+                business.put("username", username);
+                business.put("phone", phone);
+                business.put("email", email);
+                business.put("businessName", businessName);
+                business.put("location", location);
+                business.put("ratings", new ArrayList<>()); // No ratings for new business
+                business.put("followers", new ArrayList<>()); // No followers for new business
+                business.put("policy", policy);
+
+                return db.collection(collection).document(uid).set(business).continueWith(addTask ->
+                {
+                    if (!addTask.isSuccessful())
+                    {
+                        throw Objects.requireNonNull(addTask.getException());
+                    }
+                    return new Business(uid, username, phone, email, businessName, new ArrayList<>(), location,
+                            new ArrayList<>(), new ArrayList<>(), policy);
+                });
+            });
     }
 
     public Task<Boolean> updateBusiness(Business business)
@@ -90,9 +99,35 @@ public class BusinessRepository
 
     public Task<Boolean> deleteBusiness(Business business)
     {
-        DocumentReference currentClient = db.collection(collection).document(business.getId());
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null)
+        {
+            // no user signed in
+            return Tasks.forException(
+                    new IllegalStateException("No user is currently signed in"));
+        }
+        if (!user.getUid().equals(business.getId()))
+        {
+            throw new IllegalArgumentException("Error trying to delete a user that is not the current active user");
+        }
 
-        return currentClient.delete().continueWith(Task::isSuccessful);
+        DocumentReference currentClient = db.collection(collection).document(business.getId());
+        return currentClient.delete().continueWithTask(task ->
+        {
+            if (!task.isSuccessful())
+            {
+                throw Objects.requireNonNull(task.getException());
+            }
+
+            return user.delete();
+        }).continueWith(isSuccessful ->
+        {
+            if (!isSuccessful.isSuccessful())
+            {
+                throw Objects.requireNonNull(isSuccessful.getException());
+            }
+            return Boolean.TRUE;
+        });
     }
 
     // This method gets the business by the username
@@ -133,7 +168,7 @@ public class BusinessRepository
 
     public Task<Business> checkLogin(String username, String password) //TODO: Maybe can generalize to user
     {
-        return getBusinessByUsername(username).continueWith(task ->
+        return getBusinessByUsername(username).continueWithTask(task ->
         {
             if (!task.isSuccessful())
             {
@@ -145,12 +180,22 @@ public class BusinessRepository
             {
                 throw new NoSuchElementException("No such user: " + username);
             }
+            business.setId(task.getResult().getId());
 
-            if (business.getPassword().equals(password))
+            return auth.signInWithEmailAndPassword(business.getEmail(), password).continueWithTask(authTask ->
             {
-                return business;
-            }
-            throw new IllegalArgumentException("Invalid password");
+                if(!authTask.isSuccessful())
+                    throw Objects.requireNonNull(authTask.getException());
+
+                FirebaseUser user = authTask.getResult().getUser();
+                if (user == null || !user.getUid().equals(business.getId()))
+                {
+                    return Tasks.forException(
+                            new SecurityException("Authenticated UID mismatch"));
+                }
+                // If we get here, the login succeeded
+                return Tasks.forResult(business);
+            });
         });
     }
 

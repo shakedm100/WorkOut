@@ -17,7 +17,7 @@ public class AccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.account);
 
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
+       /* TabLayout tabLayout = findViewById(R.id.tabLayout);
         ViewPager2 viewPager = findViewById(R.id.viewPager);
 
         AccountPagerAdapter adapter = new AccountPagerAdapter(this);
@@ -31,6 +31,6 @@ public class AccountActivity extends AppCompatActivity {
                         case 2: tab.setText("מחיקת חשבון"); break;
                     }
                 }
-        ).attach();
+        ).attach();*/
     }
 }

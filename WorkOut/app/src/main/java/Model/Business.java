@@ -20,10 +20,10 @@ public class Business extends User implements Parcelable
     {
     }
 
-    public Business(String id, String username, String password, Phone phone, String email, String businessName,
+    public Business(String id, String username, Phone phone, String email, String businessName,
                     ArrayList<Course> courses, Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
     {
-        super(id, username, password, phone, email);
+        super(id, username, phone, email);
         this.businessName = businessName;
         this.courses = courses;
         this.location = location;
@@ -32,10 +32,10 @@ public class Business extends User implements Parcelable
         this.policy = policy;
     }
 
-    public Business(String id, String username, String password, Phone phone, String email, String businessName,
+    public Business(String id, String username, Phone phone, String email, String businessName,
                     Location location, String policy)
     {
-        super(id, username, password, phone, email);
+        super(id, username, phone, email);
         this.businessName = businessName;
         this.courses = new ArrayList<>();
         this.location = location;

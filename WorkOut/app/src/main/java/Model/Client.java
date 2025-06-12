@@ -14,10 +14,10 @@ public class Client extends User implements Parcelable{
     private Gender gender;
 
     public Client() {}
-    public Client(String id, String username, String password, Phone phone, String email,
+    public Client(String id, String username, Phone phone, String email,
                   String firstName, String lastName, Address address, Gender gender)
     {
-        super(id, username, password, phone, email);
+        super(id, username, phone, email);
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;

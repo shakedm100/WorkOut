@@ -403,7 +403,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     {
         this.courseRepository = repo;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        this.currentBusiness = new Business("dDb83EeEReSetVP9SiT7", "poolBob", "secret2",
+        this.currentBusiness = new Business("dDb83EeEReSetVP9SiT7", "poolBob",
                 phone, "bob@pool.com", "Bob’s Pool",
                 new Location(31.7683, 35.2137), "SwimSafe Policy");
         this.currentCourse = course;
