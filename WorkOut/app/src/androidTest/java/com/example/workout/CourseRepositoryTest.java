@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.Timestamp;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class CourseRepositoryTest
                     "Policy"), 10, TimeUnit.SECONDS);
         }catch (Exception e)
         {
-            System.out.println("ERROR: Business probably exists");
+            System.out.println("ERROR: Business should already exists");
         }
 
         try
@@ -72,10 +73,8 @@ public class CourseRepositoryTest
         }
         catch (Exception e)
         {
-            System.out.println("ERROR: Business insertion failed on setUp");
+            throw new RuntimeException("ERROR: Business insertion failed on setUp");
         }
-
-
     }
 
     @AfterClass
@@ -95,6 +94,7 @@ public class CourseRepositoryTest
                 ageRange, Category.Archery, "Shoot to kill", 120), 10, TimeUnit.SECONDS);
 
         assertNotNull(testSubject.getId());
+        assertFalse(testSubject.getId().isEmpty());
         assertEquals("TRX", testSubject.getName());
         assertEquals(schedule, testSubject.getSchedule());
         assertEquals(50, testSubject.getCapacity());
@@ -130,13 +130,20 @@ public class CourseRepositoryTest
         assertFalse(daysOfWeek.isEmpty());
 
         // Test update
-        Course updateCourse = testSubject;
+        Course updateCourse = new Course(testSubject);
         updateCourse.setCapacity(45);
         boolean check = await(courseRepository.updateCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
         assertTrue(check);
 
+        updateCourse.setId("dfshg");
+        check = await(courseRepository.updateCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
+        assertFalse(check);
+
         // Test delete
-        boolean checkDelete = await(courseRepository.deleteCourse(updateCourse, testBusiness), 10, TimeUnit.SECONDS);
+        boolean checkDelete = await(courseRepository.deleteCourse(testSubject, testBusiness), 10, TimeUnit.SECONDS);
         assertTrue(checkDelete);
+
+        checkDelete = await(courseRepository.deleteCourse(testSubject, testBusiness), 10, TimeUnit.SECONDS);
+        assertFalse(checkDelete);
     }
 }

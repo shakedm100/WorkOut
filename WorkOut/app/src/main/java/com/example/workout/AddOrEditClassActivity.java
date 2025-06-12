@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,7 +26,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import Model.AgeRange;
 import Model.Business;
@@ -41,21 +40,25 @@ import Model.Category;
 import Model.Course;
 import Model.CourseType;
 import Model.Day;
+import Model.Location;
+import Model.Phone;
+import Model.PhonePrefix;
 import Model.Repository.CourseRepository;
 import Model.Schedule;
 
 public class AddOrEditClassActivity extends AppCompatActivity
 {
 
+    private boolean isTest;
     private EditText courseNameEditText, capacityEditText, descriptionEditText;
     private Spinner dayOfWeekSpinner, courseTypeSpinner, categorySpinner;
-    private Button saveButton, startTimeButton, endTimeButton;
+    private Button saveButton, startTimeButton, endTimeButton, deleteButton;
     private RangeSlider ageSlider;
     private AgeRange ageRange;
     ViewGroup container;
-    Course currentCourse;
-    Business currentBusiness;
-    private CourseRepository courseRepository;
+    protected Course currentCourse;
+    protected Business currentBusiness;
+    protected CourseRepository courseRepository;
     private LocalTime startTime, endTime;
     private int initialHour, initialMinute, endHour, endMinute;
 
@@ -74,6 +77,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         ageRange = new AgeRange(0, 99);
         startTime = null;
         endTime = null;
+        isTest = false;
 
         // Link to views
         courseNameEditText = findViewById(R.id.courseNameEditText);
@@ -81,6 +85,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         categorySpinner = findViewById(R.id.categorySpinner);
         dayOfWeekSpinner = findViewById(R.id.dayOfWeekSpinner);
         saveButton = findViewById(R.id.buttonSave);
+        deleteButton = findViewById(R.id.buttonDelete);
         container = findViewById(R.id.update_course_slider_container);
         capacityEditText = findViewById(R.id.capacityEditText);
         descriptionEditText = findViewById(R.id.descriptionEditText);
@@ -123,8 +128,27 @@ public class AddOrEditClassActivity extends AppCompatActivity
         // Press on save
         saveButton.setOnClickListener(v ->
         {
-            buildCourseFromFieldsAndQuery();
+            buildCourseFromFieldsAndQuery(false);
         });
+
+        // Press on Delete
+        deleteButton.setOnClickListener(v -> {
+            courseRepository.deleteCourse(currentCourse, currentBusiness)
+                    .addOnSuccessListener(result -> {
+                        if (Boolean.TRUE.equals(result)) {
+                            Toast.makeText(this, "Successfully deleted the course", Toast.LENGTH_LONG).show();
+                            buildCourseFromFieldsAndQuery(true);
+                        } else {
+                            Toast.makeText(this, "Failed to delete the course", Toast.LENGTH_LONG).show();
+                            // TODO: Show error on screen
+                        }
+                    })
+                    .addOnFailureListener(this, e -> {
+                        Toast.makeText(this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+            finish();
+        });
+
 
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H).setHour(initialHour).setMinute(initialMinute);
@@ -272,7 +296,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
         container.addView(ageSlider);
     }
 
-    private void buildCourseFromFieldsAndQuery()
+    private void buildCourseFromFieldsAndQuery(boolean deleteClass)
     {
         CourseType courseType = CourseType.valueOf(courseTypeSpinner.getSelectedItem().toString());
         String courseName = courseNameEditText.getText().toString().trim();
@@ -307,7 +331,10 @@ public class AddOrEditClassActivity extends AppCompatActivity
                 if(task != null)
                 {
                     Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
-                    finish();
+                    TextView temp = findViewById(R.id.addOrEditTestTextView);
+                    temp.setText("Successfully added the course");
+                    if(!isTest)
+                        finish();
                 }
             }).addOnFailureListener(e ->
             {
@@ -317,6 +344,9 @@ public class AddOrEditClassActivity extends AppCompatActivity
         }
         else // Update
         {
+            if (deleteClass)
+                return;
+
             int duration;
             if(startTime == null)
             {
@@ -358,14 +388,27 @@ public class AddOrEditClassActivity extends AppCompatActivity
             {
                 if(task != null)
                 {
-                    Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Successfully updated the course", Toast.LENGTH_LONG).show();
                     finish();
                 }
             }).addOnFailureListener(e ->
             {
-                Toast.makeText(this, "Failed to add the course", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Failed to update the course", Toast.LENGTH_LONG).show();
                 // TODO: Show error on screen
             });
         }
+    }
+
+    public void setTestingConditions(CourseRepository repo, Course course)
+    {
+        this.courseRepository = repo;
+        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
+        this.currentBusiness = new Business("dDb83EeEReSetVP9SiT7", "poolBob", "secret2",
+                phone, "bob@pool.com", "Bob’s Pool",
+                new Location(31.7683, 35.2137), "SwimSafe Policy");
+        this.currentCourse = course;
+        startTime = LocalTime.of(14,30);
+        endTime = LocalTime.of(16,0);
+        isTest = true;
     }
 }

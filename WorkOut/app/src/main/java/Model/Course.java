@@ -19,7 +19,9 @@ public class Course extends Entity implements Parcelable
     private String description;
     private int duration;
 
-    public Course() {}
+    public Course()
+    {
+    }
 
     public Course(String id, CourseType type, String name, ArrayList<Client> participants, int capacity,
                   AgeRange ageRange, Schedule schedule, Category category, String description,
@@ -54,6 +56,22 @@ public class Course extends Entity implements Parcelable
         this.duration = duration;
         this.businessId = "";
     }
+
+    public Course(Course other) // Shallow copy constructor
+    {
+        super(other.getId());
+        this.type = other.type;
+        this.businessId = other.businessId;
+        this.name = other.name;
+        this.participants = other.participants;
+        this.capacity = other.capacity;
+        this.ageRange = other.ageRange;
+        this.schedule = other.schedule;
+        this.category = other.category;
+        this.description = other.description;
+        this.duration = other.duration;
+    }
+
 
     public CourseType getType()
     {
@@ -95,9 +113,15 @@ public class Course extends Entity implements Parcelable
         return description;
     }
 
-    public String getBusinessId() { return businessId; }
+    public String getBusinessId()
+    {
+        return businessId;
+    }
 
-    public int getDuration() { return duration; }
+    public int getDuration()
+    {
+        return duration;
+    }
 
     public void setType(CourseType type)
     {
@@ -109,7 +133,10 @@ public class Course extends Entity implements Parcelable
         this.name = name;
     }
 
-    public void setParticipants(ArrayList<Client> participants) { this.participants = participants; }
+    public void setParticipants(ArrayList<Client> participants)
+    {
+        this.participants = participants;
+    }
 
     public void setCapacity(int capacity)
     {
@@ -136,9 +163,15 @@ public class Course extends Entity implements Parcelable
         this.description = description;
     }
 
-    public void setBusinessId(String businessId) { this.businessId = businessId; }
+    public void setBusinessId(String businessId)
+    {
+        this.businessId = businessId;
+    }
 
-    public void setDuration(int duration) { this.duration = duration; }
+    public void setDuration(int duration)
+    {
+        this.duration = duration;
+    }
 
     protected Course(Parcel in)
     {

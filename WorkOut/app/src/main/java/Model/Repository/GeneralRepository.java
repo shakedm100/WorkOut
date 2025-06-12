@@ -19,6 +19,10 @@ import Model.City;
 import Model.Location;
 import Model.PhonePrefix;
 
+//import android.location.Address;
+import android.content.Context;
+import java.util.Locale;
+
 public class GeneralRepository
 {
 
@@ -28,8 +32,6 @@ public class GeneralRepository
     {
         db = FirebaseFirestore.getInstance();
     }
-
-    // DVIR CHANGES - added a function for the prefixes of phone
 
     /**
      * Returns all the possible prefixes for a phone number.
@@ -69,11 +71,8 @@ public class GeneralRepository
         });
     }
 
-    // END OF DVIR CHANGES
-
     /**
      * Returns up to 3 cities whose names start with the given partialName.
-     *
      * @param namePrefix the name prefix to search for
      * @return a Task that completes with a List<City>
      */
@@ -118,6 +117,15 @@ public class GeneralRepository
                 City city = snap.toObject(City.class);
                 if (city != null)
                 {
+                    String cityName = city.getEnglishName();
+                    String[] parts = cityName.split(" ");
+
+                    for (int i = 0; i < parts.length; i++)
+                        parts[i] = parts[i].substring(0, 1).toUpperCase() + parts[i].substring(1).toLowerCase();
+
+                    cityName = String.join(" ", parts);
+                    city.setEnglishName(cityName);
+
                     cities.add(city);
                 }
             }
@@ -200,4 +208,17 @@ public class GeneralRepository
             throw new RuntimeException("Invalid location");
         }
     }
+
+
+
+//    public static boolean isAddressValid(Context context, String addressStr) {
+//        Geocoder geocoder = new Geocoder(context, Locale.ENGLISH); // Use English locale
+//        try {
+//            List<android.location.Address> addresses = geocoder.getFromLocationName(addressStr, 1);
+//            return addresses != null && !addresses.isEmpty();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
 }
