@@ -75,6 +75,56 @@ public class ClientRepositoryTest
     private Phone phone;
     private Address address;
 
+    /**
+     * What is mock?
+     *  A mock is a stand-in object that simulates behavior of real dependencies,
+     *  allowing you to test a specific unit of code in isolation.
+     *  --------------------------------------------------------------------------------------
+     * For example in this code we're mocking all database related dependencies and test
+     * only the code we wrote.
+     * Pros:
+     * - The code doesn't need to account for database maintenance while testing
+     * - You can easily simulate both success and failure scenarios without
+     *   polluting or depending on production data.
+     *   we don't enter synthetic bad data that can impact negatively on the data
+     * - Tests run faster because we only simulate the dependencies and don't actually
+     *   run them
+     *   --------------------------------------------------------------------------------------
+     * Cons:
+     * - You do not verify the actual integration with the database (or other
+     *   external systems), so mocks can mask real-world issues.
+     * - Over-mocking can make tests brittle and reduce confidence. You must
+     *   strike a balance between isolation and end-to-end coverage. So think
+     *   carefully 'To mock or not to mock? That is the question!'
+     *   --------------------------------------------------------------------------------------
+     * Mock tools that we used:
+     * - mock(Class<T>)
+     *   Creates a bare‐bones fake of a class or interface. All methods return defaults (null, 0, false).
+     * - stubbing - is the act of pre-programming a mock (or spy) to
+     * return a specific value (or throw an exception) when a particular method is called.
+     * In other words, you’re “stubbing out” the real implementation and telling Mockito, for example,
+     * “When someone calls foo.bar(...), don’t run the real code—just give me this canned response.”
+     * - spy(Object real) Wraps a real instance so you can selectively override (stub)
+     *   some methods, while leaving others to execute real logic.
+     * - Argument matchers (any(), anyString(), eq(...), etc.)
+     *   Let you stub or verify calls without hard-coding exact arguments
+     * - when(…) / thenReturn(…)
+     *   Stubs a call on a mock to return a given value.
+     * - doReturn(…) / when(spy).method(…)
+     *   Stubs a call on a spy without invoking the real method at stub-time
+     *   --------------------------------------------------------------------------------------
+     *   A little deeper dive into mock:
+     * - when(…) / thenReturn(…) VS. doReturn(…) / when(spy).method(…)
+     *   when(...).thenReturn(...):
+     *   How it works: Mockito evaluates the argument to when(...) up front,
+     *   so it actually calls the real method on your mock or spy to figure out
+     *   “what method is being stubbed.”
+     * - doReturn(...).when(...).method(...)
+     *   How it works: Mockito does not invoke the method when you stub. It simply records
+     *   “for that target object and method signature, return this value.”
+     */
+
+
     @Before
     public void setUp()
     {
@@ -514,134 +564,4 @@ public class ClientRepositoryTest
         assertEquals("cid", result.getId());
         assertEquals("testEverything", result.getUsername());
     }
-
-
-
-    /*@After
-    public void setDown() throws ExecutionException, InterruptedException, TimeoutException
-    {
-        await(repository.checkLogin("testEverything", "123456"),10,TimeUnit.SECONDS);
-        await(repository.deleteClientByID(testSubject), 30, TimeUnit.SECONDS);
-    }
-
-    @Test
-    public void queryClientTest() throws ExecutionException, InterruptedException, TimeoutException
-    {
-        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-
-        try
-        {
-            // Test insert functionality
-            testSubject = await(repository.insertClient("testEverything", "12345656", phone, "testEverything@gmail.com", "Shaked",
-                    "Michael", address, Gender.Male), 10, TimeUnit.SECONDS);
-        }
-        catch (Exception e)
-        { *//*Anoter method already added him*//* }
-
-        assertNotNull(testSubject);
-
-        assertEquals("testEverything", testSubject.getUsername());
-        assertEquals(phone, testSubject.getPhone());
-        assertEquals("testEverything@gmail.com", testSubject.getEmail());
-        assertEquals("Shaked", testSubject.getFirstName());
-        assertEquals("Michael", testSubject.getLastName());
-        assertEquals(address, testSubject.getAddress());
-        assertEquals(Gender.Male, testSubject.getGender());
-
-        // Fail by username
-        assertThrows(Exception.class, () -> await(repository.insertClient("testEverything", "123456", phone, "bla@gmail.com", "Shaked",
-                "Michael", address, Gender.Male).addOnSuccessListener(client ->
-                System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
-
-        // Fail by email
-        assertThrows(Exception.class, () -> await(repository.insertClient("bla", "123456", phone, "testEverything@gmail.com", "Shaked",
-                "Michael", address, Gender.Male).addOnSuccessListener(client ->
-                System.out.println("Hello" + client.getUsername())), 10, TimeUnit.SECONDS));
-
-        // Test Get functionality
-        Client checkGet = await(repository.getClientByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
-
-        assertEquals("testEverything", checkGet.getUsername());
-        assertEquals(phone, checkGet.getPhone());
-        assertEquals("testEverything@gmail.com", checkGet.getEmail());
-        assertEquals("Shaked", checkGet.getFirstName());
-        assertEquals("Michael", checkGet.getLastName());
-        assertEquals(address, checkGet.getAddress());
-        assertEquals(Gender.Male, checkGet.getGender());
-
-        // Test update functionality
-        Client updateClient = testSubject;
-        updateClient.setFirstName("Lagrange");
-        repository.updateClientByID(updateClient);
-        Client check = await(repository.getClientByUsername(testSubject.getUsername()), 10, TimeUnit.SECONDS);
-        assertNotNull(check);
-        assertEquals(check.getFirstName(), updateClient.getFirstName());
-    }
-
-    @Test
-    public void checkLogin() throws ExecutionException, InterruptedException
-    {
-        Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
-        Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        String username = "testEverything";
-        String password = "123456";
-        try
-        {
-            // Check if the user already exists
-            when(repository.insertClient(username, password, phone, "testEverything@gmail.com", "Shaked",
-                    "Michael", address, Gender.Male)).thenReturn(Tasks.forResult(testSubject));
-        }
-        catch (Exception e)
-        { *//*Anoter method already added him*//* }
-
-        // Act
-        Task<Client> loginTask = repository.checkLogin(username, password);
-        Client result = Tasks.await(loginTask);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(username, result.getUsername());
-
-        // Now test with wrong password
-        Task<Client> passwordFailLoginTask = repository.checkLogin(username, password + "12");
-
-        // Assert
-        try
-        {
-            Tasks.await(passwordFailLoginTask);
-            fail("Expected IllegalArgumentException due to invalid password");
-        }
-        catch (ExecutionException ee)
-        {
-            // unwrap the cause
-            Throwable cause = ee.getCause();
-            assertTrue(cause instanceof IllegalArgumentException);
-            assertEquals("Invalid password", cause.getMessage());
-        }
-        catch (InterruptedException ie)
-        {
-            fail("Test interrupted unexpectedly");
-        }
-
-        // Now test with wrong password
-        Task<Client> usernameFailLoginTask = repository.checkLogin(username + "12", password);
-
-        // Assert
-        try
-        {
-            Tasks.await(usernameFailLoginTask);
-            fail("Expected NoSuchElementException for missing user");
-        }
-        catch (ExecutionException ee)
-        {
-            Throwable cause = ee.getCause();
-            assertTrue(cause instanceof IllegalArgumentException);
-            assertEquals( "No client with username: " + username + "12", cause.getMessage());
-        }
-        catch (InterruptedException ie)
-        {
-            fail("Test interrupted unexpectedly");
-        }
-    }*/
 }
