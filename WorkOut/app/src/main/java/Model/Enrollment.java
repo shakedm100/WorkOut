@@ -41,12 +41,12 @@ public class Enrollment extends Entity
         this.courseId = courseId;
     }
 
-    public Timestamp getSignedUpAt()
+    public Timestamp getTime()
     {
         return signedUpAt;
     }
 
-    public void setSignedUpAt(Timestamp signedUpAt)
+    public void setTime(Timestamp signedUpAt)
     {
         this.signedUpAt = signedUpAt;
     }

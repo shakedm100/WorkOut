@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.Business;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,11 +17,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.workout.LoginActivity;
+import com.example.workout.R;
+
 import java.util.List;
 
 import Model.City;
 
-import Model.PhonePrefix;
 import ViewModel.RegisterBusinessViewModel;
 
 public class BusinessRegisterActivity extends AppCompatActivity

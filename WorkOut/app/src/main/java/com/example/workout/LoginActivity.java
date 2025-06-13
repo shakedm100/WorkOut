@@ -22,6 +22,8 @@ import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.workout.Business.BusinessHomeActivity;
+import com.example.workout.Business.BusinessRegisterActivity;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -30,7 +32,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import Model.Client;
 import Model.Repository.ClientRepository;
 import ViewModel.LoginViewModel;
-import ViewModel.RegisterBusinessViewModel;
 
 public class LoginActivity extends AppCompatActivity
 {

@@ -1,10 +1,13 @@
-package com.example.workout;
+package com.example.workout.Business;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.workout.FullScreenImageActivity;
+import com.example.workout.R;
 
 import java.util.Arrays;
 import java.util.List;

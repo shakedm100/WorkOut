@@ -1,5 +1,9 @@
 package com.example.workout;
 
+import com.example.workout.Client.CalendarActivity;
+import com.example.workout.Client.MapActivity;
+import com.example.workout.Client.ProfileActivity;
+import com.example.workout.Client.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.content.Intent;

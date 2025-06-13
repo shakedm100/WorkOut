@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.Business;
 
 import static com.google.android.gms.tasks.Tasks.await;
 
@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.workout.R;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;

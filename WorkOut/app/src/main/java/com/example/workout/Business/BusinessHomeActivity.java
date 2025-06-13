@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.Business;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,10 +6,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import Model.Business;
-import Model.Client;
 
 public class BusinessHomeActivity extends AppCompatActivity
 {

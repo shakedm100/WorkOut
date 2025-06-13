@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.Business;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.workout.LoginActivity;
+import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import Model.Business;

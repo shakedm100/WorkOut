@@ -41,22 +41,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MapActivity" />
-        <activity android:name=".ProfileActivity"/>
-        <activity android:name=".RatingsActivity"/>
+        <activity android:name=".Client.MapActivity" />
+        <activity android:name=".Client.ProfileActivity"/>
+        <activity android:name=".Client.RatingsActivity"/>
         <activity android:name=".MessagesActivity"/>
-        <activity android:name=".SearchActivity"/>
+        <activity android:name=".Client.SearchActivity"/>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".MainActivity"/>
-        <activity android:name=".AddOrEditClassActivity"/>
-        <activity android:name=".BusinessHomeActivity"/>
-        <activity android:name=".CoursesActivity"/>
-        <activity android:name=".CalendarActivity"/>
-        <activity android:name=".SearchResultsActivity"/>
-        <activity android:name=".BusinessProfileActivity"/>
-        <activity android:name=".StatusActivity"/>
-        <activity android:name=".BusinessRegisterActivity"/>
-        <activity android:name=".BusinessCalendarActivity"/>
+        <activity android:name=".Business.AddOrEditClassActivity"/>
+        <activity android:name=".Business.BusinessHomeActivity"/>
+        <activity android:name=".Business.CoursesActivity"/>
+        <activity android:name=".Client.CalendarActivity"/>
+        <activity android:name=".Client.SearchResultsActivity"/>
+        <activity android:name=".Business.BusinessProfileActivity"/>
+        <activity android:name=".Business.StatusActivity"/>
+        <activity android:name=".Business.BusinessRegisterActivity"/>
+        <activity android:name=".Business.BusinessCalendarActivity"/>
 
     </application>
 

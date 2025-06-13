@@ -19,13 +19,10 @@ import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.example.workout.AddOrEditClassActivity;
 import com.example.workout.R;
-import com.example.workout.SearchActivity;
+import com.example.workout.Client.SearchActivity;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
-
-import static org.mockito.ArgumentMatchers.*;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Model.AgeRange;
-import Model.Business;
 import Model.Category;
 import Model.Course;
 import Model.CourseType;

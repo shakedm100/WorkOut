@@ -7,10 +7,12 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +155,31 @@ public class CourseRepository
         return current.delete().continueWith(Task::isSuccessful);
     }
 
+    public Task<List<Course>> getCoursesById(Course course)
+    {
+        return db.collection(collection).document(course.getBusinessId())
+                .collection(subCollection).document(course.getId()).get()
+                .continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                    {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+                    DocumentSnapshot snap = task.getResult();
+                    if (snap == null || !snap.exists())
+                    {
+                        return Collections.emptyList();
+                    }
+                    Course fetched = snap.toObject(Course.class);
+                    // restore ID on the model if you don’t set it via @PropertyName
+                    if (fetched != null)
+                    {
+                        fetched.setId(snap.getId());
+                    }
+                    return Collections.singletonList(fetched);
+                });
+    }
+
 
     public Task<List<Course>> getAllBusinessesCourses(Business business)
     {
@@ -219,8 +246,8 @@ public class CourseRepository
     public Task<Boolean> signupClientToCourse(Client client, Course course, Timestamp timestamp)
     {
         Map<String, Object> enroll = new HashMap();
-        enroll.put("client", client.getId());
-        enroll.put("course", course.getId());
+        enroll.put("client", client);
+        enroll.put("course", course);
         enroll.put("time", timestamp);
 
         if (!course.insertParticipant(client))
@@ -260,21 +287,21 @@ public class CourseRepository
 
     public Task<List<Enrollment>> getAllEnrollmentsByClient(Client client)
     {
-        return db.collection(enrollmentCollection).whereEqualTo("client", client.getId())
+        return db.collection(enrollmentCollection).whereEqualTo("client.id", client.getId())
                 .get().continueWith(task ->
                 {
-                   if(!task.isSuccessful())
-                       throw Objects.requireNonNull(task.getException());
+                    if (!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
 
-                   ArrayList<Enrollment> enrollments = new ArrayList<>();
-                   for (DocumentSnapshot snapshot : task.getResult())
-                   {
+                    ArrayList<Enrollment> enrollments = new ArrayList<>();
+                    for (DocumentSnapshot snapshot : task.getResult())
+                    {
                         Enrollment enrollment = snapshot.toObject(Enrollment.class);
-                        if(enrollment != null)
+                        if (enrollment != null)
                             enrollments.add(enrollment);
-                   }
+                    }
 
-                   return enrollments;
+                    return enrollments;
                 });
     }
 }

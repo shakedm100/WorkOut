@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.Client;
 
 import android.Manifest;
 import android.content.Intent;
@@ -24,6 +24,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.workout.MainActivity;
+import com.example.workout.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Task;
