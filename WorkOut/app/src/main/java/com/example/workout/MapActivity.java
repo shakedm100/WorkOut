@@ -1,5 +1,6 @@
 package com.example.workout;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -16,9 +17,11 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import android.Manifest;
 
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -47,6 +50,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ArrayList<Course> courses;
     private ArrayList<Business> businessesFromCourses;
     private boolean isFromSearch;
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -96,6 +100,55 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             });
         }
         modelLocation = null;
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_map);
+        setUpBottomNavigationView();
+    }
+
+    private void setUpBottomNavigationView()
+    {
+        bottomNavigationView.setOnItemSelectedListener(item ->
+        {
+            int id = item.getItemId();
+            if (id == R.id.nav_home)
+            {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_profile)
+            {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_search)
+            {
+                Intent intent = new Intent(this, SearchActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                return true;
+            }
+            else if (id == R.id.nav_map)
+            {
+                // you’re already here
+                return true;
+            }
+            else if (id == R.id.nav_Calendar)
+            {
+                Intent intent = new Intent(this, CalendarActivity.class);
+                intent.putExtra("client", client);
+                startActivity(intent);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override

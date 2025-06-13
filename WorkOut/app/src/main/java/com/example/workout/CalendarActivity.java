@@ -29,7 +29,7 @@ public class CalendarActivity extends AppCompatActivity {
 
         // Find the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        bottomNavigationView.setSelectedItemId(R.id.nav_calendar);
 
         // Setup event listener
         bottomNavigationView.setOnItemSelectedListener(item ->

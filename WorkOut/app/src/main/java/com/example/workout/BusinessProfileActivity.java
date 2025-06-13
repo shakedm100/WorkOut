@@ -2,6 +2,7 @@ package com.example.workout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -30,6 +31,13 @@ public class BusinessProfileActivity extends AppCompatActivity
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+
+        Button logout = findViewById(R.id.businessLogoutButton);
+        logout.setOnClickListener(task ->
+        {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         });
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);

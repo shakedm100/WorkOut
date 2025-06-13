@@ -43,10 +43,19 @@ public class ProfileActivity extends AppCompatActivity
             return insets;
         });
 
+        Button logout = findViewById(R.id.clientLogoutButton);
+        logout.setOnClickListener(task ->
+        {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        });
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
 
         current = getIntent().getParcelableExtra("client");
+        TextView userLabel = findViewById(R.id.userName);
+        userLabel.setText(current.getUsername());
 
         setUpBottomNavigationView();
     }
