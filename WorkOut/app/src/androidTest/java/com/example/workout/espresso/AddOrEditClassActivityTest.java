@@ -9,7 +9,6 @@ import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.RootMatchers.isPlatformPopup;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static com.google.android.material.R.id.material_timepicker_mode_button;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -111,7 +110,7 @@ public class AddOrEditClassActivityTest
         onView(withId(R.id.addOrEditTestTextView))
                 .check(matches(withText(containsString("Successfully added the course"))));
     }
-
+/*
     private void setTimePickerButtons()
     {
         onView(withId(R.id.startTimeButton)).perform(click());
@@ -145,5 +144,5 @@ public class AddOrEditClassActivityTest
 
         // confirm
         onView(withText("OK")).inRoot(isDialog()).perform(click());
-    }
+    }*/
 }

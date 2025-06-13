@@ -84,7 +84,7 @@
         android:id="@+id/googleOptionLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="72dp"
         android:text="Or sign in with google:"
         android:textSize="20sp"
@@ -110,7 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Don't have an account?"
+        android:text="Don't have an account? Sign up as"
         android:textSize="20sp"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
@@ -118,19 +118,19 @@
 
     <Button
         android:id="@+id/registerButton"
-        android:layout_width="218dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="150dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="#00A3A3A3"
-        android:text="Click here to register"
+        android:text="Register"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="#000000"
         android:textColorLink="@color/black"
         android:textSize="16sp"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/noHaveAnAccountLabel" />
+        app:layout_constraintTop_toBottomOf="@+id/registerToggle" />
 
     <Button
         android:id="@+id/loginButton"
@@ -168,16 +168,32 @@
         app:layout_constraintEnd_toStartOf="@+id/loginButton"
         app:layout_constraintTop_toBottomOf="@+id/passwordTextView2" />
 
-    <Button
-        android:id="@+id/BusinessRegister"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/registerToggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="40dp"
-        android:text="Business"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/registerButton"
-        app:layout_constraintTop_toBottomOf="@+id/noHaveAnAccountLabel" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noHaveAnAccountLabel"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggle_client"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Client" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggle_business"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Business" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.FirebaseAuth;
 
 import Model.Client;
@@ -31,7 +32,8 @@ import Model.Repository.ClientRepository;
 import ViewModel.LoginViewModel;
 import ViewModel.RegisterBusinessViewModel;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity
+{
     private CredentialManager credentialManager;
     private FirebaseAuth auth;
     private LoginViewModel loginViewModel;
@@ -40,6 +42,8 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView textViewError;
     Button loginButton;
+    private MaterialButtonToggleGroup toggleGroup;
+    private boolean isRegisterClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,15 +60,29 @@ public class LoginActivity extends AppCompatActivity {
         ImageButton googleAuth = findViewById(R.id.googleRegisterButton);
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
         Button registerButton = findViewById(R.id.registerButton);
-        registerButton.setOnClickListener(task -> {
-            Intent newIntent = new Intent(this, RegisterActivity.class);
-            startActivity(newIntent);
+
+        isRegisterClient = true;
+        toggleGroup = findViewById(R.id.registerToggle);
+        toggleGroup.check(R.id.toggle_client);
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
+        {
+            if(isChecked) // Shouldn't be possible
+                return;
+
+            if(checkedId == R.id.toggle_client)
+                isRegisterClient = true;
+            else
+                isRegisterClient = false;
         });
 
-        Button registerBusinessButton = findViewById(R.id.BusinessRegister);
-        registerBusinessButton.setOnClickListener(task -> {
-            Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
-            startActivity(newIntent);
+        registerButton.setOnClickListener(task ->
+        {
+            Intent intent;
+            if(isRegisterClient)
+                intent = new Intent(this, RegisterActivity.class);
+            else
+                intent = new Intent(this, BusinessRegisterActivity.class);
+            startActivity(intent);
         });
 
         loginButton = findViewById(R.id.loginButton);
@@ -85,10 +103,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // show the respond
-    private void setupObservers() {
-        loginViewModel.getLoginUiState().observe(this, loginUiState -> {
+    private void setupObservers()
+    {
+        loginViewModel.getLoginUiState().observe(this, loginUiState ->
+        {
             // Handle UI changes based on the state
-            switch (loginUiState.getStatus()) {
+            switch (loginUiState.getStatus())
+            {
                 case IDLE:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
@@ -105,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                     textViewError.setVisibility(View.GONE);
                     Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
                     Intent intent;
-                    if(loginUiState.getData() instanceof Client)
+                    if (loginUiState.getData() instanceof Client)
                     {
                         // navigate to home activity when success occurs
                         intent = new Intent(this, MainActivity.class); // move to home page
@@ -206,13 +227,17 @@ public class LoginActivity extends AppCompatActivity {
                 request,
                 /* cancellationSignal= */ null,
                 ContextCompat.getMainExecutor(this),
-                new CredentialManagerCallback<GetCredentialResponse,GetCredentialException>() {
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>()
+                {
                     @Override
-                    public void onResult(@NonNull GetCredentialResponse response) {
+                    public void onResult(@NonNull GetCredentialResponse response)
+                    {
                         handleCredential(response.getCredential());
                     }
+
                     @Override
-                    public void onError(@NonNull GetCredentialException e) {
+                    public void onError(@NonNull GetCredentialException e)
+                    {
                         Toast.makeText(
                                 LoginActivity.this,
                                 "Sign-in error: " + e.getMessage(),
@@ -223,9 +248,11 @@ public class LoginActivity extends AppCompatActivity {
         );
     }
 
-    private void handleCredential(@NonNull Credential credential) {
+    private void handleCredential(@NonNull Credential credential)
+    {
         // 7) Check for Google ID token credential type
-        if (GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(credential.getType())) {
+        if (GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(credential.getType()))
+        {
             GoogleIdTokenCredential gidc = GoogleIdTokenCredential.createFrom(credential.getData());
             // 8) Parse and validate
             gidc = GoogleIdTokenCredential.createFrom(gidc.getData());
