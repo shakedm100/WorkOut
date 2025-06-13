@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -13,14 +14,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
+import Model.Client;
 import Model.Course;
 import Model.CourseType;
 import Model.Day;
+import Model.Enrollment;
+import Model.Entity;
 import Model.Schedule;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -29,12 +34,17 @@ public class CourseRepository
     FirebaseFirestore db;
     private final String collection = "businesses";
     private final String subCollection = "courses";
+    private final String enrollmentCollection = "enrollment";
 
     public CourseRepository()
     {
         db = FirebaseFirestore.getInstance();
     }
-    public CourseRepository(FirebaseFirestore db) { this.db = db; }
+
+    public CourseRepository(FirebaseFirestore db)
+    {
+        this.db = db;
+    }
 
     public Task<Course> insertCourse(Business business, String name, Schedule schedule, int capacity,
                                      CourseType type, AgeRange ageRange, Category category, String description,
@@ -104,17 +114,17 @@ public class CourseRepository
     {
         return checkIfCourseExist(business, course)
                 .continueWithTask(existsTask ->
-                        {
-                            if (!existsTask.isSuccessful())
-                            {
-                                return Tasks.forResult(false);
-                            }
-                            if (!existsTask.getResult())
-                            {
-                                return Tasks.forResult(false);
-                            }
-                            return deleteHelper(course, business);
-                        });
+                {
+                    if (!existsTask.isSuccessful())
+                    {
+                        return Tasks.forResult(false);
+                    }
+                    if (!existsTask.getResult())
+                    {
+                        return Tasks.forResult(false);
+                    }
+                    return deleteHelper(course, business);
+                });
     }
 
     public Task<Boolean> checkIfCourseExist(Business business, Course course)
@@ -203,6 +213,68 @@ public class CourseRepository
                     }
 
                     return courses;
+                });
+    }
+
+    public Task<Boolean> signupClientToCourse(Client client, Course course, Timestamp timestamp)
+    {
+        Map<String, Object> enroll = new HashMap();
+        enroll.put("client", client.getId());
+        enroll.put("course", course.getId());
+        enroll.put("time", timestamp);
+
+        if (!course.insertParticipant(client))
+            throw new IllegalArgumentException("Course is full");
+
+        return db.collection(enrollmentCollection).add(enroll).continueWith(Task::isSuccessful);
+    }
+
+    public Task<Boolean> cancelSignupClientToCourse(Enrollment enrollment)
+    {
+        if (!enrollment.getCourse().removeParticipant(enrollment.getClient()))
+            throw new IllegalArgumentException("Client didn't signup to class");
+
+
+        DocumentReference documentReference = db.collection(enrollmentCollection).document(enrollment.getId());
+        return documentReference.delete().continueWith(Task::isSuccessful);
+    }
+
+    public Task<Enrollment> getEnrollmentByDate(Client client, Course course, Timestamp start, Timestamp end)
+    {
+        return db.collection(enrollmentCollection).whereGreaterThanOrEqualTo("time", start)
+                .whereLessThanOrEqualTo("time", end).whereEqualTo("client", client.getId())
+                .whereEqualTo("course", course.getId()).limit(1).get().continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
+
+                    Enrollment enrollment;
+                    if (task.getResult() != null && !task.getResult().isEmpty())
+                        enrollment = task.getResult().getDocuments().get(0).toObject(Enrollment.class);
+                    else
+                        throw new NoSuchElementException("No enrollment found");
+
+                    return enrollment;
+                });
+    }
+
+    public Task<List<Enrollment>> getAllEnrollmentsByClient(Client client)
+    {
+        return db.collection(enrollmentCollection).whereEqualTo("client", client.getId())
+                .get().continueWith(task ->
+                {
+                   if(!task.isSuccessful())
+                       throw Objects.requireNonNull(task.getException());
+
+                   ArrayList<Enrollment> enrollments = new ArrayList<>();
+                   for (DocumentSnapshot snapshot : task.getResult())
+                   {
+                        Enrollment enrollment = snapshot.toObject(Enrollment.class);
+                        if(enrollment != null)
+                            enrollments.add(enrollment);
+                   }
+
+                   return enrollments;
                 });
     }
 }

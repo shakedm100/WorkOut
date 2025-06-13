@@ -173,6 +173,20 @@ public class Course extends Entity implements Parcelable
         this.duration = duration;
     }
 
+    public boolean insertParticipant(Client client)
+    {
+        if(participants.size() == capacity)
+            return false;
+
+        participants.add(client);
+        return true;
+    }
+
+    public boolean removeParticipant(Client client)
+    {
+        return participants.remove(client);
+    }
+
     protected Course(Parcel in)
     {
         super(in);

@@ -25,6 +25,7 @@ import Model.AgeRange;
 import Model.Client;
 import Model.Course;
 import Model.Repository.BusinessRepository;
+import Model.Repository.CourseRepository;
 import Model.Schedule;
 
 public class SearchResultsActivity extends AppCompatActivity
@@ -36,6 +37,7 @@ public class SearchResultsActivity extends AppCompatActivity
 
     // Keep track of which “item” is currently expanded, so we can collapse it
     private LinearLayout currentlyExpandedItem = null;
+    private CourseRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,7 +58,7 @@ public class SearchResultsActivity extends AppCompatActivity
         // Find our container & empty-state TextView
         coursesContainer = findViewById(R.id.coursesSearchResultsContainer);
         emptyStateText = findViewById(R.id.emptyStateText);
-
+        repository = new CourseRepository();
         // Call showBusinesses() to inflate everything
         showCourses();
     }
@@ -156,6 +158,7 @@ public class SearchResultsActivity extends AppCompatActivity
             signUpBtn.setId(View.generateViewId());
             signUpBtn.setOnClickListener(v ->
             {
+
                 // TODO: Launch sign-up flow for this `course`
             });
 
