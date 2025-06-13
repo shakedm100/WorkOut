@@ -27,6 +27,9 @@ public class CalendarActivity extends AppCompatActivity {
 
         Client client = getIntent().getParcelableExtra("client");
 
+
+        courseRepository.getAllEnrollmentsByClient(client);
+
         // Find the BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_calendar);

@@ -9,7 +9,15 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
+
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,6 +28,7 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import Model.AgeRange;
 import Model.Client;
@@ -153,13 +162,18 @@ public class SearchResultsActivity extends AppCompatActivity
             signUpBtn.setVisibility(View.GONE);
             signUpBtn.setLayoutParams(new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
             signUpBtn.setId(View.generateViewId());
             signUpBtn.setOnClickListener(v ->
             {
-
-                // TODO: Launch sign-up flow for this `course`
+                repository.signupClientToCourse(current, course,
+                        nextScheduleTimestamp(course.getSchedule())).addOnSuccessListener(task ->
+                {
+                    Toast.makeText(this, "Sign up succeeded", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(task ->
+                {
+                    Toast.makeText(this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                });
             });
 
             // 3) “Review” button (initially GONE) ---
@@ -176,15 +190,15 @@ public class SearchResultsActivity extends AppCompatActivity
                 BusinessRepository businessRepository = new BusinessRepository();
                 businessRepository.getBusinessesById(course.getBusinessId())
                         .addOnSuccessListener(business ->
-                {
-                    Intent intent = new Intent(SearchResultsActivity.this, RatingsActivity.class);
-                    intent.putExtra("business", business);
-                    intent.putExtra("client", current);
-                    startActivity(intent);
-                }).addOnFailureListener(e ->
-                {
-                    // TODO: Add failure handling
-                });
+                        {
+                            Intent intent = new Intent(SearchResultsActivity.this, RatingsActivity.class);
+                            intent.putExtra("business", business);
+                            intent.putExtra("client", current);
+                            startActivity(intent);
+                        }).addOnFailureListener(e ->
+                        {
+                            // TODO: Add failure handling
+                        });
             });
 
             // --- Handle tapping the courseTv itself to toggle these two buttons ---
@@ -205,8 +219,7 @@ public class SearchResultsActivity extends AppCompatActivity
                     signUpBtn.setVisibility(View.VISIBLE);
                     reviewBtn.setVisibility(View.VISIBLE);
                     currentlyExpandedItem = itemLayout;
-                }
-                else
+                } else
                 {
                     signUpBtn.setVisibility(View.GONE);
                     reviewBtn.setVisibility(View.GONE);
@@ -230,6 +243,35 @@ public class SearchResultsActivity extends AppCompatActivity
         }
     }
 
+    public static Timestamp nextScheduleTimestamp(Schedule schedule)
+    {
+        Timestamp timeOfDayOnly = schedule.getOccurrence();
+        DayOfWeek targetDay = DayOfWeek.valueOf(schedule.getDay().toString().toUpperCase());
+        // Turn original Timestamp into an Instant
+        Instant origInstant = Instant.ofEpochSecond(
+                timeOfDayOnly.getSeconds(),
+                timeOfDayOnly.getNanoseconds());
+        // Extract just the time-of-day in system default zone
+        LocalTime tod = origInstant.atZone(ZoneId.systemDefault()).toLocalTime();
+
+        // Find today’s date and its DayOfWeek
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        DayOfWeek todayDow = today.getDayOfWeek();
+
+        // Compute days until the next (or same) targetDay
+        int daysUntil = (targetDay.getValue() - todayDow.getValue() + 7) % 7;
+        // if you want *strictly* next (i.e. skip today when equal), use:
+        // if (daysUntil == 0) daysUntil = 7;
+
+        LocalDate nextDate = today.plusDays(daysUntil);
+
+        // Combine date + time back into an Instant
+        ZonedDateTime zdt = ZonedDateTime.of(nextDate, tod, ZoneId.systemDefault());
+        Instant nextInstant = zdt.toInstant();
+
+        // Build and return the new Firestore Timestamp
+        return new Timestamp(nextInstant.getEpochSecond(), nextInstant.getNano());
+    }
 
     /**
      * Utility: convert dp → px so that padding/margin is density‐aware.
