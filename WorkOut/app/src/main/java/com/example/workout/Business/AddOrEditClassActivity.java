@@ -390,7 +390,10 @@ public class AddOrEditClassActivity extends AppCompatActivity
                 if(task != null)
                 {
                     Toast.makeText(this, "Successfully updated the course", Toast.LENGTH_LONG).show();
-                    finish();
+                    TextView temp = findViewById(R.id.addOrEditTestTextView);
+                    temp.setText("Successfully updated the course");
+                    if(!isTest)
+                        finish();
                 }
             }).addOnFailureListener(e ->
             {

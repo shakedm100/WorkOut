@@ -13,8 +13,9 @@ public class Enrollment extends Entity
     {
     }
 
-    public Enrollment(Client clientId, Course courseId, Timestamp signedUpAt)
+    public Enrollment(String id, Client clientId, Course courseId, Timestamp signedUpAt)
     {
+        super(id);
         this.clientId = clientId;
         this.courseId = courseId;
         this.signedUpAt = signedUpAt;
