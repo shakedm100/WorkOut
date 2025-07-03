@@ -304,4 +304,28 @@ public class CourseRepository
                     return enrollments;
                 });
     }
+
+    /**
+     * This method receives a client and returns all the courses it participated in the past
+     * it returns enrollments that contain a timestamp when the client participated in the course
+     * @param client the client we want to get his history
+     * @return Task<List<Enrollment>> the occurred in the past
+     */
+    public Task<List<Enrollment>> getClientHistory(Client client)
+    {
+        return getAllEnrollmentsByClient(client).continueWith(task ->
+        {
+            if(!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            List<Enrollment> enrollments = new ArrayList<>();
+            for (Enrollment enrollment : task.getResult())
+            {
+                if(enrollment.getTime().getSeconds() < Timestamp.now().getSeconds()) // Check if it's in the past
+                    enrollments.add(enrollment);
+            }
+
+            return enrollments;
+        });
+    }
 }

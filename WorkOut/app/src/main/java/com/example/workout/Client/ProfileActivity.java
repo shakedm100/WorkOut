@@ -39,6 +39,9 @@ public class ProfileActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile);
+
+        current = getIntent().getParcelableExtra("client");
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) ->
         {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -53,10 +56,17 @@ public class ProfileActivity extends AppCompatActivity
             startActivity(intent);
         });
 
+        Button historyButton = findViewById(R.id.historyButton);
+        historyButton.setOnClickListener(task ->
+        {
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("client", current);
+            startActivity(intent);
+        });
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
 
-        current = getIntent().getParcelableExtra("client");
         TextView userLabel = findViewById(R.id.userName);
         userLabel.setText(current.getUsername());
 
