@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.workout.MainActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -55,7 +56,7 @@ public class CalendarActivity extends AppCompatActivity
 
         // Find the BottomNavigationView
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setSelectedItemId(R.id.nav_calendar);
+        bottomNavigationView.setSelectedItemId(R.id.nav_Calendar);
         setupBottomNavigationView();
 
         courses = new ArrayList<>();
@@ -121,7 +122,7 @@ public class CalendarActivity extends AppCompatActivity
             int id = item.getItemId();
             if (id == R.id.nav_home)
             {
-                Intent intent = new Intent(this, CalendarActivity.class);
+                Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 startActivity(intent);
