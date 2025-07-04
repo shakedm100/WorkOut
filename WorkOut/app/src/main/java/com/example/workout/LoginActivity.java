@@ -22,8 +22,11 @@ import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.workout.Business.BusinessHomeActivity;
+import com.example.workout.Business.BusinessRegisterActivity;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.auth.FirebaseAuth;
 
 import Model.Client;
@@ -39,7 +42,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextPassword;
     private ProgressBar progressBar;
     private TextView loginStatusTextView;
-    Button loginButton;
+    private MaterialButtonToggleGroup toggleGroup;
+    private boolean isRegisterClient;
+    private Button loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,12 +61,31 @@ public class LoginActivity extends AppCompatActivity {
         ImageButton googleAuth = findViewById(R.id.googleRegisterButton);
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
         Button registerButton = findViewById(R.id.registerButton);
-        registerButton.setOnClickListener(task -> {
-            Intent newIntent = new Intent(this, RegisterActivity.class);
-            startActivity(newIntent);
+
+        isRegisterClient = true;
+        toggleGroup = findViewById(R.id.registerToggle);
+        toggleGroup.check(R.id.toggle_client);
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
+        {
+            if(isChecked) // Shouldn't be possible
+                return;
+
+            if(checkedId == R.id.toggle_client)
+                isRegisterClient = true;
+            else
+                isRegisterClient = false;
         });
 
-        Button registerBusinessButton = findViewById(R.id.BusinessRegister);
+        registerButton.setOnClickListener(task -> {
+            Intent intent;
+            if(isRegisterClient)
+                intent = new Intent(this, RegisterActivity.class);
+            else
+                intent = new Intent(this, BusinessRegisterActivity.class);
+            startActivity(intent);
+        });
+
+        Button registerBusinessButton = findViewById(R.id.registerButton);
         // TODO: move to suitable function
         registerBusinessButton.setOnClickListener(task -> {
             Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
