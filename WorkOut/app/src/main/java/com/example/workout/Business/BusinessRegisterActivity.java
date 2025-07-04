@@ -34,7 +34,7 @@ public class BusinessRegisterActivity extends AppCompatActivity
     private AutoCompleteTextView cityAutoComplete;
     private ProgressBar statusProgressBar;
     private Button buttonRegister;
-    private TextView textViewRegisterState;
+    private TextView businessRegisterStatusTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,7 +52,7 @@ public class BusinessRegisterActivity extends AppCompatActivity
         editTextAddress = findViewById(R.id.addressText);
         buttonRegister = findViewById(R.id.registrationButton);
         statusProgressBar = findViewById(R.id.progressBar);
-        textViewRegisterState = findViewById(R.id.statusText);
+        businessRegisterStatusTextView = findViewById(R.id.businessRegisterStatusTextView);
         editPolicyText = findViewById(R.id.policyText);
 
         // ApplicationProvider.getApplicationContext();
@@ -107,17 +107,17 @@ public class BusinessRegisterActivity extends AppCompatActivity
                 case IDLE:
                     statusProgressBar.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
-                    textViewRegisterState.setVisibility(View.GONE);
+                    businessRegisterStatusTextView.setVisibility(View.GONE);
                     break;
                 case LOADING:
                     statusProgressBar.setVisibility(View.VISIBLE);
                     buttonRegister.setEnabled(false);
-                    textViewRegisterState.setVisibility(View.GONE);
+                    businessRegisterStatusTextView.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     statusProgressBar.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
-                    textViewRegisterState.setVisibility(View.GONE);
+                    businessRegisterStatusTextView.setVisibility(View.GONE);
                     Toast.makeText(BusinessRegisterActivity.this,
                             "Registration Successful!", Toast.LENGTH_LONG).show();
                     // navigate to login screen after success
@@ -129,8 +129,8 @@ public class BusinessRegisterActivity extends AppCompatActivity
                 case ERROR:
                     statusProgressBar.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
-                    textViewRegisterState.setText(registerUiState.getErrorMessage());
-                    textViewRegisterState.setVisibility(View.VISIBLE);
+                    businessRegisterStatusTextView.setText(registerUiState.getErrorMessage());
+                    businessRegisterStatusTextView.setVisibility(View.VISIBLE);
                     break;
             }
         });

@@ -28,6 +28,9 @@ public class RegisterBusinessViewModel extends ViewModel
     private GeneralRepository generalRepository;
     private final MutableLiveData<GenericUiState<String>> registerUiState = new MutableLiveData<>(GenericUiState.idle());
 
+    /**
+     * Constructor for the RegisterBusinessViewModel.
+     */
     public RegisterBusinessViewModel()
     {
         businessRepository = new BusinessRepository();
@@ -125,7 +128,7 @@ public class RegisterBusinessViewModel extends ViewModel
             return;
         }
 
-        // phone is valid
+        // phone is valid -> create instance
         PhonePrefix phonePrefix = PhonePrefix.fromString(phonePrefixStr.trim());
         Phone phone = new Phone(phonePrefix, phoneNumber);
 
@@ -141,8 +144,11 @@ public class RegisterBusinessViewModel extends ViewModel
             return;
         }
 
+        // address is valid -> create instance
         Address address = new Address(city, addressStr);
         Geocoder geocoder = new Geocoder(context, new Locale("en", "IL"));
+
+        // parse address to location and try to create a valid location
         Location location = generalRepository.convertAddressToLocation(geocoder, address);
 
         // failed to get the long/lat of the given address
@@ -158,6 +164,7 @@ public class RegisterBusinessViewModel extends ViewModel
             return;
         }
 
+        // all fields are valid -> try to insert
         businessRepository.insertBusiness(username, password, phone, email, businessName, location, policy)
                 .addOnSuccessListener(business ->
                 {
