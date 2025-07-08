@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.workout.LoginActivity;
 import com.example.workout.MainActivity;
+import com.example.workout.MessagesActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -63,6 +64,26 @@ public class ProfileActivity extends AppCompatActivity
             intent.putExtra("client", current);
             startActivity(intent);
         });
+
+        // DVIR
+
+        Button messagesButton = findViewById(R.id.notificationsButton);
+        messagesButton.setOnClickListener(task ->
+        {
+            Intent intent = new Intent(this, MessagesActivity.class);
+            intent.putExtra("client", current);
+            startActivity(intent);
+        });
+
+        Button accountButton = findViewById(R.id.accountButton);
+        accountButton.setOnClickListener(task ->
+        {
+            Intent intent = new Intent(this, UpdateClientActivity.class);
+            intent.putExtra("client", current);
+            startActivity(intent);
+        });
+
+        //
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
