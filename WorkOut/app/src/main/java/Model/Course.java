@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class Course extends Entity implements Parcelable
@@ -252,4 +253,12 @@ public class Course extends Entity implements Parcelable
     {
         return Objects.hash(type, businessId, name, participants, capacity, ageRange, schedule, category, description, duration);
     }
+
+    /** Oldest‐first by the schedule’s occurrence timestamp */
+    public static final Comparator<Course> BY_OCCURRENCE =
+            Comparator.comparing(course -> course.getSchedule().getOccurrence());
+
+    /** Newest‐first */
+    public static final Comparator<Course> BY_OCCURRENCE_REVERSED =
+            BY_OCCURRENCE.reversed();
 }

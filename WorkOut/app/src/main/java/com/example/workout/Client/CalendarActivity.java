@@ -12,12 +12,15 @@ import com.example.workout.MainActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.lang.reflect.Array;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -110,6 +113,8 @@ public class CalendarActivity extends AppCompatActivity
                 courses.add(enrollment.getCourse());
             }
         }
+
+        Collections.sort(allEnrollments, Enrollment.BY_TIME);
 
         // Refresh UI
         courseAdapter.notifyDataSetChanged();

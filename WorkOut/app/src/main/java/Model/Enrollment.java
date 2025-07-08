@@ -2,6 +2,8 @@ package Model;
 
 import com.google.firebase.Timestamp;
 
+import java.util.Comparator;
+
 public class Enrollment extends Entity
 {
     private Client clientId;
@@ -51,5 +53,13 @@ public class Enrollment extends Entity
     {
         this.signedUpAt = signedUpAt;
     }
+
+    /*
+     * The following code is to compare two different enrollments by the Timestamp
+     */
+
+    public static final Comparator<Enrollment> BY_TIME = Comparator.comparing(Enrollment::getTime);
+
+
 }
 

@@ -13,6 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -105,7 +106,8 @@ public class BusinessCalendarActivity extends AppCompatActivity
         courseRepository.getCoursesByDayOfWeek(business, day).addOnSuccessListener(task ->
         {
             courseList.addAll(task);
-           adapter.notifyDataSetChanged();
+            courseList.sort(Course.BY_OCCURRENCE);
+            adapter.notifyDataSetChanged();
         }).addOnFailureListener(e ->
         {
             // TODO: Couldn't load courses for this business, show error
