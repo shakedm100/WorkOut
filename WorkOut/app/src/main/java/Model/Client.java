@@ -12,6 +12,7 @@ public class Client extends User implements Parcelable{
     private String lastName;
     private Address address;
     private Gender gender;
+    private boolean isFirstLogin;
 
     public Client() {}
     public Client(String id, String username, Phone phone, String email,
@@ -22,6 +23,7 @@ public class Client extends User implements Parcelable{
         this.lastName = lastName;
         this.address = address;
         this.gender = gender;
+        this.isFirstLogin = false;
     }
 
     public String getFirstName() {
@@ -40,6 +42,11 @@ public class Client extends User implements Parcelable{
         return gender;
     }
 
+    public boolean isFirstLogin()
+    {
+        return isFirstLogin;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -56,6 +63,10 @@ public class Client extends User implements Parcelable{
         this.gender = gender;
     }
 
+    public void setFirstLogin(boolean firstLogin)
+    {
+        isFirstLogin = firstLogin;
+    }
     /**
      * /////////////////////////////////////////////////////////////////////////////////////////////////////////
      * This part implements Parcelable interface. Parcelable is better then Serialization in Android because:
@@ -74,6 +85,7 @@ public class Client extends User implements Parcelable{
         lastName = in.readString();
         address = in.readParcelable(Address.class.getClassLoader());
         gender = Gender.valueOf(in.readString());
+        isFirstLogin = in.readByte() != 0; // Read byte and convert to boolean
     }
 
     @Override
@@ -84,11 +96,12 @@ public class Client extends User implements Parcelable{
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags)
     {
-        super.writeToParcel(dest, flags);       // let User write its own fields
+        super.writeToParcel(dest, flags); // let User write its own fields
         dest.writeString(firstName);
         dest.writeString(lastName);
         dest.writeParcelable(address, flags);
         dest.writeString(gender.name());
+        dest.writeByte((byte) (isFirstLogin ? 1 : 0)); // Convert boolean to byte
     }
 
     /**
@@ -125,6 +138,6 @@ public class Client extends User implements Parcelable{
     @Override
     public int hashCode()
     {
-        return Objects.hash(firstName, lastName, address, gender);
+        return Objects.hash(firstName, lastName, address, gender, isFirstLogin);
     }
 }

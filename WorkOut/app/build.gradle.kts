@@ -91,7 +91,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
 
     // Core Credential Manager:
-    implementation("androidx.credentials:credentials:1.0.1")
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     // Google ID helper library for parsing/validating tokens
     implementation("com.google.android.libraries.identity.googleid:googleid:<latest-version>")
     // Google Maps SDK for Android
@@ -99,5 +100,9 @@ dependencies {
 
     // Fused Location Provider (high-accuracy, battery-optimized)
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
 }
