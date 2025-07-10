@@ -97,13 +97,13 @@ public class UpdateClientActivity extends AppCompatActivity
 
         // set autocomplete value
 
-        List<City> cities = new ArrayList<>();
-        cities.add(client.getAddress().getCity());
-        ArrayAdapter<City> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
-        cityAutoComplete.setAdapter(adapter);
-        City matchedCity = adapter.getItem(0);
-        //City c = client.getAddress().getCity();
-        cityAutoComplete.setText(matchedCity.getEnglishName(), false); // false prevents dropdown from opening
+//        List<City> cities = new ArrayList<>();
+//        cities.add(client.getAddress().getCity());
+//        ArrayAdapter<City> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
+//        cityAutoComplete.setAdapter(adapter);
+//        City matchedCity = adapter.getItem(0);
+        //matchedCity.getEnglishName()
+        cityAutoComplete.setText(client.getAddress().getCity().getEnglishName(), false); // false prevents dropdown from opening
 
         // Setup Observers for LiveData
         setupObservers();

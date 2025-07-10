@@ -25,6 +25,7 @@ public class City implements Parcelable
     protected City(Parcel in)
     {
         name = in.readString();
+        englishName = in.readString();
     }
 
 
@@ -66,6 +67,7 @@ public class City implements Parcelable
     public void writeToParcel(@NonNull Parcel dest, int flags)
     {
         dest.writeString(name);
+        dest.writeString(englishName);
     }
 
     @Override
