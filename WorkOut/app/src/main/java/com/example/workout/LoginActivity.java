@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView loginStatusTextView;
     private MaterialButtonToggleGroup toggleGroup;
     private boolean isRegisterClient;
-    private Button loginButton;
+    private Button loginButton, registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,37 +60,37 @@ public class LoginActivity extends AppCompatActivity {
         credentialManager = CredentialManager.create(getApplicationContext());
         ImageButton googleAuth = findViewById(R.id.googleRegisterButton);
         googleAuth.setOnClickListener(v -> requestGoogleIdToken());
-        Button registerButton = findViewById(R.id.registerButton);
+        registerButton = findViewById(R.id.registerButton);
 
         isRegisterClient = true;
         toggleGroup = findViewById(R.id.registerToggle);
         toggleGroup.check(R.id.toggle_client);
-        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
-        {
-            if(isChecked) // Shouldn't be possible
-                return;
-
-            if(checkedId == R.id.toggle_client)
-                isRegisterClient = true;
-            else
-                isRegisterClient = false;
-        });
-
-        registerButton.setOnClickListener(task -> {
-            Intent intent;
-            if(isRegisterClient)
-                intent = new Intent(this, RegisterActivity.class);
-            else
-                intent = new Intent(this, BusinessRegisterActivity.class);
-            startActivity(intent);
-        });
-
-        Button registerBusinessButton = findViewById(R.id.registerButton);
-        // TODO: move to suitable function
-        registerBusinessButton.setOnClickListener(task -> {
-            Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
-            startActivity(newIntent);
-        });
+//        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
+//        {
+//            if(isChecked) // Shouldn't be possible
+//                return;
+//
+//            if(checkedId == R.id.toggle_client)
+//                isRegisterClient = true;
+//            else
+//                isRegisterClient = false;
+//        });
+//
+//        registerButton.setOnClickListener(task -> {
+//            Intent intent;
+//            if(isRegisterClient)
+//                intent = new Intent(this, RegisterActivity.class);
+//            else
+//                intent = new Intent(this, BusinessRegisterActivity.class);
+//            startActivity(intent);
+//        });
+//
+//        Button registerBusinessButton = findViewById(R.id.registerButton);
+//        // TODO: move to suitable function
+//        registerBusinessButton.setOnClickListener(task -> {
+//            Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
+//            startActivity(newIntent);
+//        });
 
         loginButton = findViewById(R.id.loginButton);
         /*loginButton.setOnClickListener(click ->
@@ -155,6 +155,27 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setupButtonClickListeners()
     {
+        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
+        {
+            if(isChecked) // Shouldn't be possible
+                return;
+
+            if(checkedId != R.id.toggle_client)
+                isRegisterClient = true;
+            else
+                isRegisterClient = false;
+        });
+
+        registerButton.setOnClickListener(task -> {
+            Intent intent;
+            if(isRegisterClient)
+                intent = new Intent(this, RegisterActivity.class);
+            else
+                intent = new Intent(this, BusinessRegisterActivity.class);
+
+            startActivity(intent);
+        });
+
         loginButton.setOnClickListener(v ->
         {
             String username = editTextUsername.getText().toString().trim();

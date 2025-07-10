@@ -10,6 +10,7 @@ import java.util.List;
 
 import Model.Address;
 import Model.City;
+import Model.Client;
 import Model.Gender;
 import Model.Phone;
 import Model.PhonePrefix;
@@ -19,7 +20,7 @@ import Model.Repository.GeneralRepository;
 public class UpdateClientViewModel extends ViewModel
 {
 
-    private final Model.Repository.ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
     private final GeneralRepository generalRepository;
 
@@ -31,7 +32,7 @@ public class UpdateClientViewModel extends ViewModel
 //        this.generalRepository = generalRepository;
 //    }
 
-    public RegisterViewModel()
+    public UpdateClientViewModel()
     {
         this.clientRepository = new ClientRepository();
         this.generalRepository = new GeneralRepository();
@@ -59,10 +60,8 @@ public class UpdateClientViewModel extends ViewModel
     /**
      * Attempts to register a new User with the given parameters.
      */
-    public void registerUser(String email, String password, String username, String firstName, String lastName,
-                             String phonePrefixStr, String phoneNumberStr, String birthday, City city, String street, Gender gender) // String cityName
+    public void updateClient(String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
     {
-
         _updateUiState.postValue(GenericUiState.loading("Validating input..."));
 
         // basic validation checks
@@ -91,23 +90,6 @@ public class UpdateClientViewModel extends ViewModel
             _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
             return;
         }
-
-        if (email == null || email.trim().isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches())
-        {
-            _updateUiState.postValue(GenericUiState.error("Please enter a valid email address."));
-            return;
-        }
-
-        // check if the username or email are already taken by other user
-        generalRepository.canRegisterUser("clients", username, email)
-                .addOnSuccessListener(exists -> {
-                    if (exists) {
-                        _updateUiState.postValue(GenericUiState.error("Username or Email are already taken!"));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    _updateUiState.postValue(GenericUiState.error("Something went wrong!"));
-                });
 
         if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty())
         {
@@ -149,29 +131,36 @@ public class UpdateClientViewModel extends ViewModel
             _updateUiState.postValue(GenericUiState.error("Please enter a street address."));
             return;
         }
-        if (gender == null)
-        {
-            _updateUiState.postValue(GenericUiState.error("Please select a gender."));
-            return;
-        }
 
         // Trim inputs after validation
-        final String finalEmail = email.trim();
-        final String finalUsername = username.trim();
         final String finalFirstName = firstName.trim();
         final String finalLastName = lastName.trim();
         final String finalPhoneNumber = phoneNumberStr.trim();
-        //final String finalCityName = cityName.trim(); -> changed to object
         final String finalStreet = street.trim();
 
         _updateUiState.postValue(GenericUiState.loading("Verifying city information..."));
 
-        Phone phone = new Phone(prefix, finalPhoneNumber);
-        Address address = new Address(city, finalStreet);
+        Phone finalPhone = new Phone(prefix, finalPhoneNumber);
+        Address finalAddress = new Address(city, finalStreet);
 
-        // TODO: CHANGE TO UPDATE!!!
-        clientRepository.insertClient(finalUsername, password, phone, finalEmail, finalFirstName, finalLastName, address, gender)
-                .addOnSuccessListener(regResult ->
+        // check if any change was made
+        if (client.getFirstName().equals(finalFirstName) &&
+                client.getLastName().equals(finalLastName) &&
+                client.getPhone().equals(finalPhone) &&
+                client.getAddress().equals(finalAddress))
+        {
+            _updateUiState.postValue(GenericUiState.error("No changes were made."));
+            return;
+        }
+
+        // set the new client details after validation
+        client.setFirstName(finalFirstName);
+        client.setLastName(finalLastName);
+        client.setPhone(finalPhone);
+        client.setAddress(finalAddress);
+
+        clientRepository.updateClientByID(client)
+                .addOnSuccessListener(updateResult ->
                 {
                     _updateUiState.postValue(GenericUiState.success("Update successful!" + finalFirstName));
                 })
@@ -184,11 +173,5 @@ public class UpdateClientViewModel extends ViewModel
     public LiveData<GenericUiState<String>> getUpdateUiState()
     {
         return updateUiState;
-    }
-
-    // Optional: Method to reset the state if needed from the Activity/Fragment
-    public void resetUpdateState()
-    {
-        _updateUiState.postValue(GenericUiState.idle());
     }
 }
