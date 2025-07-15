@@ -87,11 +87,16 @@ public class RegisterViewModel extends ViewModel
             return;
         }
 
-        boolean isNameValid = firstName.chars().allMatch(Character::isLetter);
-        if (!isNameValid)
+        boolean isNameValid;
+        String[] nameSplit = firstName.split(" ");
+        for (int i = 0; i < nameSplit.length; i++)
         {
-            _registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
-            return;
+            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
+            if (!isNameValid)
+            {
+                _registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
+                return;
+            }
         }
 
         if (lastName == null || lastName.trim().isEmpty())
@@ -100,11 +105,15 @@ public class RegisterViewModel extends ViewModel
             return;
         }
 
-        isNameValid = lastName.chars().allMatch(Character::isLetter);
-        if (!isNameValid)
+        nameSplit = firstName.split(" ");
+        for (int i = 0; i < nameSplit.length; i++)
         {
-            _registerUiState.postValue(GenericUiState.error("Last name must contain only letters."));
-            return;
+            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
+            if (!isNameValid)
+            {
+                _registerUiState.postValue(GenericUiState.error("Last name must contain only letters."));
+                return;
+            }
         }
 
         if (email == null || email.trim().isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches())

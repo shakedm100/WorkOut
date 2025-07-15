@@ -22,6 +22,8 @@ import Model.PhonePrefix;
 //import android.location.Address;
 import android.content.Context;
 import java.util.Locale;
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
 
 public class GeneralRepository
 {
@@ -181,6 +183,48 @@ public class GeneralRepository
         {
             throw new RuntimeException("Invalid address");
         }
+    }
+
+    public boolean areSimilar(String a, String b) {
+
+        int maxDistance = 3;
+        if (a.length() > 15 || b.length() > 15)
+            maxDistance = 4;
+
+        LevenshteinDistance distance = new LevenshteinDistance(maxDistance); // maxDistance represents two string that are similar in some way
+        Integer result = distance.apply(a.toLowerCase(), b.toLowerCase());
+        return result != null; // if within maxDistance
+    }
+
+    public Location convertAddressToLocation2(Geocoder geocoder, Address address) {
+        try {
+            String streetInput = address.getName();
+            String cityInput = address.getCity().getEnglishName();
+
+            String query = streetInput + ", " + cityInput;
+            List<android.location.Address> results = geocoder.getFromLocationName(query, 1);
+
+            if (!results.isEmpty()) {
+                android.location.Address result = results.get(0);
+
+                String resultStreet = result.getThoroughfare(); // street name
+                String resultCity = result.getLocality(); // city name
+
+                // check similarity
+                if (resultStreet != null && resultCity != null)
+                {
+                    // check only the street name
+                    if (areSimilar(streetInput.replaceAll("[\\s\\-\\d]", "") + " Street", resultStreet) && areSimilar(cityInput, resultCity))
+                    {
+                        return new Location(result.getLongitude(), result.getLatitude());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid address" + e.getMessage());
+        }
+
+        return null; // Invalid address
     }
 
     public Address convertLocationToAddress(Geocoder geocoder, Location location)

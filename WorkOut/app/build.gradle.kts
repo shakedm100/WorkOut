@@ -99,5 +99,6 @@ dependencies {
 
     // Fused Location Provider (high-accuracy, battery-optimized)
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation ("org.apache.commons:commons-text:1.10.0")
 
 }

@@ -87,23 +87,19 @@ public class UpdateClientActivity extends AppCompatActivity
 
         int position = adapterPhonePrefixes.getPosition(client.getPhone().getNumber()); // uses equals()
         if (position >= 0)
-        {
             spinnerPhonePrefix.setSelection(position);
-        }
-        else
-        {
-            // TODO: handle error
-        }
+
+        // TODO: handle error if position is -1?
 
         // set autocomplete value
 
-//        List<City> cities = new ArrayList<>();
-//        cities.add(client.getAddress().getCity());
-//        ArrayAdapter<City> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
-//        cityAutoComplete.setAdapter(adapter);
-//        City matchedCity = adapter.getItem(0);
-        //matchedCity.getEnglishName()
-        cityAutoComplete.setText(client.getAddress().getCity().getEnglishName(), false); // false prevents dropdown from opening
+        List<City> cities = new ArrayList<>();
+        cities.add(client.getAddress().getCity());
+        ArrayAdapter<City> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
+        cityAutoComplete.setAdapter(adapter);
+        City matchedCity = adapter.getItem(0);
+        cityAutoComplete.setText(matchedCity.getEnglishName(), false); // false prevents dropdown from opening
+        //cityAutoComplete.setText(client.getAddress().getCity().getEnglishName(), false); // false prevents dropdown from opening
 
         // Setup Observers for LiveData
         setupObservers();
@@ -152,10 +148,7 @@ public class UpdateClientActivity extends AppCompatActivity
 
     private void setupClickListeners() {
         updateButton.setOnClickListener(v -> {
-            // Retrieve data from all EditText and Spinner fields
-            //String email = editTextEmail.getText().toString().trim();
-            //String password = editTextPassword.getText().toString().trim();
-            //String username = editTextUsername.getText().toString().trim();
+
             String firstName = editTextFirstName.getText().toString().trim();
             String lastName = editTextLastName.getText().toString().trim();
 
@@ -182,7 +175,7 @@ public class UpdateClientActivity extends AppCompatActivity
             String street = editTextStreet.getText().toString().trim();
 
             // Call the ViewModel method to perform update
-            updateClientViewModel.updateClient(firstName, lastName, phonePrefixStr, phoneNumber, selectedCity, street, client);
+            updateClientViewModel.updateClient(this.getApplicationContext(), firstName, lastName, phonePrefixStr, phoneNumber, selectedCity, street, client);
         });
 
         // get back to the profile page

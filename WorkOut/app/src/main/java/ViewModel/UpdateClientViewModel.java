@@ -1,5 +1,8 @@
 package ViewModel;
 
+import android.content.Context;
+import android.location.Geocoder;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -7,11 +10,13 @@ import androidx.lifecycle.ViewModel;
 import com.google.android.gms.tasks.Task;
 
 import java.util.List;
+import java.util.Locale;
 
 import Model.Address;
 import Model.City;
 import Model.Client;
 import Model.Gender;
+import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.ClientRepository;
@@ -60,10 +65,10 @@ public class UpdateClientViewModel extends ViewModel
     /**
      * Attempts to register a new User with the given parameters.
      */
-    public void updateClient(String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
+    public void updateClient(Context context, String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
     {
         _updateUiState.postValue(GenericUiState.loading("Validating input..."));
-
+        boolean isNameValid;
         // basic validation checks
         if (firstName == null || firstName.trim().isEmpty())
         {
@@ -71,12 +76,17 @@ public class UpdateClientViewModel extends ViewModel
             return;
         }
 
-        boolean isNameValid = firstName.chars().allMatch(Character::isLetter);
-        if (!isNameValid)
+        String[] nameSplit = firstName.split(" ");
+        for (int i = 0; i < nameSplit.length; i++)
         {
-            _updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
-            return;
+            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
+            if (!isNameValid)
+            {
+                _updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
+                return;
+            }
         }
+
 
         if (lastName == null || lastName.trim().isEmpty())
         {
@@ -84,11 +94,15 @@ public class UpdateClientViewModel extends ViewModel
             return;
         }
 
-        isNameValid = lastName.chars().allMatch(Character::isLetter);
-        if (!isNameValid)
+        nameSplit = lastName.split(" ");
+        for (int i = 0; i < nameSplit.length; i++)
         {
-            _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
-            return;
+            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
+            if (!isNameValid)
+            {
+                _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
+                return;
+            }
         }
 
         if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty())
@@ -143,6 +157,17 @@ public class UpdateClientViewModel extends ViewModel
         Phone finalPhone = new Phone(prefix, finalPhoneNumber);
         Address finalAddress = new Address(city, finalStreet);
 
+        // parse address to location and try to create a valid location
+        Geocoder geocoder = new Geocoder(context, new Locale("en", "IL"));
+        Location location = generalRepository.convertAddressToLocation2(geocoder, finalAddress);
+
+        // failed to get the long/lat of the given address
+        if (location == null)
+        {
+            _updateUiState.postValue(GenericUiState.error("Invalid address."));
+            return;
+        }
+
         // check if any change was made
         if (client.getFirstName().equals(finalFirstName) &&
                 client.getLastName().equals(finalLastName) &&
@@ -152,6 +177,12 @@ public class UpdateClientViewModel extends ViewModel
             _updateUiState.postValue(GenericUiState.error("No changes were made."));
             return;
         }
+
+        // get data to roll back if the update fails
+        String oldFirstName = client.getFirstName();
+        String oldLastName = client.getLastName();
+        Phone oldPhone = client.getPhone();
+        Address oldAddress = client.getAddress();
 
         // set the new client details after validation
         client.setFirstName(finalFirstName);
@@ -166,6 +197,11 @@ public class UpdateClientViewModel extends ViewModel
                 })
                 .addOnFailureListener(updateException ->
                 {
+                    // roll back in case of a failure
+                    client.setFirstName(oldFirstName);
+                    client.setLastName(oldLastName);
+                    client.setPhone(oldPhone);
+                    client.setAddress(oldAddress);
                     _updateUiState.postValue(GenericUiState.error("Update failed: " + updateException.getMessage()));
                 });
     }
