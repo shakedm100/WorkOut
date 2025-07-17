@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:padding="16dp">
+    tools:context=".MainActivity">
 
 
     <ImageView
@@ -13,8 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:src="@color/material_dynamic_primary90"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="-7dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/lastNameText"
