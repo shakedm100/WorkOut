@@ -128,13 +128,19 @@
         android:id="@+id/searchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
         android:backgroundTint="@color/background"
         android:text="Search"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewModeToggle" />
+        app:layout_constraintTop_toBottomOf="@id/viewModeToggle"
+        app:layout_constraintVertical_bias="0.204"
+        app:layout_goneMarginBottom="8dp"
+        />
 
     <LinearLayout
         android:id="@+id/search_slider_container"
@@ -177,6 +183,11 @@
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
+    <TextView
+        android:id="@+id/searchTestTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -191,12 +202,6 @@
         app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"/>
-
-    <TextView
-        android:id="@+id/searchTestTextView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

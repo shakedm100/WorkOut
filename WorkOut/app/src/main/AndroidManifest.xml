@@ -58,6 +58,7 @@
         <activity android:name=".Business.BusinessRegisterActivity"/>
         <activity android:name=".Business.BusinessCalendarActivity"/>
         <activity android:name=".Client.HistoryActivity"/>
+        <activity android:name=".Client.UpdateClientActivity"/>
 
     </application>
 
