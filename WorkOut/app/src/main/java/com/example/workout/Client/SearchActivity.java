@@ -44,7 +44,6 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -78,12 +77,13 @@ public class SearchActivity extends AppCompatActivity
     private AgeRange ageRange;
     private CourseType chosenCourseType;
     private Spinner categorySpinner, courseTypeSpinner, dayOfWeekSpinner;
-    private EditText editTextLocation;
+    private EditText editDistanceLocation;
     private ViewGroup container;
     private Button startTimeButton, endTimeButton;
     private LocalTime startTime, endTime;
     private Timestamp[] times;
     private final int LOCATION_PERMISSION_REQUEST = 1001;
+    private final int defaultRadius = 100;
     private BottomNavigationView bottomNavigationView;
     private Client current;
     private MaterialButtonToggleGroup toggleGroup;
@@ -105,7 +105,7 @@ public class SearchActivity extends AppCompatActivity
 
         isTest = false;
         categorySpinner = findViewById(R.id.categorySearchSpinner);
-        editTextLocation = findViewById(R.id.locationSearchEditText);
+        editDistanceLocation = findViewById(R.id.distanceSearchEditText);
         courseTypeSpinner = findViewById(R.id.typeSpinner);
         courseRepository = new CourseRepository();
         container = findViewById(R.id.search_slider_container);
@@ -125,13 +125,13 @@ public class SearchActivity extends AppCompatActivity
         toggleGroup.check(R.id.toggle_list);
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
         {
-           if(!isChecked)
-               return;
+            if (!isChecked)
+                return;
 
-           if(checkedId == R.id.toggle_map)
-               isList = false;
-           else
-               isList = true;
+            if (checkedId == R.id.toggle_map)
+                isList = false;
+            else
+                isList = true;
         });
 
         current = getIntent().getParcelableExtra("client");
@@ -233,22 +233,22 @@ public class SearchActivity extends AppCompatActivity
             Intent intent;
             TextView tempTextView = findViewById(R.id.searchTestTextView);
 
-            if(isList)
+            if (isList)
             {
                 intent = new Intent(this, SearchResultsActivity.class);
-                if(isTest)
+                if (isTest)
                     tempTextView.setText("Successfully searching and showing list");
             }
             else
             {
                 intent = new Intent(this, MapActivity.class);
-                if(isTest)
+                if (isTest)
                     tempTextView.setText("Successfully searching and showing map");
             }
 
             intent.putParcelableArrayListExtra("course_list", courseArrayList);
             intent.putExtra("client", current);
-            if(!isTest)
+            if (!isTest)
                 startActivity(intent);
         }).addOnFailureListener(task ->
         {
@@ -387,8 +387,8 @@ public class SearchActivity extends AppCompatActivity
         String courseType = courseTypeSpinner.getSelectedItem().toString().trim();
         String dayOfWeek = dayOfWeekSpinner.getSelectedItem().toString().trim();
 
-        if(startTime.getHour() != 0 || startTime.getMinute() != 0 ||
-        endTime.getHour() != 23 || endTime.getMinute() != 59)
+        if (startTime.getHour() != 0 || startTime.getMinute() != 0 ||
+                endTime.getHour() != 23 || endTime.getMinute() != 59)
         {
             LocalDate epochDate = LocalDate.of(1970, 1, 1);
             LocalDateTime combined = LocalDateTime.of(epochDate, startTime);
@@ -411,7 +411,7 @@ public class SearchActivity extends AppCompatActivity
         {
             tasks.add(searchCategory());
         }
-        if (!editTextLocation.getText().toString().trim().isEmpty())
+        if (!editDistanceLocation.getText().toString().trim().isEmpty())
         {
             tasks.add(searchRadius());
         }
@@ -423,7 +423,7 @@ public class SearchActivity extends AppCompatActivity
         {
             tasks.add(searchCourseType());
         }
-        if(times[0] != null && times[1] != null && !dayOfWeek.equals("Choose Day"))
+        if (times[0] != null && times[1] != null && !dayOfWeek.equals("Choose Day"))
         {
             tasks.add(searchDayTime());
         }
@@ -432,7 +432,7 @@ public class SearchActivity extends AppCompatActivity
         // If no filters, return empty immediately
         if (tasks.isEmpty())
         {
-            return Tasks.forResult(Collections.emptyList());
+            tasks.add(searchRadius());
         }
 
         // Wait for all to finish successfully
@@ -470,36 +470,41 @@ public class SearchActivity extends AppCompatActivity
     private Task<List<Course>> searchRadius()
     {
         // Location search handling
-        String locationText = editTextLocation.getText().toString().trim();
-        double radius = Double.parseDouble(locationText);
-        if (!locationText.isEmpty())
+        String distanceText = editDistanceLocation.getText().toString().trim();
+        double radius;
+        try
         {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED)
-            {
-                // Request location permission if needed
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        LOCATION_PERMISSION_REQUEST);
-            }
-            try
-            {
-                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                return fusedLocationClient.getLastLocation()
-                        .continueWithTask(locatinTask ->
-                        {
-                            Location location = new Location(locatinTask.getResult().getLatitude(),
-                                    locatinTask.getResult().getLongitude());
-                            searchStrategy = new SearchRadiusStrategy(radius);
-                            return courseRepository.searchByStrategy(searchStrategy, locatinTask.getResult());
-                        });
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException("Permission denied?"); // TODO: Show error on screen
-            }
+            radius = Double.parseDouble(distanceText);
+        }catch (Exception e)
+        {
+            radius = defaultRadius;
         }
 
-        return null;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            // Request location permission if needed
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST);
+        }
+        try
+        {
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            double finalRadius = radius;
+            return fusedLocationClient.getLastLocation()
+                    .continueWithTask(locatinTask ->
+                    {
+                        double latitude = locatinTask.getResult().getLatitude();
+                        double longitude = locatinTask.getResult().getLongitude();
+                        Location location = new Location(latitude, longitude);
+                        searchStrategy = new SearchRadiusStrategy(finalRadius);
+                        return courseRepository.searchByStrategy(searchStrategy, location);
+                    });
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Permission denied?"); // TODO: Show error on screen
+        }
     }
 
     private Task<List<Course>> searchAgeRange()
@@ -540,8 +545,8 @@ public class SearchActivity extends AppCompatActivity
         this.courseRepository = repo;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         Address address = new Address(new City("Rosh Ha'Ayin"), "Haim Hertzog");
-        current = new Client("esdrg","shakedm100", phone,
-                "shaked1mi@gmail.com", "Shaked","Michael", address, Gender.Male);
+        current = new Client("esdrg", "shakedm100", phone,
+                "shaked1mi@gmail.com", "Shaked", "Michael", address, Gender.Male);
         isTest = true;
     }
 }

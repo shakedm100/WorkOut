@@ -45,7 +45,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
     private BusinessRepository businessRepository;
-    private int defaultRadius = 100;
+    private final int defaultRadius = 100;
     private Location modelLocation;
     private Client client;
     private ArrayList<Course> courses;
