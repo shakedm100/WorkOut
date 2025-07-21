@@ -73,6 +73,14 @@
         android:layout_marginTop="8dp"
         android:text="Courses list"/>
 
+    <TextView
+        android:id="@+id/map_bottom_business_policy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Policy: "/>
+
+
     <Button
         android:id="@+id/map_bottom_sign_up_button"
         android:layout_width="match_parent"

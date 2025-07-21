@@ -35,6 +35,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 import Model.Business;
@@ -247,6 +249,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         RatingBar ratingBar = view.findViewById(R.id.map_bottom_business_ratingbar);
         TextView ratingCountTextView = view.findViewById(R.id.map_bottom_business_rating_count);
         TextView coursesListTextView = view.findViewById(R.id.map_bottom_business_courses);
+        TextView policyTextView = view.findViewById(R.id.map_bottom_business_policy);
         Button courseSignUpButton = view.findViewById(R.id.map_bottom_sign_up_button);
 
         nameTextView.setText(business.getBusinessName());
@@ -277,6 +280,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         coursesListTextView.setText(courses);
+
+        String policy = "Policy: " + business.getPolicy();
+        policyTextView.setText(policy);
 
         // Set click-listeners on buttons inside the sheet
         courseSignUpButton.setOnClickListener(v ->
