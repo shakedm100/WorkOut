@@ -171,7 +171,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
             else if (id == R.id.nav_profile)
             {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, ProfileActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 startActivity(intent);

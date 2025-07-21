@@ -120,7 +120,7 @@ public class ProfileActivity extends AppCompatActivity
             }
             else if (id == R.id.nav_map)
             {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, MapActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
                 startActivity(intent);
