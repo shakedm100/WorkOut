@@ -3,7 +3,6 @@ package com.example.workout.Client;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -25,10 +24,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.Manifest;
 
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,18 +35,14 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
-import Model.Address;
 import Model.Business;
 import Model.Client;
 import Model.Course;
 import Model.Location;
 import Model.Repository.BusinessRepository;
 import Model.Repository.CourseRepository;
-import Model.Repository.GeneralRepository;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -67,7 +62,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private ArrayList<Course> courses;
     private ArrayList<Business> businessesFromCourses;
     private boolean isFromSearch;
-    BottomNavigationView bottomNavigationView;
+    private BottomNavigationView bottomNavigationView;
+    private FloatingActionButton recenterButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -80,6 +76,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         {
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
         }
+
+        recenterButton = findViewById(R.id.fabRecenter);
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
@@ -121,6 +119,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_map);
         setUpBottomNavigationView();
+
+        recenterButton.setOnClickListener(v ->
+        {
+            recenterMap();
+        });
+    }
+
+    private void recenterMap()
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED)
+        {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(location ->
+                    {
+                        if (location != null && googleMap != null)
+                        {
+                            LatLng ll = new LatLng(
+                                    location.getLatitude(),
+                                    location.getLongitude()
+                            );
+                            googleMap.animateCamera(
+                                    CameraUpdateFactory.newLatLngZoom(ll, 15f),
+                                    500,
+                                    null
+                            );
+                        }
+                    });
+        }
+        else
+        {
+            Toast.makeText(this, "Location permission missing", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setUpBottomNavigationView()

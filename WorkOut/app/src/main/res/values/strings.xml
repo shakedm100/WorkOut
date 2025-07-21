@@ -19,6 +19,8 @@
     <string name="update">update</string>
     <string name="classes">Classes</string>
     <string name="status">status</string>
-    <string name="reviews">Reviews</string> />
+    <string name="reviews">Reviews</string>
+    <string name="recenter_map">Recenter map</string>
+    />
     />
 </resources>
