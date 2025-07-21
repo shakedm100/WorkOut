@@ -36,7 +36,6 @@ public class RatingsActivity extends AppCompatActivity
     private ProgressBar ratingsProgressBar;
     private Client client;
     private Business business;
-    private BusinessRepository businessRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,7 +51,6 @@ public class RatingsActivity extends AppCompatActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        businessRepository = new BusinessRepository();
         clientRatingViewModel = new ClientRatingViewModel();
 
         ratingBar = findViewById(R.id.ratingBar);
@@ -98,8 +96,9 @@ public class RatingsActivity extends AppCompatActivity
                     ratingsStatusTextView.setVisibility(View.GONE);
                     Toast.makeText(RatingsActivity.this,
                             "Rating added Successful!", Toast.LENGTH_LONG).show();
-                    // navigate to login screen after success
+                    // navigate to main screen after success
                     intent = new Intent(RatingsActivity.this, MainActivity.class);
+                    intent.putExtra("client", client);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish(); // can't go back
