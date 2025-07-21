@@ -46,7 +46,7 @@
         <activity android:name=".Client.RatingsActivity"/>
         <activity android:name=".MessagesActivity"/>
         <activity android:name=".Client.SearchActivity"/>
-        <activity android:name=".RegisterActivity"/>
+        <activity android:name=".Client.RegisterActivity"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".Business.AddOrEditClassActivity"/>
         <activity android:name=".Business.BusinessHomeActivity"/>

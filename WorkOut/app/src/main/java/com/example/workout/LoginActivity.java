@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.content.ContextCompat;
@@ -24,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.workout.Business.BusinessHomeActivity;
 import com.example.workout.Business.BusinessRegisterActivity;
+import com.example.workout.Client.RegisterActivity;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -31,8 +31,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import Model.Client;
 import ViewModel.LoginViewModel;
-
-import static android.content.ContentValues.TAG;
 
 import android.util.Log;
 

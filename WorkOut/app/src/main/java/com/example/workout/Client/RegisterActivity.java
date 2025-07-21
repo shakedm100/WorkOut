@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.Client;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,15 +18,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import Model.Address;
 import Model.City;
-import Model.Client;
 import Model.Gender;
-import Model.Phone;
-import Model.PhonePrefix;
-import Model.Repository.ClientRepository;
+
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.example.workout.LoginActivity;
+import com.example.workout.R;
 
 import java.util.List;
 

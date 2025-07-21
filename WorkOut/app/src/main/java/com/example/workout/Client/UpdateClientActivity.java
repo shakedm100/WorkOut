@@ -10,16 +10,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.workout.LoginActivity;
 import com.example.workout.MainActivity;
 import com.example.workout.R;
-import com.example.workout.RegisterActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -27,12 +23,8 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import Model.Address;
 import Model.City;
 import Model.Client;
-import Model.Gender;
-import Model.Phone;
-import ViewModel.RegisterViewModel;
 import ViewModel.UpdateClientViewModel;
 
 public class UpdateClientActivity extends AppCompatActivity
