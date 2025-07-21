@@ -80,4 +80,10 @@ public class Address implements Parcelable
             return new Address[size];
         }
     };
+
+    @Override
+    public String toString()
+    {
+        return "Address: " + "city: " + city.getName() + ", address: '" + name;
+    }
 }

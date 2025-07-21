@@ -235,6 +235,11 @@ public class GeneralRepository
                     location.getLongitude(), 1);
             if (!addresses.isEmpty())
             {
+                /*String thoroughfare = addresses.get(0).getThoroughfare();
+                City city = new City(addresses.get(0).getLocality());
+                String number = addresses.get(0).getSubThoroughfare();
+                String name = thoroughfare + " " + number;
+                return new Address(city, name);*/
                 String[] split = addresses.get(0).getFeatureName().split("/");
                 String name = "";
                 if(split.length > 0)

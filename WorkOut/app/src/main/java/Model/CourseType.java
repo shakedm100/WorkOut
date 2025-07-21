@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 public enum CourseType
 {
     Solo,
-    Dou,
+    Duo,
     Group;
 
     /** Try to map a free‐form string into one of the enum constants. */

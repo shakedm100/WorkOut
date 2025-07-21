@@ -86,4 +86,10 @@ public class Phone implements Parcelable {
     {
         return Objects.hash(prefix, number);
     }
+
+    @Override
+    public String toString()
+    {
+        return "Phone: " + prefix.getCode() + "-" + number;
+    }
 }

@@ -39,7 +39,10 @@
         app:layout_constraintTop_toBottomOf="@id/rateBusinessText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"/>
+        android:layout_marginTop="24dp"
+        android:progressTint="@color/deep_yellow"
+        android:secondaryProgressTint="@color/deep_yellow"
+        android:indeterminateTint="@color/deep_yellow"/>
 
     <EditText
         android:id="@+id/commentEditText"

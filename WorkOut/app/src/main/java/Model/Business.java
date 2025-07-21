@@ -206,6 +206,21 @@ public class Business extends User implements Parcelable
         return false;
     }
 
+    public float averageRating()
+    {
+        if(ratings == null || ratings.isEmpty())
+            return 0;
+
+        float sum = 0;
+
+        for(Rating rating : ratings)
+        {
+            sum += rating.getStars();
+        }
+
+        return sum / ratings.size();
+    }
+
     public boolean addFollower(Client follower)
     {
         if(followers == null)

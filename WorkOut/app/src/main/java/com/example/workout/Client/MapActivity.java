@@ -2,6 +2,8 @@ package com.example.workout.Client;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,20 +20,34 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import android.Manifest;
 
+import android.os.Parcelable;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
+import Model.Address;
 import Model.Business;
 import Model.Client;
 import Model.Course;
 import Model.Location;
 import Model.Repository.BusinessRepository;
+import Model.Repository.CourseRepository;
+import Model.Repository.GeneralRepository;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -87,7 +103,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         client = getIntent().getParcelableExtra("client");
         courses = getIntent().getParcelableArrayListExtra("course_list");
         businessesFromCourses = new ArrayList<>();
-        if(courses == null)
+        if (courses == null)
         {
             isFromSearch = false;
             courses = new ArrayList<>();
@@ -157,6 +173,103 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     {
         this.googleMap = map;
         enableMyLocation();
+
+        try
+        {
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style));
+            if (!success)
+            {
+                Log.e("MapActivity", "Style parsing failed.");
+            }
+        }
+        catch (Resources.NotFoundException e)
+        {
+            Log.e("MapActivity", "Can't find map style.", e);
+        }
+
+        // listen for marker taps
+        googleMap.setOnMarkerClickListener(marker ->
+        {
+            Business biz = (Business) marker.getTag();
+            if (biz != null)
+            {
+                showBusinessInfoBottomSheet(biz);
+                return true;    // consume the event (won’t also center/zoom)
+            }
+            return false;     // fallback to default behavior
+        });
+    }
+
+    private void showBusinessInfoBottomSheet(Business business)
+    {
+        // Create the BottomSheetDialog
+        BottomSheetDialog sheet = new BottomSheetDialog(this);
+        // Inflate your layout
+        View view = getLayoutInflater()
+                .inflate(R.layout.bottom_sheet_business_info, null);
+        // Populate fields
+        TextView nameTextView = view.findViewById(R.id.map_bottom_business_name);
+        TextView cityTextView = view.findViewById(R.id.map_bottom_business_city);
+        TextView addressTextView = view.findViewById(R.id.map_bottom_business_address);
+        TextView phoneTextView = view.findViewById(R.id.map_bottom_business_phone);
+        RatingBar ratingBar = view.findViewById(R.id.map_bottom_business_ratingbar);
+        TextView ratingCountTextView = view.findViewById(R.id.map_bottom_business_rating_count);
+        TextView coursesListTextView = view.findViewById(R.id.map_bottom_business_courses);
+        Button courseSignUpButton = view.findViewById(R.id.map_bottom_sign_up_button);
+
+        nameTextView.setText(business.getBusinessName());
+        GeneralRepository generalRepository = new GeneralRepository();
+        Geocoder geocoder = new Geocoder(this);
+        Address address = generalRepository.convertLocationToAddress(geocoder, business.getLocation());
+        String cityText = "City: " + address.getCity().getName();
+        cityTextView.setText(cityText);
+        String addressText = "Address: " + address.getName();
+        addressTextView.setText(addressText);
+        phoneTextView.setText(business.getPhone().toString());
+        ratingBar.setRating(business.averageRating());
+
+        int ratingsCount = business.getRatings() != null ? business.getRatings().size() : 0;
+        String ratingCountText = "(" + ratingsCount + ")";
+        ratingCountTextView.setText(ratingCountText);
+
+        StringBuilder courses = new StringBuilder().append("Courses: ");
+        boolean firstIteration = true;
+        for (Course course : business.getCourses())
+        {
+            if (firstIteration)
+            {
+                courses.append(course.getName());
+                firstIteration = false;
+            }
+            else
+            {
+                courses.append(", " + course.getName());
+            }
+        }
+
+        coursesListTextView.setText(courses);
+
+        // Set click-listeners on buttons inside the sheet
+        courseSignUpButton.setOnClickListener(v ->
+        {
+            CourseRepository courseRepository = new CourseRepository();
+            courseRepository.getAllBusinessesCourses(business).addOnSuccessListener(courseList ->
+            {
+                Intent intent = new Intent(this, SearchResultsActivity.class);
+                intent.putExtra("client", client);
+                intent.putParcelableArrayListExtra("course_list", (ArrayList<Course>) courseList);
+                startActivity(intent);
+            }).addOnFailureListener(error ->
+            {
+                //TODO: Add error handling
+            });
+
+        });
+
+        // Set content and show
+        sheet.setContentView(view);
+        sheet.show();
     }
 
     private void showNearbyBusinesses()
@@ -172,14 +285,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         {
             for (Business current : businesses)
             {
-                if(existInBusinessesFromCourses(current) || !isFromSearch)
+                if (existInBusinessesFromCourses(current) || !isFromSearch)
                 {
                     Location location = current.getLocation();
                     LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position);
                     markerOptions.title(current.getBusinessName());
-                    googleMap.addMarker(markerOptions);
+                    Marker marker = googleMap.addMarker(markerOptions);
+                    if (marker != null)
+                        marker.setTag(current);
                 }
             }
         });
@@ -187,9 +302,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private boolean existInBusinessesFromCourses(Business business)
     {
-        for(Business current : businessesFromCourses)
+        for (Business current : businessesFromCourses)
         {
-            if(business.getId().equals(current.getId()))
+            if (business.getId().equals(current.getId()))
                 return true;
         }
 
@@ -205,7 +320,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST);
-        } else
+        }
+        else
         {
             // Disable google's UI button because you can't align it where you want
             // And because it's stupid

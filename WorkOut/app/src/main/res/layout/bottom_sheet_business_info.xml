@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/map_bottom_business_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Business Name"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <RatingBar
+            android:id="@+id/map_bottom_business_ratingbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:stepSize="0.5"
+            android:numStars="5"
+            android:rating="4.0"
+            android:isIndicator="true"
+            style="?android:attr/ratingBarStyleSmall"
+            android:progressTint="@color/deep_yellow"
+            android:secondaryProgressTint="@color/deep_yellow"
+            android:indeterminateTint="@color/deep_yellow"
+            />
+
+        <TextView
+            android:id="@+id/map_bottom_business_rating_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="(0)"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/map_bottom_business_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="NYC"/>
+
+    <TextView
+        android:id="@+id/map_bottom_business_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="123 Main St."/>
+
+    <TextView
+        android:id="@+id/map_bottom_business_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="(555) 123-4567"/>
+
+    <TextView
+        android:id="@+id/map_bottom_business_courses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Courses list"/>
+
+    <Button
+        android:id="@+id/map_bottom_sign_up_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/azure"
+        android:text="SHOW ALL COURSES"/>
+
+</LinearLayout>
