@@ -177,7 +177,7 @@ public class SearchResultsActivity extends AppCompatActivity
                 });
             });
 
-            // 3) “Review” button (initially GONE) ---
+            // “Review” button (initially GONE) ---
             Button reviewBtn = new Button(SearchResultsActivity.this);
             reviewBtn.setText("Review");
             reviewBtn.setVisibility(View.GONE);

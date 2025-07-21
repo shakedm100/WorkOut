@@ -39,8 +39,8 @@ public class Location implements Parcelable
 
     protected Location(Parcel in)
     {
-        longitude = in.readLong();
-        latitude = in.readLong();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
     }
 
     @Override
