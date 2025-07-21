@@ -35,9 +35,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import Model.Address;
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
+import Model.City;
 import Model.Course;
 import Model.CourseType;
 import Model.Day;
@@ -405,11 +407,12 @@ public class AddOrEditClassActivity extends AppCompatActivity
 
     public void setTestingConditions(CourseRepository repo, Course course)
     {
+        Address address = new Address(new City("Jerusalem"), "HaPalmach 25");
         this.courseRepository = repo;
         Phone phone = new Phone(PhonePrefix.PREFIX_052, "5265777");
         this.currentBusiness = new Business("dDb83EeEReSetVP9SiT7", "poolBob",
                 phone, "bob@pool.com", "Bob’s Pool",
-                new Location(31.7683, 35.2137), "SwimSafe Policy");
+                new Location(31.7683, 35.2137), "SwimSafe Policy", address);
         this.currentCourse = course;
         startTime = LocalTime.of(14,30);
         endTime = LocalTime.of(16,0);

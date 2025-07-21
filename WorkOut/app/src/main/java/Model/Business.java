@@ -15,13 +15,15 @@ public class Business extends User implements Parcelable
     private ArrayList<Client> followers;
     private ArrayList<Rating> ratings;
     private String policy;
+    private Address address;
 
     public Business()
     {
     }
 
     public Business(String id, String username, Phone phone, String email, String businessName,
-                    ArrayList<Course> courses, Location location, ArrayList<Client> followers, ArrayList<Rating> ratings, String policy)
+                    ArrayList<Course> courses, Location location, ArrayList<Client> followers,
+                    ArrayList<Rating> ratings, String policy, Address address)
     {
         super(id, username, phone, email);
         this.businessName = businessName;
@@ -30,10 +32,11 @@ public class Business extends User implements Parcelable
         this.followers = followers;
         this.ratings = ratings;
         this.policy = policy;
+        this.address = address;
     }
 
     public Business(String id, String username, Phone phone, String email, String businessName,
-                    Location location, String policy)
+                    Location location, String policy, Address address)
     {
         super(id, username, phone, email);
         this.businessName = businessName;
@@ -42,6 +45,7 @@ public class Business extends User implements Parcelable
         this.followers = new ArrayList<>();
         this.ratings = new ArrayList<>();
         this.policy = policy;
+        this.address = address;
     }
 
     public String getBusinessName()
@@ -74,6 +78,11 @@ public class Business extends User implements Parcelable
         return policy;
     }
 
+    public Address getAddress()
+    {
+        return address;
+    }
+
     public void setBusinessName(String businessName)
     {
         this.businessName = businessName;
@@ -104,6 +113,11 @@ public class Business extends User implements Parcelable
         this.policy = policy;
     }
 
+    public void setAddress(Address address)
+    {
+        this.address = address;
+    }
+
     protected Business(Parcel in)
     {
         super(in);
@@ -113,6 +127,7 @@ public class Business extends User implements Parcelable
         ratings = in.createTypedArrayList(Rating.CREATOR);
         policy = in.readString();
         location = in.readParcelable(Location.class.getClassLoader());
+        address = in.readParcelable(Address.class.getClassLoader());
     }
 
     @Override
@@ -125,6 +140,7 @@ public class Business extends User implements Parcelable
         dest.writeTypedList(ratings);
         dest.writeString(policy);
         dest.writeParcelable(location, flags);
+        dest.writeParcelable(address, flags);
     }
 
     @Override

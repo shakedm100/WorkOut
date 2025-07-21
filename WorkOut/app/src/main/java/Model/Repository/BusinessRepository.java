@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import Model.Address;
 import Model.Business;
 import Model.Client;
 import Model.Location;
@@ -47,7 +48,7 @@ public class BusinessRepository
 
     public Task<Business> insertBusiness(String username, String password, Phone phone, String email,
                                          String businessName, Location location,
-                                         String policy)
+                                         String policy, Address address)
     {
         return generalRepository.canRegisterUser(collection, username, email).continueWithTask(checkTask ->
         {
@@ -81,6 +82,7 @@ public class BusinessRepository
                 business.put("ratings", new ArrayList<>()); // No ratings for new business
                 business.put("followers", new ArrayList<>()); // No followers for new business
                 business.put("policy", policy);
+                business.put("address", address);
 
                 return db.collection(collection).document(uid).set(business).continueWith(addTask ->
                 {
@@ -89,7 +91,7 @@ public class BusinessRepository
                         throw Objects.requireNonNull(addTask.getException());
                     }
                     return new Business(uid, username, phone, email, businessName, new ArrayList<>(), location,
-                            new ArrayList<>(), new ArrayList<>(), policy);
+                            new ArrayList<>(), new ArrayList<>(), policy, address);
                 });
             });
     }

@@ -32,16 +32,6 @@ public class GeneralRepositoryTest
     }
 
     @Test
-    public void convertLocationToAddressTest()
-    {
-        Location l = new Location( 34.978001, 32.082981);
-        Geocoder g = new Geocoder(context, new Locale("he", "IL"));
-        Address theAddress = generalRepository.convertLocationToAddress(g,l);
-        assertEquals("חיים הרצוג", theAddress.getName());
-        assertEquals("ראש העין", theAddress.getCity().getName());
-    }
-
-    @Test
     public void convertAddressToLocationTest()
     {
         City city = new City("ראש העין");

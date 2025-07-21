@@ -219,12 +219,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Button courseSignUpButton = view.findViewById(R.id.map_bottom_sign_up_button);
 
         nameTextView.setText(business.getBusinessName());
-        GeneralRepository generalRepository = new GeneralRepository();
-        Geocoder geocoder = new Geocoder(this);
-        Address address = generalRepository.convertLocationToAddress(geocoder, business.getLocation());
-        String cityText = "City: " + address.getCity().getName();
+        String cityText = "City: " + business.getAddress().getCity().getEnglishName();
         cityTextView.setText(cityText);
-        String addressText = "Address: " + address.getName();
+        String addressText = "Address: " + business.getAddress().getName();
         addressTextView.setText(addressText);
         phoneTextView.setText(business.getPhone().toString());
         ratingBar.setRating(business.averageRating());

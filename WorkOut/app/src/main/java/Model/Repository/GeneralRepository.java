@@ -227,37 +227,6 @@ public class GeneralRepository
         return null; // Invalid address
     }
 
-    public Address convertLocationToAddress(Geocoder geocoder, Location location)
-    {
-        try
-        {
-            List<android.location.Address> addresses = geocoder.getFromLocation(location.getLatitude(),
-                    location.getLongitude(), 1);
-            if (!addresses.isEmpty())
-            {
-                /*String thoroughfare = addresses.get(0).getThoroughfare();
-                City city = new City(addresses.get(0).getLocality());
-                String number = addresses.get(0).getSubThoroughfare();
-                String name = thoroughfare + " " + number;
-                return new Address(city, name);*/
-                String[] split = addresses.get(0).getFeatureName().split("/");
-                String name = "";
-                if(split.length > 0)
-                {
-                    name = split[0];
-                    City city = new City(addresses.get(0).getLocality());
-                    return new Address(city, name);
-                }
-            }
-
-            return null;
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Invalid location");
-        }
-    }
-
 
 
 //    public static boolean isAddressValid(Context context, String addressStr) {

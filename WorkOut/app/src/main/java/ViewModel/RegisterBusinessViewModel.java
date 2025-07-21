@@ -165,7 +165,7 @@ public class RegisterBusinessViewModel extends ViewModel
         }
 
         // all fields are valid -> try to insert
-        businessRepository.insertBusiness(username, password, phone, email, businessName, location, policy)
+        businessRepository.insertBusiness(username, password, phone, email, businessName, location, policy, address)
                 .addOnSuccessListener(business ->
                 {
                     registerUiState.postValue(GenericUiState.success("Register success!"));
