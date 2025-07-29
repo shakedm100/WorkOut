@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.googleid)
     implementation(libs.play.services.location)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -105,5 +106,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation ("androidx.core:core-ktx:1.16.0")
 
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation("com.google.firebase:firebase-inappmessaging-display")
+    implementation("com.google.firebase:firebase-analytics")
 }

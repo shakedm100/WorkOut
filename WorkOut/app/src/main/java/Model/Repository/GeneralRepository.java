@@ -3,6 +3,7 @@ package Model.Repository;
 import android.location.Geocoder;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,13 +22,14 @@ import Model.PhonePrefix;
 
 //import android.location.Address;
 import android.content.Context;
+import android.util.Log;
+
 import java.util.Locale;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 
 public class GeneralRepository
 {
-
     FirebaseFirestore db;
 
     public GeneralRepository()
@@ -250,6 +252,29 @@ public class GeneralRepository
         catch (IOException e)
         {
             throw new RuntimeException("Invalid location");
+        }
+    }
+
+    /**
+     * Uploads the token to the database.
+     * @param token the new token of the current user.
+     */
+    public void uploadTokenToFirestore(String token) {
+        db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        if (auth.getCurrentUser() != null)
+        {
+            String userId = auth.getCurrentUser().getUid();
+            db.collection("clients").document(userId)
+                    .update("fcmToken", token)
+                    .addOnSuccessListener(aVoid -> Log.d("FCM", "Token saved"))
+                    .addOnFailureListener(e -> Log.w("FCM", "Error saving token", e));
+        }
+
+        else
+        {
+            Log.w("FCM", "User not logged in. Cannot upload token.");
         }
     }
 

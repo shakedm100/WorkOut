@@ -2,6 +2,10 @@ package com.example.workout.Business;
 
 import static com.google.android.gms.tasks.Tasks.await;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -46,6 +50,15 @@ import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.CourseRepository;
 import Model.Schedule;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+
+import android.os.Build;
+import android.content.Context;
+
 
 public class AddOrEditClassActivity extends AppCompatActivity
 {
@@ -96,6 +109,9 @@ public class AddOrEditClassActivity extends AppCompatActivity
         initialHour = 12;
         initialMinute = 0;
 
+//        requestNotificationPermission();
+//        createNotificationChannel();
+
         createCourseTypeSpinner();
         createCategorySpinner();
         createAgeSlider();
@@ -136,12 +152,18 @@ public class AddOrEditClassActivity extends AppCompatActivity
         deleteButton.setOnClickListener(v -> {
             courseRepository.deleteCourse(currentCourse, currentBusiness)
                     .addOnSuccessListener(result -> {
-                        if (Boolean.TRUE.equals(result)) {
+                        if (Boolean.TRUE.equals(result))
+                        {
+                            // send a cancellation notification to all the participants
+                            if (currentCourse.getParticipants().size() > 0)
+                            {
+                                // TODO:create a notification
+                            }
                             Toast.makeText(this, "Successfully deleted the course", Toast.LENGTH_LONG).show();
                             buildCourseFromFieldsAndQuery(true);
                         } else {
                             Toast.makeText(this, "Failed to delete the course", Toast.LENGTH_LONG).show();
-                            // TODO: Show error on screen
+                            // TODO: Show error on screen - create a view model
                         }
                     })
                     .addOnFailureListener(this, e -> {
@@ -415,4 +437,42 @@ public class AddOrEditClassActivity extends AppCompatActivity
         endTime = LocalTime.of(16,0);
         isTest = true;
     }
+
+    // notifications
+    /*
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "MyChannel";
+            String description = "My Notification Channel";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("my_channel_id", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+    }
+
+    private void showNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "my_channel_id")
+                .setSmallIcon(R.drawable.notification_icon) // make sure this icon exists
+                .setContentTitle("Hello")
+                .setContentText("This is a test notification.")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1001, builder.build());
+    }
+
+     */
 }
