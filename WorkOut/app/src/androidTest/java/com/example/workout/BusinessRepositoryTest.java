@@ -18,7 +18,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import Model.Address;
 import Model.Business;
+import Model.City;
 import Model.Client;
 import Model.Gender;
 import Model.Location;
@@ -67,6 +69,7 @@ public class BusinessRepositoryTest
     private Phone testPhone;
     private Location testLocation;
     private BusinessRepository repo;
+    private Address address;
 
     @Before
     public void setUp()
@@ -79,6 +82,7 @@ public class BusinessRepositoryTest
         when(mockCollection.document(anyString())).thenReturn(mockDocument);
         // init repository
         repo = new BusinessRepository(mockDb, mockAuth, mockGeneralRepo);
+        address = new Address(new City("Tev Aviv"), "Even Gvirol");
     }
 
     // --- INSERT BUSINESS ---
@@ -87,7 +91,7 @@ public class BusinessRepositoryTest
     {
         Business business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         // Auth stub
         when(mockGeneralRepo.canRegisterUser(anyString(), anyString(), anyString())).thenReturn(Tasks.forResult(false));
         AuthResult authRes = mock(AuthResult.class);
@@ -103,7 +107,7 @@ public class BusinessRepositoryTest
                 repo.insertBusiness(
                         business.getUsername(), "123456", business.getPhone(),
                         business.getEmail(), "EasyBusy", business.getLocation(),
-                        business.getPolicy()), 5, TimeUnit.SECONDS);
+                        business.getPolicy(), business.getAddress()), 5, TimeUnit.SECONDS);
 
         assertNotNull(result);
         assertEquals("bid", result.getId());
@@ -127,7 +131,7 @@ public class BusinessRepositoryTest
             Tasks.await(repo.insertBusiness(
                     "testEverything", "123456", testPhone,
                     "dup@mail.com", "EasyBusy", testLocation,
-                    "Policy"), 5, TimeUnit.SECONDS);
+                    "Policy", address), 5, TimeUnit.SECONDS);
             fail("Expected ExecutionException");
         }
         catch (ExecutionException ee)
@@ -155,7 +159,7 @@ public class BusinessRepositoryTest
         DocumentSnapshot snap = mock(DocumentSnapshot.class);
         Business stored = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         when(snap.toObject(Business.class)).thenReturn(stored);
         when(snap.getId()).thenReturn("bid");
         when(mockDocument.get()).thenReturn(forResult(snap));
@@ -194,9 +198,10 @@ public class BusinessRepositoryTest
     @Test
     public void updateBusinessByID_success() throws Exception
     {
+        Address address = new Address(new City("Tev Aviv"), "Even Gvirol");
         Business business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         when(mockDocument.set(business))
                 .thenReturn(forResult(null));
 
@@ -209,7 +214,7 @@ public class BusinessRepositoryTest
     {
         Business business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         when(mockDocument.set(business))
                 .thenReturn(forException(new RuntimeException("update failed")));
 
@@ -223,7 +228,7 @@ public class BusinessRepositoryTest
     {
         Business business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         FirebaseUser user = mock(FirebaseUser.class);
         when(mockAuth.getCurrentUser()).thenReturn(user);
         when(user.getUid()).thenReturn("otherBid");
@@ -254,7 +259,7 @@ public class BusinessRepositoryTest
     {
         Business business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         FirebaseUser user = mock(FirebaseUser.class);
         when(mockAuth.getCurrentUser()).thenReturn(user);
         when(user.getUid()).thenReturn("bid");
@@ -273,7 +278,7 @@ public class BusinessRepositoryTest
         BusinessRepository spyRepo = spy(repo);
         Business business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", address);
         doReturn(Tasks.forResult(business))
                 .when(spyRepo)
                 .getBusinessByUsername(eq("testEverything"));
