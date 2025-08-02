@@ -12,23 +12,16 @@ import com.example.workout.MainActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.lang.reflect.Array;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import Adapters.CourseAdapter;
 import Model.Client;
 import Model.Course;
-import Model.Day;
 import Model.Enrollment;
 import Model.Repository.CourseRepository;
 
@@ -48,7 +41,7 @@ public class CalendarActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.calendar_page);
+        setContentView(R.layout.activity_calendar);
 
         client = getIntent().getParcelableExtra("client");
 

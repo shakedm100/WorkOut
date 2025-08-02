@@ -13,7 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +35,7 @@ public class BusinessCalendarActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.calendar_business);
+        setContentView(R.layout.activity_calendar_business);
 
         calendarView = findViewById(R.id.calendarView);
         courseRecyclerView = findViewById(R.id.courseRecyclerView);

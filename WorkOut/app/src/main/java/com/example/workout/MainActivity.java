@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_page); // Choose the correct XML
+        setContentView(R.layout.activity_home); // Choose the correct XML
 
         Client client = getIntent().getParcelableExtra("client");
 

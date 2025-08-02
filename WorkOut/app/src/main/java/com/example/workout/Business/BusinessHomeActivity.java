@@ -17,7 +17,7 @@ public class BusinessHomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.business_home);
+        setContentView(R.layout.activity_business_home);
 
         Business business = getIntent().getParcelableExtra("business");
 

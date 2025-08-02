@@ -22,7 +22,7 @@ public class GalleryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.gallery_business);
+        setContentView(R.layout.activity_gallery_business);
 
         recyclerView = findViewById(R.id.galleryRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3)); // 3 עמודות

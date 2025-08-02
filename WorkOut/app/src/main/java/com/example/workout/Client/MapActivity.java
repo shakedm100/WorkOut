@@ -35,8 +35,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 import Model.Business;
@@ -71,7 +69,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.map_page);
+        setContentView(R.layout.activity_map);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null)
@@ -240,7 +238,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         BottomSheetDialog sheet = new BottomSheetDialog(this);
         // Inflate your layout
         View view = getLayoutInflater()
-                .inflate(R.layout.bottom_sheet_business_info, null);
+                .inflate(R.layout.item_bottom_sheet_business_info, null);
         // Populate fields
         TextView nameTextView = view.findViewById(R.id.map_bottom_business_name);
         TextView cityTextView = view.findViewById(R.id.map_bottom_business_city);

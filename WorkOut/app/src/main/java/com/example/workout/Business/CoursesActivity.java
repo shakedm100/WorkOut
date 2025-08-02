@@ -34,7 +34,7 @@ public class CoursesActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.classes_business);
+        setContentView(R.layout.activity_classes_business);
 
         business = getIntent().getParcelableExtra("business");
 

@@ -40,7 +40,7 @@ public class BusinessRegisterActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registration_business);
+        setContentView(R.layout.activity_registration_business);
 
         editTextEmail = findViewById(R.id.emailText);
         editTextPassword = findViewById(R.id.passwordText);
