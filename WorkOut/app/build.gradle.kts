@@ -79,6 +79,10 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.googleid)
     implementation(libs.play.services.location)
+    implementation(fileTree(mapOf(
+        "dir" to "C:\\Users\\Shaked\\AppData\\Local\\Android\\Sdk\\platforms\\android-35",
+        "include" to listOf("*.aar", "*.jar")
+    )))
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

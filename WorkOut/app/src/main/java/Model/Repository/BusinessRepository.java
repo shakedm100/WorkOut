@@ -25,6 +25,9 @@ import Model.Phone;
 import Model.Rating;
 import Model.SearchStrategies.SearchStrategyInterface;
 
+/**
+ * This class is responsible for
+ */
 public class BusinessRepository
 {
     private final FirebaseFirestore db;
@@ -32,6 +35,9 @@ public class BusinessRepository
     private final GeneralRepository generalRepository;
     private final String collection = "businesses";
 
+    /**
+     * The regular constructor for this repository
+     */
     public BusinessRepository()
     {
         db = FirebaseFirestore.getInstance();
