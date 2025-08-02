@@ -48,7 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration_page);
+        setContentView(R.layout.activity_registration_client);
 
         // Initialize ViewModel (Using a Factory is good practice if ViewModel has dependencies)
         // For ClientRepository, it's good to pass it via factory for testability.

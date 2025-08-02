@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:text="username"
+        android:text=""
         android:textColor="@color/black"
         android:textSize="34sp"
         android:textStyle="bold"
@@ -89,7 +89,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:backgroundTint="@color/background"
-        android:text="History"
+        android:text="@string/history"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/notificationsButton" />
@@ -102,7 +102,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:backgroundTint="@color/background"
-        android:text="Logout"
+        android:text="@string/logout"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/historyButton" />

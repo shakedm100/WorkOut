@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:gravity="start|top"
             android:padding="8dp"
-            android:text="messages"
+            android:text="@string/messages"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="#000000"
             android:textSize="18sp"

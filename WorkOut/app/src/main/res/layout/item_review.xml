@@ -15,6 +15,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginEnd="16dp"
+            android:contentDescription="@string/profile_image"
             android:src="@drawable/profile_icon"
             android:scaleType="centerCrop" />
 
@@ -28,7 +29,7 @@
                 android:id="@+id/textUsername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username"
+                android:text="@string/username"
                 android:textStyle="bold"
                 android:textSize="16sp" />
 
@@ -36,7 +37,7 @@
                 android:id="@+id/textReview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="This is the customer's review..."
+                android:text="@string/this_is_the_customer_s_review"
                 android:textSize="14sp"
                 android:layout_marginTop="4dp" />
 

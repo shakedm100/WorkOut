@@ -10,7 +10,7 @@
         android:id="@+id/map_bottom_business_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Business Name"
+        android:text="@string/business_name"
         android:textSize="18sp"
         android:textStyle="bold"/>
 
@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="(0)"
+            android:text="@string/_0"
             android:textSize="14sp"/>
     </LinearLayout>
 
@@ -50,35 +50,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="NYC"/>
+        android:text="@string/nyc"/>
 
     <TextView
         android:id="@+id/map_bottom_business_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="123 Main St."/>
+        android:text="@string/_123_main_st"/>
 
     <TextView
         android:id="@+id/map_bottom_business_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="(555) 123-4567"/>
+        android:text="@string/_555_123_4567"/>
 
     <TextView
         android:id="@+id/map_bottom_business_courses"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Courses list"/>
+        android:text="@string/courses_list"/>
 
     <TextView
         android:id="@+id/map_bottom_business_policy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Policy: "/>
+        android:text="@string/policy_input"/>
 
 
     <Button
@@ -87,6 +87,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/azure"
-        android:text="SHOW ALL COURSES"/>
+        android:text="@string/show_all_courses"/>
 
 </LinearLayout>

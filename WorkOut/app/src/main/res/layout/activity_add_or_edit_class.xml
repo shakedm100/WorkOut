@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="24dp">
 
     <LinearLayout
@@ -16,21 +17,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Class Name" />
+            tools:ignore="Autofill"
+            android:inputType="text"
+            android:hint="@string/class_name" />
 
         <Spinner
             android:id="@+id/courseTypeSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Class Type" />
+            android:hint="@string/class_type" />
 
         <Spinner
             android:id="@+id/categorySpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Category" />
+            android:hint="@string/category" />
 
         <Spinner
             android:id="@+id/dayOfWeekSpinner"
@@ -38,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:id="@+id/timePickerRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,6 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/azure"
+                tools:ignore="HardcodedText"
                 android:text="Select Start \n Time" />
 
             <Space
@@ -63,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/azure"
+                tools:ignore="HardcodedText"
                 android:text="Select End \n Time" />
 
         </LinearLayout>
@@ -80,7 +85,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Total Capacity"
+            tools:ignore="autofill"
+            android:hint="@string/total_capacity"
             android:inputType="numberSigned" />
 
         <!-- Dummy comment -->
@@ -89,7 +95,8 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:ems="10"
-            android:hint="Course Description"
+            tools:ignore="autofill"
+            android:hint="@string/course_description"
             android:inputType="text" />
 
         <Button
@@ -98,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:backgroundTint="@color/background"
-            android:text="Save"
+            android:text="@string/save"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/black"
             android:textSize="20sp"
@@ -110,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:backgroundTint="@color/background"
-            android:text="Delete"
+            android:text="@string/delete"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/black"
             android:textSize="20sp"

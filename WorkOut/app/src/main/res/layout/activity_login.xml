@@ -11,6 +11,7 @@
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="92dp"
+        android:contentDescription="@string/login"
         android:src="@color/background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.875"
@@ -24,7 +25,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="60dp"
         android:labelFor="@id/usernameTextLogin"
-        android:text="Username:"
+        android:text="@string/username_input"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +62,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="40dp"
         android:labelFor="@id/passwordTextLogin"
-        android:text="Password:"
+        android:text="@string/password"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
-        android:text="Login"
+        android:text="@string/login"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="40sp"
         android:textStyle="bold|italic"
@@ -88,7 +89,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="72dp"
-        android:text="Or sign in with google:"
+        android:text="@string/or_sign_in_with_google"
         android:textSize="20sp"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,7 +103,7 @@
         android:layout_marginTop="20dp"
         android:autofillHints="google register"
         android:background="@drawable/google_logo"
-        android:contentDescription="google sign in"
+        android:contentDescription="@string/google_sign_in"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/googleOptionLabel" />
 
@@ -112,7 +113,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Don't have an account? Sign up as"
+        android:text="@string/don_t_have_an_account_sign_up_as"
         android:textSize="20sp"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
@@ -125,7 +126,7 @@
         android:layout_marginStart="150dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="#00A3A3A3"
-        android:text="Register"
+        android:text="@string/register"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="#000000"
         android:textColorLink="@color/black"
@@ -140,7 +141,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="44dp"
         android:backgroundTint="@color/background"
-        android:text="Login"
+        android:text="@string/login"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.486"
@@ -176,14 +177,14 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Client" />
+            android:text="@string/client" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/toggle_business"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Business" />
+            android:text="@string/business" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -193,7 +194,7 @@
         android:layout_height="41dp"
         android:layout_marginTop="22dp"
         android:layout_marginEnd="70dp"
-        android:text="TextView"
+        android:text=""
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginButton"

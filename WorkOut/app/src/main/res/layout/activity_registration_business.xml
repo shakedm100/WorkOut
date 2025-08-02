@@ -12,6 +12,7 @@
         android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:contentDescription="@string/register"
         android:src="@color/background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +39,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="44dp"
         android:labelFor="@id/phoneText"
-        android:text="Phone:"
+        android:text="@string/phone"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +52,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="37dp"
         android:labelFor="@id/nameText"
-        android:text="Name:"
+        android:text="@string/name"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +65,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="44dp"
         android:labelFor="@id/emailText"
-        android:text="Email:"
+        android:text="@string/email"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +78,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="28dp"
         android:labelFor="@id/passwordText"
-        android:text="Password:"
+        android:text="@string/password"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -90,7 +91,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="160dp"
         android:labelFor="@id/usernameText"
-        android:text="Username:"
+        android:text="@string/username_input"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -107,7 +108,7 @@
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:hint="username" />
+        tools:hint="Username" />
 
     <EditText
         android:id="@+id/nameText"
@@ -115,7 +116,9 @@
         android:layout_height="48dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="28dp"
+        android:autofillHints="name"
         android:ems="10"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordText" />
 
@@ -138,12 +141,12 @@
         android:layout_height="48dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="28dp"
-        android:autofillHints="emailAddress"
+        android:autofillHints="email"
         android:ems="10"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameText"
-        tools:hint="email@gmail.com" />
+        tools:hint="address@email.com" />
 
     <EditText
         android:id="@+id/phoneText"
@@ -156,21 +159,18 @@
         android:inputType="phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailText"
-        tools:hint="phone" />
+        tools:hint="Phone number" />
 
     <TextView
         android:id="@+id/AddressTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="36dp"
         android:labelFor="@id/addressText"
-        android:text="Address:"
+        android:text="@string/address"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/addressText"
-        app:layout_constraintHorizontal_bias="0.06"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/cityTextView"
         app:layout_constraintTop_toBottomOf="@+id/cityTextView" />
 
     <TextView
@@ -180,7 +180,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="40dp"
         android:labelFor="@id/cityAutoComplete"
-        android:text="City:"
+        android:text="@string/city"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -190,16 +190,12 @@
         android:id="@+id/policyTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="72dp"
         android:labelFor="@id/addressText"
-        android:text="Policy:"
+        android:text="@string/policy_input"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/policyText"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/AddressTextView"
         app:layout_constraintTop_toBottomOf="@+id/AddressTextView" />
 
     <EditText
@@ -213,7 +209,7 @@
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cityAutoComplete"
-        tools:hint="address" />
+        tools:hint="Address" />
 
     <Button
         android:id="@+id/registrationButton"
@@ -221,7 +217,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="96dp"
         android:backgroundTint="@color/background"
-        android:text="Register"
+        android:text="@string/register"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -245,7 +241,7 @@
         android:layout_height="57dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="28dp"
-        android:hint="Enter the name of city"
+        android:hint="@string/enter_the_name_of_city"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneText" />
 
@@ -264,7 +260,8 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="28dp"
         android:ems="10"
-        android:hint="policy"
+        tools:ignore="autofill"
+        android:hint="@string/example_no_refunds_24_hours_before_class"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressText" />
@@ -275,7 +272,7 @@
         android:layout_height="62dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="36dp"
-        android:text="TextView"
+        android:text=""
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/progressBar"
         app:layout_constraintTop_toBottomOf="@+id/registrationButton"
