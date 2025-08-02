@@ -26,7 +26,13 @@ import Model.Rating;
 import Model.SearchStrategies.SearchStrategyInterface;
 
 /**
- * This class is responsible for
+ * Repository for managing {@link Business} entities in Firestore, including
+ * creation, updates, deletions, queries and login flows.
+ * <p>
+ * Internally uses {@link FirebaseFirestore} for data storage,
+ * {@link FirebaseAuth} for authentication, and delegates
+ * some checks to a {@link GeneralRepository}.
+ * </p>
  */
 public class BusinessRepository
 {
@@ -36,7 +42,9 @@ public class BusinessRepository
     private final String collection = "businesses";
 
     /**
-     * The regular constructor for this repository
+     * Default constructor initializes with the singleton instances of
+     * {@link FirebaseFirestore}, {@link FirebaseAuth} and a new
+     * {@link GeneralRepository}.
      */
     public BusinessRepository()
     {
@@ -45,6 +53,14 @@ public class BusinessRepository
         generalRepository = new GeneralRepository();
     }
 
+    /**
+     * Test‐and‐dependency injection constructor.
+     * Used primarily for mock testing
+     *
+     * @param db                 FirebaseFirestore instance to use
+     * @param auth               FirebaseAuth instance to use
+     * @param generalRepository  GeneralRepository instance for user‐existence checks
+     */
     public BusinessRepository(FirebaseFirestore db, FirebaseAuth auth, GeneralRepository generalRepository)
     {
         this.db = db;
@@ -52,6 +68,25 @@ public class BusinessRepository
         this.generalRepository = generalRepository;
     }
 
+    /**
+     * Registers a new business user: checks username availability, creates a Firebase
+     * Authentication user, and writes the business record to Firestore.
+     *
+     * @param username      desired unique username
+     * @param password      desired password
+     * @param phone         business phone number
+     * @param email         email address (used for Firebase Auth)
+     * @param businessName  display name of the business
+     * @param location      geographic location of the business
+     * @param policy        business policy text or URL
+     * @param address       physical address details of the business
+     * @return a Task that completes with the newly created {@link Business} object,
+     * or fails with:
+     * <ul>
+     *  <li>{@link IllegalArgumentException} if username already exists;</li>
+     *  <li>any FirebaseAuth or Firestore exception otherwise.</li>
+     * </ul>
+     */
     public Task<Business> insertBusiness(String username, String password, Phone phone, String email,
                                          String businessName, Location location,
                                          String policy, Address address)
@@ -102,6 +137,14 @@ public class BusinessRepository
             });
     }
 
+    /**
+     * Overwrites an existing business document in Firestore with the provided
+     * {@link Business} object.
+     *
+     * @param business the business data to save (must have a valid id)
+     * @return a Task that completes with {@code true} if the update succeeded,
+     * or {@code false} if it failed.
+     */
     public Task<Boolean> updateBusiness(Business business)
     {
         // Get the business's DocumentReference
@@ -112,6 +155,15 @@ public class BusinessRepository
         return currentBusiness.set(business).continueWith(Task::isSuccessful);
     }
 
+    /**
+     * Deletes the currently authenticated business user from both Firestore
+     * and Firebase Authentication.
+     *
+     * @param business the business to delete (its id must match the current user)
+     * @return a Task that completes with {@code true} if the deletion succeeded.
+     * @throws IllegalStateException    if no user is signed in.
+     * @throws IllegalArgumentException if the signed-in user does not match the business id.
+     */
     public Task<Boolean> deleteBusiness(Business business)
     {
         FirebaseUser user = auth.getCurrentUser();
@@ -145,8 +197,16 @@ public class BusinessRepository
         });
     }
 
-    // This method gets the business by the username
-    public Task<Business> getBusinessByUsername(String username) //TODO: Maybe can generalize to user
+    /**
+     * Fetches a {@link Business} by its unique username. Also triggers loading
+     * of the business’s courses in the background.
+     *
+     * @param username the username to query
+     * @return a Task that completes with the found {@code Business},
+     * or fails with {@link IllegalArgumentException} if none found,
+     * or any Firestore exception.
+     */
+    public Task<Business> getBusinessByUsername(String username)
     {
         return db.collection(collection).whereEqualTo("username", username)
                 .limit(1).get().continueWith(task ->
@@ -181,7 +241,22 @@ public class BusinessRepository
                 });
     }
 
-    public Task<Business> checkLogin(String username, String password) //TODO: Maybe can generalize to user
+    /**
+     * Authenticates a business by username and password. First looks up the
+     * {@link Business} record to retrieve its email, then signs in via
+     * {@link FirebaseAuth}.
+     *
+     * @param username the business username
+     * @param password the password to verify
+     * @return a Task that completes with the authenticated {@code Business},
+     * or fails with:
+     * <ul>
+     *  <li>{@link NoSuchElementException} if no such username;</li>
+     *  <li>{@link SecurityException} if the returned UID does not match;</li>
+     *  <li>any Firebase exception otherwise.</li>
+     * </ul>
+     */
+    public Task<Business> checkLogin(String username, String password)
     {
         return getBusinessByUsername(username).continueWithTask(task ->
         {
@@ -215,17 +290,25 @@ public class BusinessRepository
     }
 
     /**
-     * This function is responsible for all the search logic. It receives a generic
-     * SearchInterface that decides how to search and an object that acts as a search filter.
-     * @param searchStrategy dictates how to search
-     * @param data the relative search data
-     * @return a list of businesses that agree with the search terms
+     * Executes a business search using an arbitrary {@link SearchStrategyInterface}.
+     *
+     * @param searchStrategy strategy that knows how to perform the query
+     * @param data arbitrary filter data passed through to the strategy
+     * @return a Task completing with the list of matching businesses.
      */
     public Task<List<Business>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
     {
         return searchStrategy.searchBusinesses(data);
     }
 
+    /**
+     * Looks up, up to 8 businesses whose name begins with the given prefix
+     * (case‐sensitive).
+     *
+     * @param namePrefix non‐empty prefix of businessName
+     * @return a Task completing with the matching list, or {@code null} if the
+     * {@code namePrefix} is empty.
+     */
     public Task<List<Business>> getBusinessesByNamePartially(String namePrefix)
     {
         if(namePrefix.isEmpty())
@@ -260,6 +343,14 @@ public class BusinessRepository
         });
     }
 
+    /**
+     * Retrieves a single {@link Business} document by its Firestore document ID.
+     *
+     * @param id business document ID
+     * @return a Task completing with the found Business,
+     * or fails with {@link NoSuchElementException} if not found,
+     * or any Firestore exception.
+     */
     public Task<Business> getBusinessesById(String id)
     {
         return db.collection(collection).document(id).get().continueWith(task ->
@@ -286,6 +377,14 @@ public class BusinessRepository
         });
     }
 
+    /**
+     * Appends a {@link Rating} to the given {@link Business} and persists the change.
+     *
+     * @param business the target business (must already contain rating list)
+     * @param rating   rating object to add
+     * @return a Task completing with the updated Business,
+     * or rolls back and throws on failure.
+     */
     public Task<Business> addRatingToBusiness(Business business, Rating rating)
     {
         if(!business.addRating(rating))
@@ -303,6 +402,14 @@ public class BusinessRepository
         });
     }
 
+    /**
+     * Removes a {@link Rating} from the given {@link Business} and persists the change.
+     *
+     * @param business the target business
+     * @param rating   rating object to remove
+     * @return a Task completing with the updated Business,
+     * or rolls back and throws on failure.
+     */
     public Task<Business> deleteRatingFromBusiness(Business business, Rating rating)
     {
         if(!business.deleteRating(rating))
@@ -320,6 +427,14 @@ public class BusinessRepository
         });
     }
 
+    /**
+     * Updates an existing {@link Rating} in the given {@link Business} and persists.
+     *
+     * @param business the target business
+     * @param rating   rating object with updated values
+     * @return a Task completing with the updated Business,
+     * or rolls back and throws on failure.
+     */
     public Task<Business> updateRatingFromBusiness(Business business, Rating rating)
     {
         if(!business.updateRating(rating))
@@ -336,21 +451,4 @@ public class BusinessRepository
             return business;
         });
     }
-
-/*    public Task<Business> addFollowerToBusiness(Client follower, Business business)
-    {
-        if(!business.addRating(follower))
-            throw new RuntimeException("Insert to business failed!");
-
-        return updateBusiness(business).continueWith(task ->
-        {
-            if(!task.isSuccessful())
-            {
-                business.deleteRating(follower);
-                throw Objects.requireNonNull(task.getException());
-            }
-
-            return business;
-        });
-    }*/
 }
