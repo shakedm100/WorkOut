@@ -78,10 +78,6 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/azure" />
 
-        <meta-data
-            android:name="com.google.firebase.messaging.my_notifications_channel_id"
-            android:value="@string/my_notifications_channel_id" />
-
 
     </application>
 
