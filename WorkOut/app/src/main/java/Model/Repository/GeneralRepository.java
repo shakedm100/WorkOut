@@ -3,13 +3,13 @@ package Model.Repository;
 import android.location.Geocoder;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,11 +17,10 @@ import java.util.Objects;
 import Model.Address;
 import Model.City;
 import Model.Location;
-import Model.PhonePrefix;
 
 //import android.location.Address;
-import android.content.Context;
-import java.util.Locale;
+import android.util.Log;
+
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 
@@ -227,16 +226,26 @@ public class GeneralRepository
         return null; // Invalid address
     }
 
+    /**
+     * Uploads the token to the database.
+     * @param token the new token of the current user.
+     */
+    public void uploadTokenToFirestore(String token) {
+        db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
 
+        if (auth.getCurrentUser() != null)
+        {
+            String userId = auth.getCurrentUser().getUid();
+            db.collection("clients").document(userId)
+                    .update("fcmToken", token)
+                    .addOnSuccessListener(aVoid -> Log.d("FCM", "Token saved"))
+                    .addOnFailureListener(e -> Log.w("FCM", "Error saving token", e));
+        }
 
-//    public static boolean isAddressValid(Context context, String addressStr) {
-//        Geocoder geocoder = new Geocoder(context, Locale.ENGLISH); // Use English locale
-//        try {
-//            List<android.location.Address> addresses = geocoder.getFromLocationName(addressStr, 1);
-//            return addresses != null && !addresses.isEmpty();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
+        else
+        {
+            Log.w("FCM", "User not logged in. Cannot upload token.");
+        }
+    }
 }

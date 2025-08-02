@@ -83,6 +83,7 @@ dependencies {
         "dir" to "C:\\Users\\Shaked\\AppData\\Local\\Android\\Sdk\\platforms\\android-35",
         "include" to listOf("*.aar", "*.jar")
     )))
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
