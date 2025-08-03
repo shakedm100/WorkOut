@@ -28,15 +28,49 @@ import Model.Business;
 import Model.Course;
 import Model.Day;
 
+/**
+ * A {@link SearchStrategyInterface} implementation that finds
+ * {@link Business} or {@link Course} entities whose scheduled times
+ * fall between two provided {@link Timestamp} values.
+ * <p>
+ * The two-element {@code Timestamp[]} represents an arbitrary interval;
+ * the strategy normalizes to “time-of-day” on January 1, 1970, and
+ * matches courses whose {@code schedule.occurrence} lies within that range
+ * on the same “day” of week.
+ * </p>
+ */
 public class SearchDateStrategy implements SearchStrategyInterface<Timestamp[]>
 {
     private FirebaseFirestore db;
 
+    /**
+     * Constructs a new SearchDateStrategy using the Firestore singleton.
+     */
     public SearchDateStrategy()
     {
         db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Searches for {@link Business} entities that offer courses whose
+     * scheduled occurrence falls between the two provided timestamps.
+     * <ol>
+     *   <li>Validates exactly two timestamps are supplied.</li>
+     *   <li>Sorts them into min/max.</li>
+     *   <li>Extracts the {@link Day} of week from the earlier timestamp.</li>
+     *   <li>Normalizes both to time-only {@code Timestamp} at 1970-01-01 UTC.</li>
+     *   <li>Performs a collectionGroup query on “courses” where day matches
+     *       and occurrence ∈ [normMin, normMax].</li>
+     *   <li>Groups resulting courses by their parent business document reference.</li>
+     *   <li>Fetches each business’s document and attaches its list of matching courses.</li>
+     * </ol>
+     *
+     * @param times two-element array of Timestamps defining the search interval
+     * @return a Task completing with a List of matching {@link Business} objects,
+     *         each populated with the relevant {@link Course} subcollection;
+     *         or an empty list if none match.
+     * @throws IllegalArgumentException if {@code times.length != 2}.
+     */
     @Override
     public Task<List<Business>> searchBusinesses(Timestamp[] times)
     {
@@ -133,6 +167,23 @@ public class SearchDateStrategy implements SearchStrategyInterface<Timestamp[]>
                 });
     }
 
+    /**
+     * Searches for {@link Course} entities whose scheduled occurrence
+     * falls between two provided timestamps.
+     * <ol>
+     *   <li>Validates two timestamps.</li>
+     *   <li>Sorts into min/max.</li>
+     *   <li>Extracts Day of week.</li>
+     *   <li>Normalizes timestamps to time-only at 1970-01-01.</li>
+     *   <li>Performs a collectionGroup query on “courses” matching day
+     *       and occurrence within the time window.</li>
+     *   <li>Maps each result to a Course and populates its businessId.</li>
+     * </ol>
+     *
+     * @param times two-element array of Timestamps for the time window
+     * @return a Task completing with a List of matching {@link Course} objects
+     * @throws IllegalArgumentException if {@code times.length != 2}.
+     */
     @Override
     public Task<List<Course>> searchCourses(Timestamp[] times) {
         if (times.length != 2) {
@@ -187,7 +238,13 @@ public class SearchDateStrategy implements SearchStrategyInterface<Timestamp[]>
                 });
     }
 
-
+    /**
+     * Converts a full {@link Timestamp} into a “time‐only” {@code Timestamp}
+     * anchored at 1970-01-01 00:00:00 UTC plus the same hour/min/sec/nanos.
+     *
+     * @param raw the original Timestamp
+     * @return normalized Timestamp or {@code null} if {@code raw} is null
+     */
     private static Timestamp normalizeToTimeOnly(Timestamp raw)
     {
         if (raw == null)
@@ -213,7 +270,12 @@ public class SearchDateStrategy implements SearchStrategyInterface<Timestamp[]>
         return new Timestamp(secondsOfDay, nanoOfSecond);
     }
 
-
+    /**
+     * Extracts the {@link Day} of week from a {@code Timestamp} (UTC).
+     *
+     * @param timestamp the input Timestamp
+     * @return corresponding Day enum
+     */
     private Day extractDayFromTimestamp(Timestamp timestamp)
     {
         // Convert to java.util.Date

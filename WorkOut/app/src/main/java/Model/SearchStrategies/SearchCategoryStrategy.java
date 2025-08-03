@@ -20,11 +20,25 @@ import Model.Category;
 import Model.Course;
 import Model.Repository.CourseRepository;
 
+/**
+ * A {@link SearchStrategyInterface} implementation that finds
+ * {@link Business} or {@link Course} entities based on a specified {@link Category}.
+ * <p>
+ * Performs a collectionGroup query on all “courses” subcollections to locate courses
+ * matching the given category. For the business search path, it groups matching
+ * courses by their parent business, fetches each business document, and attaches
+ * the filtered course list.
+ * </p>
+ */
 public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
 {
     private final FirebaseFirestore db;
     private final CourseRepository courseRepository;
 
+    /**
+     * Constructs a new SearchCategoryStrategy using the Firestore singleton
+     * and a default {@link CourseRepository}.
+     */
     public SearchCategoryStrategy()
     {
         db = FirebaseFirestore.getInstance();
@@ -32,9 +46,19 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
     }
 
     /**
-     * Find all the businesses that have a matching category
-     * @param category the category the user wants
-     * @return list of businesses that have that category
+     * Searches for {@link Business} entities that offer at least one {@link Course}
+     * in the specified {@code category}.
+     * <ol>
+     *   <li>Performs a collectionGroup query on “courses” where {@code category} matches.</li>
+     *   <li>Groups the resulting Course objects by their parent business reference.</li>
+     *   <li>Fetches each Business document and attaches its filtered Course list.</li>
+     * </ol>
+     *
+     * @param category the {@link Category} to filter courses by
+     * @return a Task completing with a List of matching {@link Business} objects,
+     *         each populated with its relevant {@link Course} subcollection;
+     *         or an empty list if none found.
+     * @throws RuntimeException if any Firestore operation fails.
      */
     @Override
     public Task<List<Business>> searchBusinesses(Category category)
@@ -96,6 +120,18 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
                 });
     }
 
+    /**
+     * Searches for {@link Course} entities in the specified {@code category}.
+     * <ol>
+     *   <li>Performs a collectionGroup query on “courses” where {@code category} matches.</li>
+     *   <li>Maps each matching document to a {@link Course}, sets its Firestore document ID,</li>
+     *   <li>and annotates it with its parent businessId.</li>
+     * </ol>
+     *
+     * @param category the {@link Category} to filter courses by
+     * @return a Task completing with a List of matching {@link Course} objects
+     * @throws RuntimeException if the Firestore query fails.
+     */
     @Override
     public Task<List<Course>> searchCourses(Category category) {
         return db.collectionGroup("courses")

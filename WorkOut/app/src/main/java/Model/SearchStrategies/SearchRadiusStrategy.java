@@ -20,12 +20,23 @@ import Model.Course;
 import Model.Location;
 import Model.Repository.CourseRepository;
 
+/**
+ * A {@link SearchStrategyInterface} implementation that finds
+ * {@link Business} and {@link Course} entities within a given
+ * geographic radius from a specified {@link Location}.
+ */
 public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
 {
+    // Conversion source: https://stackoverflow.com/questions/1253499/simple-calculations-for-working-with-lat-lon-and-km-distance
     private final FirebaseFirestore db;
     private final CourseRepository courseRepository;
     private final double radius;
 
+    /**
+     * Constructs a new SearchRadiusStrategy.
+     *
+     * @param radius the search radius in kilometers
+     */
     public SearchRadiusStrategy(double radius)
     {
         this.radius = radius;
@@ -33,12 +44,24 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
         courseRepository = new CourseRepository();
     }
 
-    // Conversion source: https://stackoverflow.com/questions/1253499/simple-calculations-for-working-with-lat-lon-and-km-distance
+    /**
+     * Converts degrees of latitude into approximate kilometers.
+     *
+     * @param latitude degrees of latitude
+     * @return kilometers corresponding to the latitude difference
+     */
     private double convertLatitudeToKM(double latitude)
     {
         return latitude * 110.574;
     }
 
+    /**
+     * Converts degrees of longitude into approximate kilometers at a given latitude.
+     *
+     * @param longitude degrees of longitude
+     * @param latitude  latitude at which to compute the conversion
+     * @return kilometers corresponding to the longitude difference
+     */
     private double convertLongitudeToKM(double longitude, double latitude)
     {
         double rad = Math.toRadians(latitude);
@@ -48,9 +71,9 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
     /**
      * Helper function that calculates the distance between two locations
      *
-     * @param currentLocation  the current user's location
-     * @param businessLocation the business's location
-     * @return the distance between them
+     * @param currentLocation  the reference location
+     * @param businessLocation the target location
+     * @return distance in kilometers between the two points
      */
     private double distance(Location currentLocation, Location businessLocation)
     {
@@ -66,6 +89,16 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
         return Math.sqrt(powX + powY);
     }
 
+    /**
+     * Searches for {@link Business} documents whose locations fall within the
+     * specified radius of the {@code current} location. First applies a bounding‐box
+     * filter for performance, then refines by true distance, and finally loads
+     * each business’s courses before returning the results.
+     *
+     * @param current the center {@link Location} for the search
+     * @return a Task completing with a List of matching {@link Business} objects,
+     *         each populated with its subcollection of courses.
+     */
     @Override
     public Task<List<Business>> searchBusinesses(Location current)
     {
@@ -147,6 +180,15 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
                 });
     }
 
+    /**
+     * Searches for {@link Course} documents whose parent businesses fall within
+     * the specified radius of {@code current}. Uses a bounding‐box filter, then
+     * refines by true distance, and finally aggregates courses from each matching business.
+     *
+     * @param current the center {@link Location} for the search
+     * @return a Task completing with a List of matching {@link Course} objects,
+     *         each annotated with its parent businessId.
+     */
     @Override
     public Task<List<Course>> searchCourses(Location current)
     {

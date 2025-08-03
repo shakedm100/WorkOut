@@ -18,15 +18,42 @@ import Model.Business;
 import Model.CourseType;
 import Model.Course;
 
+/**
+ * A {@link SearchStrategyInterface} implementation that finds
+ * {@link Business} or {@link Course} entities based on a specified {@link CourseType}.
+ * <p>
+ * Uses a collectionGroup query on the “courses” subcollections to locate all courses
+ * matching the given type, then groups them by parent business for the business search
+ * path.
+ * </p>
+ */
 public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseType>
 {
     private FirebaseFirestore db;
 
+    /**
+     * Constructs a new SearchCourseTypeStrategy using the Firestore singleton.
+     */
     public SearchCourseTypeStrategy()
     {
         db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Searches for {@link Business} entities that offer at least one
+     * {@link Course} of the given {@code type}.
+     * <ol>
+     *   <li>Performs a collectionGroup query on “courses” where {@code type} matches.</li>
+     *   <li>Groups resulting Course objects by their parent business reference.</li>
+     *   <li>Fetches each Business document and attaches the filtered Course list.</li>
+     * </ol>
+     *
+     * @param type the {@link CourseType} to filter by
+     * @return a Task completing with a List of matching {@link Business} objects,
+     *         each populated with its relevant {@link Course} subcollection;
+     *         or an empty list if none found.
+     * @throws RuntimeException if any Firestore operation fails.
+     */
     @Override
     public Task<List<Business>> searchBusinesses(CourseType type)
     {
@@ -99,6 +126,18 @@ public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseT
                 });
     }
 
+    /**
+     * Searches for {@link Course} entities of the specified {@code type}.
+     * <ol>
+     *   <li>Performs a collectionGroup query on “courses” where {@code type} matches.</li>
+     *   <li>Maps each matching document to a {@link Course}, sets its document ID,</li>
+     *   <li>and annotates with its parent businessId.</li>
+     * </ol>
+     *
+     * @param type the {@link CourseType} to filter by
+     * @return a Task completing with a List of matching {@link Course} objects.
+     * @throws RuntimeException if the Firestore query fails.
+     */
     @Override
     public Task<List<Course>> searchCourses(CourseType type) {
         return db.collectionGroup("courses")

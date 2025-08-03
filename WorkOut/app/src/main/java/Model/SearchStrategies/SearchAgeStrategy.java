@@ -21,11 +21,25 @@ import Model.Business;
 import Model.Course;
 import Model.Repository.CourseRepository;
 
+/**
+ * A {@link SearchStrategyInterface} implementation that finds
+ * {@link Business} or {@link Course} entities whose age ranges overlap
+ * a specified {@link AgeRange}.
+ * <p>
+ * Uses a collectionGroup query on all “courses” subcollections to locate
+ * courses whose {@code ageRange} overlaps the provided range, then
+ * groups by parent business and fetches full documents.
+ * </p>
+ */
 public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
 {
     private FirebaseFirestore db;
     private CourseRepository courseRepository;
 
+    /**
+     * Constructs a new SearchAgeStrategy using the Firestore singleton
+     * and a default {@link CourseRepository}.
+     */
     public SearchAgeStrategy()
     {
         db = FirebaseFirestore.getInstance();
@@ -33,11 +47,20 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
     }
 
     /**
-     * This method find all the businesses that have courses with a compatible age range,
-     * above the min and below the max
+     * Finds all {@link Business} entities that offer at least one {@link Course}
+     * whose {@code ageRange} overlaps the given {@code ageRange}.
+     * <ol>
+     *   <li>Queries for courses where minAge ≤ provided maxAge and maxAge ≥ provided minAge.</li>
+     *   <li>Collects unique business document references from matching courses.</li>
+     *   <li>Fetches each Business document.</li>
+     *   <li>For each business, loads its full list of courses and attaches them.</li>
+     * </ol>
      *
-     * @param ageRange the minimum and maximum ages
-     * @return all businesses that have a course between the desired ages
+     * @param ageRange the desired age range (min and max)
+     * @return a Task completing with a List of matching {@link Business} objects,
+     *         each populated with all its {@link Course}s;
+     *         or an empty list if none match.
+     * @throws RuntimeException if any Firestore operation fails.
      */
     @Override
     public Task<List<Business>> searchBusinesses(AgeRange ageRange)
@@ -114,6 +137,19 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
                 });
     }
 
+    /**
+     * Finds all {@link Course} entities whose {@code ageRange} overlaps
+     * the given {@code ageRange}.
+     * <ol>
+     *   <li>Queries for courses where minAge ≤ provided maxAge and maxAge ≥ provided minAge.</li>
+     *   <li>Maps each matching document to a {@link Course}, setting its ID and
+     *       annotating with its parent businessId.</li>
+     * </ol>
+     *
+     * @param ageRange the desired age range (min and max)
+     * @return a Task completing with a List of matching {@link Course} objects.
+     * @throws RuntimeException if the Firestore query fails.
+     */
     @Override
     public Task<List<Course>> searchCourses(AgeRange ageRange)
     {
