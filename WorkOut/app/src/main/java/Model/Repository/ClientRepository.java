@@ -41,6 +41,10 @@ import Model.Address;
 import Model.PhonePrefix;
 import Model.Rating;
 
+/**
+ * Repository for managing {@link Client} entities in Firestore and
+ * handling Firebase Authentication (including Google Sign-In).
+ */
 public class ClientRepository
 {
     private final FirebaseFirestore db;
@@ -49,6 +53,9 @@ public class ClientRepository
     private final GeneralRepository generalRepository;
     private final OkHttpClient httpClient; // Declared here
 
+    /**
+     * Default constructor initializes Firestore, Auth, general checks, and HTTP client.
+     */
     public ClientRepository()
     {
         db = FirebaseFirestore.getInstance();
@@ -57,6 +64,13 @@ public class ClientRepository
         httpClient = new OkHttpClient();
     }
 
+    /**
+     * Injection constructor for testing.
+     *
+     * @param auth         FirebaseAuth instance
+     * @param db           FirebaseFirestore instance
+     * @param generalRepo  GeneralRepository for username/email checks
+     */
     public ClientRepository(FirebaseAuth auth, FirebaseFirestore db, GeneralRepository generalRepo)
     {
         this.auth = auth;
@@ -67,20 +81,23 @@ public class ClientRepository
 
 
     /**
-     * This function is responsible for the logic of client insertion to the database.
-     * It returns an instance of the new client if it succeeded with the new client id.
-     * If communication with the DB fails it throws an exception.
-     * If the username or email already exist it also throws an exception.
+     * Registers a new client: checks availability, creates a Firebase Auth user,
+     * and writes the client record to Firestore.
      *
-     * @param username  user's username
-     * @param password  user's password
-     * @param phone     user's phone
-     * @param email     user's email
-     * @param firstName user's firstname
-     * @param lastName  user's password
-     * @param address   user's address
-     * @param gender    user's gender
-     * @return a new client instance if succeeded, exception otherwise
+     * @param username  desired unique username
+     * @param password  desired password
+     * @param phone     client's phone number
+     * @param email     client's email (used for Auth)
+     * @param firstName client's first name
+     * @param lastName  client's last name
+     * @param address   client's address
+     * @param gender    client's gender
+     * @return a Task completing with the new {@link Client} on success,
+     *         or failing with:
+     *         <ul>
+     *           <li>{@link IllegalArgumentException} if username/email taken;</li>
+     *           <li>any FirebaseAuth or Firestore exception otherwise.</li>
+     *         </ul>
      */
     public Task<Client> insertClient(String username, String password, Phone phone, String email, String firstName,
                                      String lastName, Address address, Gender gender)
@@ -139,11 +156,10 @@ public class ClientRepository
     }
 
     /**
-     * This method updates client's data excluding email, username and password
-     * those will be updated separately if needed
+     * Updates all fields of an existing {@link Client} document (except auth fields).
      *
-     * @param client the client to update
-     * @return Task<True> if succeeded, Task<False> if failed
+     * @param client the client to update (must have a valid id)
+     * @return a Task completing with {@code true} if the set succeeded, {@code false} otherwise
      */
     public Task<Boolean> updateClientByID(Client client)
     {
@@ -153,6 +169,14 @@ public class ClientRepository
         return currentClient.set(client).continueWith(task -> task.isSuccessful());
     }
 
+    /**
+     * Deletes the currently authenticated client from Firestore and Firebase Auth.
+     *
+     * @param client the client to delete (id must match current user)
+     * @return a Task completing with {@code true} if deletion succeeded
+     * @throws IllegalStateException    if no user signed in
+     * @throws IllegalArgumentException if signed-in user does not match client id
+     */
     public Task<Boolean> deleteClientByID(Client client)
     {
         FirebaseUser user = auth.getCurrentUser();
@@ -186,6 +210,20 @@ public class ClientRepository
         });
     }
 
+    /**
+     * Authenticates a client by username/password. First fetches the Firestore record
+     * (to get the email), then signs in via FirebaseAuth.
+     *
+     * @param username the client's username
+     * @param password the client's password
+     * @return a Task completing with the authenticated {@link Client},
+     *         or failing with:
+     *         <ul>
+     *           <li>{@link NoSuchElementException} if no such username;</li>
+     *           <li>{@link SecurityException} if UID mismatch;</li>
+     *           <li>any Firebase exception otherwise.</li>
+     *         </ul>
+     */
     public Task<Client> checkLogin(String username, String password)
     {
         return getClientByUsername(username)
@@ -224,6 +262,14 @@ public class ClientRepository
                 });
     }
 
+    /**
+     * Looks up a client by their unique username.
+     *
+     * @param username the username to query
+     * @return a Task completing with the found {@link Client},
+     *         or failing with {@link IllegalArgumentException} if not found,
+     *         or any Firestore exception.
+     */
     public Task<Client> getClientByUsername(String username)
     {
         return db.collection(collection)
@@ -277,13 +323,14 @@ public class ClientRepository
     }
 
     /**
-     * Handles Google Sign-In: Authenticates with Firebase, fetches profile from People API,
-     * and creates or updates the client in Firestore.
+     * Signs in to Firebase using a Google ID token, then fetches profile info
+     * from Google People API to create or update the {@link Client} record.
      *
-     * @param idTokenForFirebase      The Google ID token for Firebase sign-in.
-     * @param accessTokenForPeopleApi The Google OAuth2 access token for People API.
-     * @param serverAuthCode          Optional: Server auth code (can be used by a backend, not directly used here for People API).
-     * @return Task<Client> that resolves to the Client object.
+     * @param idTokenForFirebase      Google ID Token for Firebase Auth
+     * @param accessTokenForPeopleApi OAuth2 access token for People API
+     * @param serverAuthCode          optional server auth code (may be null)
+     * @return a Task completing with the up-to-date {@link Client}
+     *         or failing with any auth/IO/JSON exception encountered.
      */
     public Task<Client> handleGoogleAuthWithFirebase(String idTokenForFirebase,
             String accessTokenForPeopleApi, @Nullable String serverAuthCode)
@@ -337,7 +384,11 @@ public class ClientRepository
     }
 
     /**
-     * Helper to fetch data from Google People API.
+     * Fetches the authenticated user's profile from Google People API.
+     *
+     * @param accessToken OAuth2 Bearer token
+     * @return a Task completing with a {@link PeopleProfile} DTO,
+     *         or failing with {@link IOException} or JSON parsing errors.
      */
     private Task<PeopleProfile> fetchPeopleProfile(String accessToken)
     {
@@ -496,7 +547,13 @@ public class ClientRepository
     }
 
     /**
-     * Helper to process FirebaseUser and PeopleProfile data to create/update Client in Firestore.
+     * Merges FirebaseUser and PeopleProfile data into Firestore: updates existing
+     * client document or creates a new one on first login.
+     *
+     * @param firebaseUser authenticated Firebase user
+     * @param profile      data fetched from People API
+     * @return a Task completing with the resulting {@link Client}
+     *         or failing with any Firestore exception.
      */
     private Task<Client> processClientData(FirebaseUser firebaseUser, PeopleProfile profile)
     {
@@ -666,7 +723,7 @@ public class ClientRepository
 
 
     /**
-     * Simple holder for the People API result.
+     * Simple holder for data returned by the Google People API.
      */
     private static class PeopleProfile
     {

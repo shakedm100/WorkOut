@@ -23,20 +23,33 @@ import android.util.Log;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
-
+/**
+ * A general-purpose repository for common Firestore operations and utilities:
+ * <ul>
+ *   <li>Querying cities</li>
+ *   <li>Checking username/email availability</li>
+ *   <li>Geocoding addresses</li>
+ *   <li>String similarity checks</li>
+ *   <li>Uploading FCM tokens</li>
+ * </ul>
+ */
 public class GeneralRepository
 {
 
     FirebaseFirestore db;
 
+    /**
+     * Default constructor initializes Firestore instance.
+     */
     public GeneralRepository()
     {
         db = FirebaseFirestore.getInstance();
     }
 
     /**
-     * Returns all the possible prefixes for a phone number.
-     * @return a Task which will return a list of the prefixes.
+     * Returns a hard-coded list of common Israeli mobile-phone prefixes.
+     *
+     * @return list of valid phone prefixes (e.g. "050", "052", ...)
      */
     public List<String> getAllPhonePrefixes()
     {
@@ -51,6 +64,12 @@ public class GeneralRepository
         return phonePrefixes;
     }
 
+    /**
+     * Fetches all {@link City} documents from Firestore.
+     *
+     * @return a Task that completes with a List of all City objects,
+     *         or fails with any Firestore exception.
+     */
     public Task<List<City>> getAllCities()
     {
         Query q = db.collection("cities");
@@ -73,9 +92,16 @@ public class GeneralRepository
     }
 
     /**
-     * Returns up to 3 cities whose names start with the given partialName.
-     * @param namePrefix the name prefix to search for
-     * @return a Task that completes with a List<City>
+     * Returns up to three cities whose name begins with the given prefix.
+     * <p>
+     * If the prefix starts with a non-ASCII character, searches the 'name' field;
+     * otherwise, uses 'englishName' (converted to uppercase).
+     * </p>
+     *
+     * @param namePrefix the case-sensitive prefix to search by
+     * @return a Task completing with a List of matching City objects,
+     *         or {@code null} if {@code namePrefix} is empty.
+     * @throws RuntimeException if the Firestore query fails.
      */
     public Task<List<City>> getCityByNamePartially(String namePrefix)
     {
@@ -136,14 +162,14 @@ public class GeneralRepository
     }
 
     /**
-     * This method receives username and email and check if one of them already exists
-     * in the database, if one of them exist it returns true async
-     * and if not it returns false async
-     * throws an error if communication failed
+     * Checks whether a username or email already exists in the given collection.
      *
-     * @param username the user's username
-     * @param email    the user's email
-     * @return Task<false> if the user's username & email don't exit. true otherwise
+     * @param collection Firestore collection name (e.g. "clients" or "businesses")
+     * @param username   username to check
+     * @param email      email to check
+     * @return a Task completing with {@code true} if either field exists,
+     *         {@code false} otherwise.
+     * @throws RuntimeException if the Firestore query fails.
      */
     public Task<Boolean> canRegisterUser(String collection, String username, String email)
     {
@@ -164,6 +190,14 @@ public class GeneralRepository
                 });
     }
 
+    /**
+     * Converts a domain {@link Address} to geographic {@link Location} via Android's Geocoder.
+     *
+     * @param geocoder Android Geocoder instance
+     * @param address  domain Address (street + city)
+     * @return a Location with longitude and latitude, or {@code null} if not found
+     * @throws RuntimeException if geocoding fails
+     */
     public Location convertAddressToLocation(Geocoder geocoder, Address address)
     {
         try
@@ -184,7 +218,14 @@ public class GeneralRepository
         }
     }
 
-    public boolean areSimilar(String a, String b) {
+    /**
+     * Determines if two strings are “similar” within an adjustable Levenshtein threshold.
+     *
+     * @param a first string
+     * @param b second string
+     * @return {@code true} if the edit distance ≤ 3 (or 4 for longer strings), {@code false} otherwise
+     */
+    private boolean areSimilar(String a, String b) {
 
         int maxDistance = 3;
         if (a.length() > 15 || b.length() > 15)
@@ -195,6 +236,15 @@ public class GeneralRepository
         return result != null; // if within maxDistance
     }
 
+    /**
+     * A more strict geocoding: only returns a location if both street and city
+     * match the Geocoder result within the similarity threshold.
+     *
+     * @param geocoder Android Geocoder instance
+     * @param address  domain Address
+     * @return Location if both street and city are similar, or {@code null}
+     * @throws RuntimeException if geocoding fails
+     */
     public Location convertAddressToLocation2(Geocoder geocoder, Address address) {
         try {
             String streetInput = address.getName();
