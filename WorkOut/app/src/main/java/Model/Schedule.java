@@ -13,21 +13,40 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Objects;
 
+/**
+ * Represents a weekly schedule entry with a day of week and a time-of-day occurrence.
+ * Implements Parcelable for Android IPC.
+ */
 public class Schedule implements Parcelable
 {
     private Day day;
     private Timestamp occurrence;
 
+    /** Default no-arg constructor (required by serialization frameworks). */
     public Schedule()
     {
     }
 
+    /**
+     * Constructs a Schedule for a specific day and timestamp.
+     * The timestamp is normalized to a time-of-day on the epoch date (Jan 1 1970 UTC).
+     *
+     * @param day        the day of the week
+     * @param occurrence a full Timestamp; only its time component will be retained
+     */
     public Schedule(Day day, Timestamp occurrence)
     {
         this.day = day;
         this.occurrence = normalizeToTimeOnly(occurrence);
     }
 
+    /**
+     * Strips the date portion of a Timestamp, retaining only the UTC time-of-day.
+     * Resulting timestamp has seconds = seconds since midnight, date = 1970-01-01 UTC.
+     *
+     * @param raw the original Timestamp
+     * @return a time-only Timestamp, or null if raw was null
+     */
     private static Timestamp normalizeToTimeOnly(Timestamp raw)
     {
         if (raw == null) return null;
@@ -47,26 +66,31 @@ public class Schedule implements Parcelable
         return new Timestamp(secondsOfDay, nanoOfSecond);
     }
 
-    public Day getDay()
-    {
+    /** @return the day of the week for this schedule */
+    public Day getDay() {
         return day;
     }
 
-    public Timestamp getOccurrence()
-    {
+    /** @return the normalized time-of-day occurrence (epoch date + time) */
+    public Timestamp getOccurrence() {
         return occurrence;
     }
 
-    public void setDay(Day day)
-    {
+    /** @param day the day to set */
+    public void setDay(Day day) {
         this.day = day;
     }
 
-    public void setOccurrence(Timestamp occurrence)
-    {
+    /**
+     * Sets the occurrence, normalizing to time-only.
+     *
+     * @param occurrence full Timestamp; only time-of-day is stored
+     */
+    public void setOccurrence(Timestamp occurrence) {
         this.occurrence = normalizeToTimeOnly(occurrence);
     }
 
+    /** Recreates a Schedule from a Parcel. */
     protected Schedule(Parcel in)
     {
         day = Day.valueOf(in.readString());
@@ -87,6 +111,7 @@ public class Schedule implements Parcelable
         return 0;
     }
 
+    /** Parcelable.Creator that generates Schedule instances from a Parcel. */
     public static final Creator<Schedule> CREATOR = new Creator<Schedule>()
     {
         @Override
@@ -102,6 +127,12 @@ public class Schedule implements Parcelable
         }
     };
 
+    /**
+     * Two Schedules are equal if they share the same day and occurrence time.
+     *
+     * @param o the object to compare
+     * @return true if equal, false otherwise
+     */
     @Override
     public boolean equals(Object o)
     {

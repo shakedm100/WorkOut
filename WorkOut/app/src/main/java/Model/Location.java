@@ -5,38 +5,67 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
+/**
+ * Geographic coordinates with latitude and longitude.
+ * Implements {@link Parcelable} for Android IPC.
+ */
 public class Location implements Parcelable
 {
     private double longitude;
     private double latitude;
 
-    public Location() {}
+    /**
+     * Default no-arg constructor for Firestore.
+     */
+    public Location()
+    {
+    }
+
+    /**
+     * Constructs a Location with the given coordinates.
+     *
+     * @param longitude longitudinal coordinate
+     * @param latitude  latitudinal coordinate
+     */
     public Location(double longitude, double latitude)
     {
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
+    /**
+     * @return the latitude
+     */
     public double getLatitude()
     {
         return latitude;
     }
 
+    /**
+     * @return the longitude
+     */
     public double getLongitude()
     {
         return longitude;
     }
 
+    /**
+     * @param latitude the latitude to set
+     */
     public void setLatitude(double latitude)
     {
         this.latitude = latitude;
     }
 
+    /**
+     * @param longitude the longitude to set
+     */
     public void setLongitude(double longitude)
     {
         this.longitude = longitude;
     }
 
+    /** Recreates a Location from a Parcel. */
     protected Location(Parcel in)
     {
         longitude = in.readDouble();
@@ -71,6 +100,7 @@ public class Location implements Parcelable
         return 0;
     }
 
+    /** Parcelable.Creator that generates Location instances from a Parcel. */
     public static final Creator<Location> CREATOR = new Creator<Location>()
     {
         @Override

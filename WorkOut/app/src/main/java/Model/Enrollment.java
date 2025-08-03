@@ -4,17 +4,29 @@ import com.google.firebase.Timestamp;
 
 import java.util.Comparator;
 
+/**
+ * Represents a client's enrollment in a course, with timestamp.
+ * Extends {@link Entity} to inherit a unique ID.
+ */
 public class Enrollment extends Entity
 {
     private Client clientId;
     private Course courseId;
     private Timestamp signedUpAt; // or com.google.firebase.Timestamp
 
-    // Firestore needs a no-arg constructor
+    /** No-arg constructor for Firestore serialization. */
     public Enrollment()
     {
     }
 
+    /**
+     * Constructs an Enrollment.
+     *
+     * @param id         unique enrollment ID
+     * @param clientId   the client enrolling
+     * @param courseId   the course enrolled in
+     * @param signedUpAt timestamp of signup
+     */
     public Enrollment(String id, Client clientId, Course courseId, Timestamp signedUpAt)
     {
         super(id);
@@ -23,42 +35,28 @@ public class Enrollment extends Entity
         this.signedUpAt = signedUpAt;
     }
 
-    // getters & setters
-    public Client getClient()
-    {
-        return clientId;
-    }
+    /** @return the enrolled client */
+    public Client getClient() { return clientId; }
 
-    public void setClient(Client clientId)
-    {
-        this.clientId = clientId;
-    }
+    /** @param clientId the client to set */
+    public void setClient(Client clientId) { this.clientId = clientId; }
 
-    public Course getCourse()
-    {
-        return courseId;
-    }
+    /** @return the course enrolled */
+    public Course getCourse() { return courseId; }
 
-    public void setCourse(Course courseId)
-    {
-        this.courseId = courseId;
-    }
+    /** @param courseId the course to set */
+    public void setCourse(Course courseId) { this.courseId = courseId; }
 
-    public Timestamp getTime()
-    {
-        return signedUpAt;
-    }
+    /** @return signup timestamp */
+    public Timestamp getTime() { return signedUpAt; }
 
-    public void setTime(Timestamp signedUpAt)
-    {
-        this.signedUpAt = signedUpAt;
-    }
+    /** @param signedUpAt the timestamp to set */
+    public void setTime(Timestamp signedUpAt) { this.signedUpAt = signedUpAt; }
 
-    /*
-     * The following code is to compare two different enrollments by the Timestamp
-     */
+    /** Comparator to order enrollments by signup time (oldest first). */
+    public static final Comparator<Enrollment> BY_TIME =
+            Comparator.comparing(Enrollment::getTime);
 
-    public static final Comparator<Enrollment> BY_TIME = Comparator.comparing(Enrollment::getTime);
 
 
 }

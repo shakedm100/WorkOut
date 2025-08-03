@@ -2,6 +2,9 @@ package Model;
 
 import androidx.annotation.Nullable;
 
+/**
+ * A category of sports or activities.
+ */
 public enum Category
 {
     Archery,
@@ -57,7 +60,13 @@ public enum Category
 
 
     /**
-     * Try to map a free‐form string into one of the enum constants.
+     * Attempts to map a free‐form string into a Category enum constant.
+     * <p>
+     * Trims whitespace and replaces spaces with underscores, then
+     * looks up the matching enum. Returns null if no match.
+     *
+     * @param s the input string to convert
+     * @return the matching Category, or null if none found
      */
     public static @Nullable Category fromString(String s)
     {

@@ -1,15 +1,19 @@
 package Model;
 
+/**
+ * Gender enumeration with a case-insensitive lookup.
+ */
 public enum Gender
 {
     Male,
     Female;
 
     /**
-     * Case-insensitive lookup of a Gender by name.
-     * @param gender the string to convert
-     * @return the matching Gender
-     * @throws IllegalArgumentException if no match is found or input is null
+     * Returns the Gender matching the supplied string, ignoring case.
+     *
+     * @param gender the input string (must not be null)
+     * @return the matching Gender constant
+     * @throws IllegalArgumentException if input is null or no match found
      */
     public static Gender fromString(String gender) {
         if (gender == null) {

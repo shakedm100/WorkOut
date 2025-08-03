@@ -5,16 +5,30 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
+/**
+ * A client’s rating of a business or course, with stars and an optional comment.
+ * Implements {@link Parcelable} for Android IPC.
+ */
 public class Rating implements Parcelable
 {
     private float stars;
     private String comment;
     private Client client;
 
+    /**
+     * Default no-arg constructor for Firestore.
+     */
     public Rating()
     {
     }
 
+    /**
+     * Constructs a Rating.
+     *
+     * @param stars   number of stars (e.g. 4.5)
+     * @param comment optional textual feedback
+     * @param client  the client who left the rating
+     */
     public Rating(float stars, String comment, Client client)
     {
         this.stars = stars;
@@ -22,36 +36,55 @@ public class Rating implements Parcelable
         this.client = client;
     }
 
+    /**
+     * @return the star count
+     */
     public float getStars()
     {
         return stars;
     }
 
+    /**
+     * @return the comment text
+     */
     public String getComment()
     {
         return comment;
     }
 
+    /**
+     * @return the client who rated
+     */
     public Client getClient()
     {
         return client;
     }
 
+    /**
+     * @param stars the star count to set
+     */
     public void setStars(float stars)
     {
         this.stars = stars;
     }
 
+    /**
+     * @param comment the comment to set
+     */
     public void setComment(String comment)
     {
         this.comment = comment;
     }
 
+    /**
+     * @param client the client to set
+     */
     public void setClient(Client client)
     {
         this.client = client;
     }
 
+    /** Recreates a Rating from a Parcel. */
     protected Rating(Parcel in)
     {
         stars = in.readFloat();
@@ -73,6 +106,7 @@ public class Rating implements Parcelable
         return 0;
     }
 
+    /** Parcelable.Creator that generates Rating instances from a Parcel. */
     public static final Creator<Rating> CREATOR = new Creator<Rating>()
     {
         @Override

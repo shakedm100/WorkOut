@@ -17,6 +17,12 @@ public enum PhonePrefix {
         this.code = code;
     }
 
+    /**
+     * Parses an exact prefix code string into the matching enum.
+     *
+     * @param phoneNumber the prefix string (e.g. "052")
+     * @return the matching PhonePrefix, or null if none
+     */
     public static PhonePrefix fromString(String phoneNumber)
     {
         if(phoneNumber == null)
@@ -42,10 +48,10 @@ public enum PhonePrefix {
     }
 
     /**
-     * This method infers the prefix from a full phone number
-     * and returns the correct PhonePrefix
-     * @param phoneNumber the full phone number
-     * @return the starting prefix of the phone number
+     * Infers the prefix from a full 10-digit phone number string.
+     *
+     * @param phoneNumber the full number (e.g. "0521234567")
+     * @return the matching PhonePrefix, or null if invalid
      */
     public static PhonePrefix inferPreFix(String phoneNumber)
     {
@@ -65,9 +71,7 @@ public enum PhonePrefix {
         return null;
     }
 
-    /**
-     * @return the numeric prefix, e.g. "050"
-     */
+    /** @return the numeric prefix code, e.g. "050" */
     public String getCode()
     {
         return code;

@@ -7,34 +7,79 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
+/**
+ * Defines an inclusive range of ages.
+ * Implements Parcelable so it can be passed between Android components.
+ */
 public class AgeRange implements Parcelable
 {
     private int minAge;
     private int maxAge;
 
-    public AgeRange() {}
+    /**
+     * Default no-argument constructor.
+     */
+    public AgeRange()
+    {
+    }
+
+    /**
+     * Constructs an AgeRange with the specified minimum and maximum.
+     *
+     * @param minAge the minimum age (inclusive)
+     * @param maxAge the maximum age (inclusive)
+     */
     public AgeRange(int minAge, int maxAge)
     {
         this.minAge = minAge;
         this.maxAge = maxAge;
     }
 
-    public int getMinAge() {
+    /**
+     * Returns the minimum age.
+     *
+     * @return the minimum age
+     */
+    public int getMinAge()
+    {
         return minAge;
     }
 
-    public int getMaxAge() {
+    /**
+     * Returns the maximum age.
+     *
+     * @return the maximum age
+     */
+    public int getMaxAge()
+    {
         return maxAge;
     }
 
-    public void setMinAge(int minAge) {
+    /**
+     * Sets the minimum age.
+     *
+     * @param minAge the minimum age to set
+     */
+    public void setMinAge(int minAge)
+    {
         this.minAge = minAge;
     }
 
-    public void setMaxAge(int maxAge) {
+    /**
+     * Sets the maximum age.
+     *
+     * @param maxAge the maximum age to set
+     */
+    public void setMaxAge(int maxAge)
+    {
         this.maxAge = maxAge;
     }
 
+    /**
+     * Reconstructs an AgeRange from a Parcel.
+     *
+     * @param in the Parcel containing the serialized AgeRange
+     */
     protected AgeRange(Parcel in)
     {
         minAge = in.readInt();
@@ -47,6 +92,12 @@ public class AgeRange implements Parcelable
         return 0;
     }
 
+    /**
+     * Serializes this AgeRange into a Parcel.
+     *
+     * @param parcel the Parcel in which the object should be written
+     * @param i additional flags about how the object should be written
+     */
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i)
     {
@@ -54,6 +105,9 @@ public class AgeRange implements Parcelable
         parcel.writeInt(maxAge);
     }
 
+    /**
+     * Parcelable.Creator that generates instances of AgeRange from a Parcel.
+     */
     public static final Creator<AgeRange> CREATOR = new Creator<AgeRange>()
     {
         @Override
@@ -69,6 +123,12 @@ public class AgeRange implements Parcelable
         }
     };
 
+    /**
+     * Two AgeRange objects are equal if both minAge and maxAge match.
+     *
+     * @param o the object to compare to
+     * @return true if equal, false otherwise
+     */
     @Override
     public boolean equals(Object o)
     {
@@ -77,6 +137,11 @@ public class AgeRange implements Parcelable
         return minAge == ageRange.minAge && maxAge == ageRange.maxAge;
     }
 
+    /**
+     * Computes the hash code based on minAge and maxAge.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode()
     {

@@ -7,12 +7,26 @@ import androidx.annotation.NonNull;
 
 import java.util.Objects;
 
+/**
+ * Core user model containing login credentials.
+ * Extends {@link Entity} for ID support and implements Parcelable.
+ */
 public class User extends Entity implements Parcelable {
     private String username;
     private Phone phone;
     private String email;
 
+    /** Default no-arg constructor (for Firestore/serialization). */
     public User() {}
+
+    /**
+     * Constructs a User with the given credentials.
+     *
+     * @param id       unique user ID
+     * @param username login username
+     * @param phone    phone contact info
+     * @param email    email address
+     */
     public User(String id, String username, Phone phone, String email)
     {
         super(id);
@@ -21,6 +35,7 @@ public class User extends Entity implements Parcelable {
         this.email = email;
     }
 
+    /** Reconstructs a User from a Parcel. */
     public User(Parcel in) {
         super(in);
         username = in.readString();
@@ -28,28 +43,34 @@ public class User extends Entity implements Parcelable {
         email = in.readString();
     }
 
+    /** @return the login username */
     public String getUsername() {
         return username;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
+    /** @return the phone contact */
     public Phone getPhone() {
         return phone;
     }
 
+    /** @return the email address */
+    public String getEmail() {
+        return email;
+    }
+
+    /** @param username the username to set */
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
+    /** @param phone the phone to set */
     public void setPhone(Phone phone) {
         this.phone = phone;
+    }
+
+    /** @param email the email to set */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
@@ -65,6 +86,7 @@ public class User extends Entity implements Parcelable {
         parcel.writeString(email);
     }
 
+    /** Parcelable.Creator that generates User instances from a Parcel. */
     public static final Creator<User> CREATOR = new Creator<User>() {
         @Override
         public User createFromParcel(Parcel in) {
@@ -77,6 +99,12 @@ public class User extends Entity implements Parcelable {
         }
     };
 
+    /**
+     * Two Users are equal if they have the same username, phone, and email.
+     *
+     * @param o the object to compare
+     * @return true if equal, false otherwise
+     */
     @Override
     public boolean equals(Object o)
     {
