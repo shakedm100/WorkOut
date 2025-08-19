@@ -140,11 +140,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     location.getLatitude(),
                                     location.getLongitude()
                             );
-                            googleMap.animateCamera(
-                                    CameraUpdateFactory.newLatLngZoom(ll, 15f),
-                                    500,
-                                    null
-                            );
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15f));
                         }
                     });
         }
@@ -203,6 +199,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap map)
     {
         this.googleMap = map;
+        googleMap.getUiSettings().setCompassEnabled(false);
         enableMyLocation();
 
         try
@@ -367,13 +364,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     {
                         if (location != null)
                         {
-                            LatLng ll = new LatLng(
-                                    location.getLatitude(),
-                                    location.getLongitude()
-                            );
-                            googleMap.animateCamera(
-                                    CameraUpdateFactory.newLatLngZoom(ll, 15f)
-                            );
+                            LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 15f));
 
                             modelLocation = new Location(location.getLongitude(), location.getLatitude());
                             showNearbyBusinesses();
