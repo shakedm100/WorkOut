@@ -20,6 +20,7 @@ import java.util.Objects;
 import Model.Address;
 import Model.Business;
 import Model.Client;
+import Model.Course;
 import Model.Location;
 import Model.Phone;
 import Model.Rating;
@@ -57,9 +58,9 @@ public class BusinessRepository
      * Test‐and‐dependency injection constructor.
      * Used primarily for mock testing
      *
-     * @param db                 FirebaseFirestore instance to use
-     * @param auth               FirebaseAuth instance to use
-     * @param generalRepository  GeneralRepository instance for user‐existence checks
+     * @param db                FirebaseFirestore instance to use
+     * @param auth              FirebaseAuth instance to use
+     * @param generalRepository GeneralRepository instance for user‐existence checks
      */
     public BusinessRepository(FirebaseFirestore db, FirebaseAuth auth, GeneralRepository generalRepository)
     {
@@ -72,14 +73,14 @@ public class BusinessRepository
      * Registers a new business user: checks username availability, creates a Firebase
      * Authentication user, and writes the business record to Firestore.
      *
-     * @param username      desired unique username
-     * @param password      desired password
-     * @param phone         business phone number
-     * @param email         email address (used for Firebase Auth)
-     * @param businessName  display name of the business
-     * @param location      geographic location of the business
-     * @param policy        business policy text or URL
-     * @param address       physical address details of the business
+     * @param username     desired unique username
+     * @param password     desired password
+     * @param phone        business phone number
+     * @param email        email address (used for Firebase Auth)
+     * @param businessName display name of the business
+     * @param location     geographic location of the business
+     * @param policy       business policy text or URL
+     * @param address      physical address details of the business
      * @return a Task that completes with the newly created {@link Business} object,
      * or fails with:
      * <ul>
@@ -107,34 +108,34 @@ public class BusinessRepository
             }
 
             return auth.createUserWithEmailAndPassword(email, password);
-            }).continueWithTask(task ->
+        }).continueWithTask(task ->
+        {
+            if (!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            String uid = task.getResult().getUser().getUid();
+            Map<String, Object> business = new HashMap<>();
+            business.put("uid", uid);
+            business.put("username", username);
+            business.put("phone", phone);
+            business.put("email", email);
+            business.put("businessName", businessName);
+            business.put("location", location);
+            business.put("ratings", new ArrayList<>()); // No ratings for new business
+            business.put("followers", new ArrayList<>()); // No followers for new business
+            business.put("policy", policy);
+            business.put("address", address);
+
+            return db.collection(collection).document(uid).set(business).continueWith(addTask ->
             {
-                if(!task.isSuccessful())
-                    throw Objects.requireNonNull(task.getException());
-
-                String uid = task.getResult().getUser().getUid();
-                Map<String, Object> business = new HashMap<>();
-                business.put("uid", uid);
-                business.put("username", username);
-                business.put("phone", phone);
-                business.put("email", email);
-                business.put("businessName", businessName);
-                business.put("location", location);
-                business.put("ratings", new ArrayList<>()); // No ratings for new business
-                business.put("followers", new ArrayList<>()); // No followers for new business
-                business.put("policy", policy);
-                business.put("address", address);
-
-                return db.collection(collection).document(uid).set(business).continueWith(addTask ->
+                if (!addTask.isSuccessful())
                 {
-                    if (!addTask.isSuccessful())
-                    {
-                        throw Objects.requireNonNull(addTask.getException());
-                    }
-                    return new Business(uid, username, phone, email, businessName, new ArrayList<>(), location,
-                            new ArrayList<>(), new ArrayList<>(), policy, address);
-                });
+                    throw Objects.requireNonNull(addTask.getException());
+                }
+                return new Business(uid, username, phone, email, businessName, new ArrayList<>(), location,
+                        new ArrayList<>(), new ArrayList<>(), policy, address);
             });
+        });
     }
 
     /**
@@ -274,7 +275,7 @@ public class BusinessRepository
 
             return auth.signInWithEmailAndPassword(business.getEmail(), password).continueWithTask(authTask ->
             {
-                if(!authTask.isSuccessful())
+                if (!authTask.isSuccessful())
                     throw Objects.requireNonNull(authTask.getException());
 
                 FirebaseUser user = authTask.getResult().getUser();
@@ -293,7 +294,7 @@ public class BusinessRepository
      * Executes a business search using an arbitrary {@link SearchStrategyInterface}.
      *
      * @param searchStrategy strategy that knows how to perform the query
-     * @param data arbitrary filter data passed through to the strategy
+     * @param data           arbitrary filter data passed through to the strategy
      * @return a Task completing with the list of matching businesses.
      */
     public Task<List<Business>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
@@ -311,7 +312,7 @@ public class BusinessRepository
      */
     public Task<List<Business>> getBusinessesByNamePartially(String namePrefix)
     {
-        if(namePrefix.isEmpty())
+        if (namePrefix.isEmpty())
             return null;
 
         Query query = db.collection(collection)
@@ -387,12 +388,12 @@ public class BusinessRepository
      */
     public Task<Business> addRatingToBusiness(Business business, Rating rating)
     {
-        if(!business.addRating(rating))
+        if (!business.addRating(rating))
             throw new RuntimeException("Insert to business failed!");
 
         return updateBusiness(business).continueWith(task ->
         {
-            if(!task.isSuccessful())
+            if (!task.isSuccessful())
             {
                 business.deleteRating(rating);
                 throw Objects.requireNonNull(task.getException());
@@ -412,12 +413,12 @@ public class BusinessRepository
      */
     public Task<Business> deleteRatingFromBusiness(Business business, Rating rating)
     {
-        if(!business.deleteRating(rating))
+        if (!business.deleteRating(rating))
             throw new RuntimeException("Delete from business failed!");
 
         return updateBusiness(business).continueWith(task ->
         {
-            if(!task.isSuccessful())
+            if (!task.isSuccessful())
             {
                 business.deleteRating(rating);
                 throw Objects.requireNonNull(task.getException());
@@ -437,18 +438,83 @@ public class BusinessRepository
      */
     public Task<Business> updateRatingFromBusiness(Business business, Rating rating)
     {
-        if(!business.updateRating(rating))
+        if (!business.updateRating(rating))
             throw new RuntimeException("Delete from business failed!");
 
         return updateBusiness(business).continueWith(task ->
         {
-            if(!task.isSuccessful())
+            if (!task.isSuccessful())
             {
                 business.deleteRating(rating);
                 throw Objects.requireNonNull(task.getException());
             }
 
             return business;
+        });
+    }
+
+    /**
+     * Checks if the specified {@link Client} has submitted a rating for the given {@link Business}.
+     * <p>
+     * This method queries the Firestore database for the business document with the given business ID.
+     * It then inspects the {@code ratings} array field within that document. Each rating entry is
+     * expected to be a map containing:
+     * <ul>
+     *     <li>{@code stars} – a numeric value representing the rating score</li>
+     *     <li>{@code comment} – an optional comment string</li>
+     *     <li>{@code client} – a nested map containing the {@code id} and other client details</li>
+     * </ul>
+     * If a rating associated with the given client is found, a {@link Rating} object is constructed
+     * and returned asynchronously. If no matching rating is found, the task result will be {@code null}.
+     * </p>
+     *
+     * @param business the business for which to check ratings; if {@code null}, the task completes with {@code null}.
+     * @param client the client whose rating should be checked; if {@code null}, the task completes with {@code null}.
+     * @return a {@link Task} that resolves to the matching {@link Rating}, or {@code null} if no rating exists.
+     * @throws NullPointerException if the Firestore query fails and {@link Task#getException()} is {@code null}.
+     */
+    public Task<Rating> checkIfRatingExists(Business business, Client client)
+    {
+        if (client == null || business == null)
+            return Tasks.forResult(null);
+
+        DocumentReference businessRef = db.collection("businesses").document(business.getId());
+
+        return businessRef.get().continueWith(task ->
+        {
+            if (!task.isSuccessful())
+                throw Objects.requireNonNull(task.getException());
+
+            DocumentSnapshot snapshot = task.getResult();
+            if (snapshot == null || !snapshot.exists())
+                return null;
+
+            // Extract the ratings array
+            List<Map<String, Object>> ratings = (List<Map<String, Object>>) snapshot.get("ratings");
+            if (ratings == null)
+                return null;
+
+            for (Map<String, Object> ratingMap : ratings)
+            {
+                Map<String, Object> clientMap = (Map<String, Object>) ratingMap.get("client");
+                if (clientMap != null)
+                {
+                    String clientId = (String) clientMap.get("id");
+                    if (clientId != null && clientId.equals(client.getId()))
+                    {
+                        // construct a Rating object
+                        double ratingValue = ratingMap.get("stars") instanceof Number
+                                ? ((Number) ratingMap.get("stars")).doubleValue()
+                                : 0.0;
+                        String comment = (String) ratingMap.get("comment");
+
+                        return new Rating((float) ratingValue, comment, client);
+                    }
+                }
+            }
+
+            // no rating found
+            return null;
         });
     }
 }

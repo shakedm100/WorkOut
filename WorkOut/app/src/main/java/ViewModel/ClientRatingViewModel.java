@@ -62,4 +62,41 @@ public class ClientRatingViewModel extends ViewModel
                     ratingsUiState.postValue(GenericUiState.error("Rating failed: " + insertException.getMessage()));
                 });
     }
+
+    public Task<Business> updateRating(Business business, Rating rating)
+    {
+        if(business == null || rating == null)
+        {
+            ratingsUiState.postValue(GenericUiState.error("Error receiving business or rating"));
+            return null;
+        }
+
+        return businessRepository.updateRatingFromBusiness(business, rating).addOnSuccessListener(task ->
+        {
+            ratingsUiState.postValue(GenericUiState.success("Rating update success!"));
+        }).addOnFailureListener(insertException ->
+        {
+            ratingsUiState.postValue(GenericUiState.error("Rating update failed: " + insertException.getMessage()));
+        });
+    }
+
+    public Task<Rating> checkIfRatingExists(Business business, Client client)
+    {
+        if(business == null || client == null)
+        {
+            ratingsUiState.postValue(GenericUiState.error("Error receiving business or client"));
+            return null;
+        }
+
+        return businessRepository.checkIfRatingExists(business, client).addOnSuccessListener(task ->
+        {
+            if(task != null)
+                ratingsUiState.postValue(GenericUiState.idle());
+            else
+                ratingsUiState.postValue(GenericUiState.idle());
+        }).addOnFailureListener(insertException ->
+        {
+            ratingsUiState.postValue(GenericUiState.error("Checking for existing rating failed: " + insertException.getMessage()));
+        });
+    }
 }

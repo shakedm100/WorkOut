@@ -36,6 +36,7 @@ public class RatingsActivity extends AppCompatActivity
     private ProgressBar ratingsProgressBar;
     private Client client;
     private Business business;
+    private Rating currentRating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,6 +54,7 @@ public class RatingsActivity extends AppCompatActivity
 
         clientRatingViewModel = new ClientRatingViewModel();
 
+        currentRating = null;
         ratingBar = findViewById(R.id.ratingBar);
         commentEditText = findViewById(R.id.commentEditText);
         submitRatingButton = findViewById(R.id.submitRatingButton);
@@ -67,6 +69,17 @@ public class RatingsActivity extends AppCompatActivity
 
         businessNameTextView.setText("Rate " + business.getBusinessName());
 
+        clientRatingViewModel.checkIfRatingExists(business, client).addOnSuccessListener(task ->
+        {
+            // Rating exists
+            if(task != null)
+            {
+                currentRating = task;
+                commentEditText.setText(currentRating.getComment());
+                ratingBar.setRating(currentRating.getStars());
+            }
+        });
+
         // observers
         setupObservers();
 
@@ -74,12 +87,15 @@ public class RatingsActivity extends AppCompatActivity
         setupClickListeners();
     }
 
-    private void setupObservers() {
-        clientRatingViewModel.getRatingsUiState().observe(this, ratingUiState -> {
+    private void setupObservers()
+    {
+        clientRatingViewModel.getRatingsUiState().observe(this, ratingUiState ->
+        {
             if (ratingUiState == null) return;
             Intent intent;
 
-            switch (ratingUiState.getStatus()) {
+            switch (ratingUiState.getStatus())
+            {
                 case IDLE:
                     ratingsProgressBar.setVisibility(View.GONE);
                     //buttonRegister.setEnabled(true);
@@ -120,7 +136,10 @@ public class RatingsActivity extends AppCompatActivity
             float stars = ratingBar.getRating();
             String comment = commentEditText.getText().toString().trim();
             //Rating rating = new Rating(stars, comment, client);
-            clientRatingViewModel.addRating(stars, comment, client, business);
+            if(currentRating == null)
+                clientRatingViewModel.addRating(stars, comment, client, business);
+            else
+                clientRatingViewModel.updateRating(business, new Rating(stars, comment, client));
         });
     }
 
