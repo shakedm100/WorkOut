@@ -399,27 +399,50 @@ public class CourseRepository
     }
 
     /**
-     * Fetches all {@link Enrollment} records for a given {@link Client}.
+     * Retrieves all {@link Enrollment} documents from Firestore that belong to the specified {@link Client}.
+     * <p>
+     * This method queries the {@code enrollment} collection and applies a filter on the nested field
+     * {@code client.id} to match the provided client's unique identifier. It then deserializes the
+     * resulting documents into {@link Enrollment} objects and collects them into a list.
+     * </p>
      *
-     * @param client client whose enrollments to fetch
-     * @return a Task completing with the list of enrollments; fails on Firestore errors.
+     * <p>Firestore schema expectation:</p>
+     * <pre>
+     * enrollment (collection)
+     *   └── {enrollmentId} (document)
+     *         └── client (map)
+     *               └── id (string)
+     * </pre>
+     *
+     * @param client the {@link Client} whose enrollments should be retrieved.
+     *               If {@code null}, the task resolves immediately with an empty list.
+     * @return a {@link Task} that resolves to a {@link List} of {@link Enrollment} objects
+     *         associated with the given client. If no enrollments exist, the list will be empty.
+     * @throws NullPointerException if the Firestore query fails and the task’s exception is {@code null}.
      */
     public Task<List<Enrollment>> getAllEnrollmentsByClient(Client client)
     {
-        return db.collection(enrollmentCollection).whereEqualTo("client.id", client.getId())
-                .get().continueWith(task ->
+        if (client == null)
+            return Tasks.forResult(new ArrayList<>());
+
+        return db.collection(enrollmentCollection)
+                .whereEqualTo(FieldPath.of("client", "id"), client.getId())
+                .get()
+                .continueWith(task ->
                 {
                     if (!task.isSuccessful())
                         throw Objects.requireNonNull(task.getException());
 
                     ArrayList<Enrollment> enrollments = new ArrayList<>();
-                    for (DocumentSnapshot snapshot : task.getResult())
+                    QuerySnapshot qs = task.getResult();
+                    if (qs != null)
                     {
-                        Enrollment enrollment = snapshot.toObject(Enrollment.class);
-                        if (enrollment != null)
-                            enrollments.add(enrollment);
+                        for (DocumentSnapshot snapshot : qs.getDocuments())
+                        {
+                            Enrollment enrollment = snapshot.toObject(Enrollment.class);
+                            if (enrollment != null) enrollments.add(enrollment);
+                        }
                     }
-
                     return enrollments;
                 });
     }

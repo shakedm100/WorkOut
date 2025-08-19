@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.workout.R;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 import Model.AgeRange;
 import Model.Client;
 import Model.Course;
+import Model.Enrollment;
 import Model.Repository.BusinessRepository;
 import Model.Repository.CourseRepository;
 import Model.Schedule;
@@ -167,11 +169,26 @@ public class SearchResultsActivity extends AppCompatActivity
             signUpBtn.setId(View.generateViewId());
             signUpBtn.setOnClickListener(v ->
             {
-                repository.signupClientToCourse(current, course,
-                        nextScheduleTimestamp(course.getSchedule())).addOnSuccessListener(task ->
+                Timestamp nextOccurrence = nextScheduleTimestamp(course.getSchedule());
+
+                checkIfUserAlreadySigned(current, course, nextOccurrence).addOnSuccessListener(check ->
                 {
-                    Toast.makeText(this, "Sign up succeeded", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(task ->
+                    if(!check)
+                    {
+                        repository.signupClientToCourse(current, course,
+                                nextOccurrence).addOnSuccessListener(task ->
+                        {
+                            Toast.makeText(this, "Sign up succeeded", Toast.LENGTH_SHORT).show();
+                        }).addOnFailureListener(task ->
+                        {
+                            Toast.makeText(this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                    else
+                    {
+                        Toast.makeText(this, "Sign up failed - you are signed up to an overlapping course", Toast.LENGTH_LONG).show();
+                    }
+                }).addOnFailureListener(error ->
                 {
                     Toast.makeText(this, "Sign up failed", Toast.LENGTH_SHORT).show();
                 });
@@ -281,5 +298,44 @@ public class SearchResultsActivity extends AppCompatActivity
     {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+    /**
+     * This method checks if a user is already signed to another course
+     * by checking if is there any overlap between the given enrollment time
+     * and the existing enrollments
+     * @param client the client that signs up
+     * @param course the course to sign up to
+     * @param minTime the starting time of the next occurrence of the course
+     * @return Task<true> if there is any overlap, false otherwise
+     */
+    private Task<Boolean> checkIfUserAlreadySigned(Client client, Course course, Timestamp minTime)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(minTime.toDate());
+        calendar.add(Calendar.MINUTE, course.getDuration());
+        Timestamp maxTime = new Timestamp(calendar.getTime());
+        return repository.getAllEnrollmentsByClient(client).continueWith(task ->
+        {
+            if (!task.isSuccessful() || task.getResult() == null)
+                return false;
+
+            for(Enrollment current : task.getResult())
+            {
+                calendar.setTime(current.getTime().toDate());
+                calendar.add(Calendar.MINUTE, current.getCourse().getDuration());
+
+                Timestamp currentMinTime = current.getTime();
+                Timestamp currentMaxTime = new Timestamp(calendar.getTime());
+
+                // overlap check
+                if(currentMinTime.getSeconds() >= minTime.getSeconds() && currentMinTime.getSeconds() <= maxTime.getSeconds())
+                    return true;
+                if(currentMaxTime.getSeconds() >= minTime.getSeconds() && currentMaxTime.getSeconds() <= maxTime.getSeconds())
+                    return true;
+            }
+
+            return false;
+        });
     }
 }
