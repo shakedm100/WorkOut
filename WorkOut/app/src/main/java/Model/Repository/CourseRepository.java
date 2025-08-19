@@ -1,7 +1,5 @@
 package Model.Repository;
 
-import android.util.Log;
-
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
@@ -9,8 +7,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,7 +29,6 @@ import Model.Course;
 import Model.CourseType;
 import Model.Day;
 import Model.Enrollment;
-import Model.Entity;
 import Model.Schedule;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -417,7 +418,7 @@ public class CourseRepository
      * @param client the {@link Client} whose enrollments should be retrieved.
      *               If {@code null}, the task resolves immediately with an empty list.
      * @return a {@link Task} that resolves to a {@link List} of {@link Enrollment} objects
-     *         associated with the given client. If no enrollments exist, the list will be empty.
+     * associated with the given client. If no enrollments exist, the list will be empty.
      * @throws NullPointerException if the Firestore query fails and the task’s exception is {@code null}.
      */
     public Task<List<Enrollment>> getAllEnrollmentsByClient(Client client)
@@ -470,5 +471,86 @@ public class CourseRepository
 
             return enrollments;
         });
+    }
+
+    /**
+     * Convenience overload that fetches the next seven upcoming course enrollments
+     * for the given {@code client}, using {@code zone} to determine the current time.
+     * <p>
+     * An “upcoming” enrollment is any record whose {@code time} (a per-occurrence
+     * {@link com.google.firebase.Timestamp}) is greater than or equal to “now”
+     * computed in the provided {@link java.time.ZoneId}.
+     * <p>
+     * This delegates to {@link #getUpcomingCoursesByClient(Client, ZoneId, int)} with {@code limit = 7}.
+     *
+     * @param client the client whose upcoming enrollments should be returned; must not be {@code null}
+     * @param zone   the time zone used to compute “now” when filtering upcoming enrollments; must not be {@code null}
+     * @return a {@link com.google.android.gms.tasks.Task} that resolves to a list (possibly empty)
+     *         of at most seven {@link Enrollment} items ordered by ascending {@code time};
+     *         the task may fail with the underlying Firestore exception (e.g., {@code FirebaseFirestoreException})
+     */
+    public Task<List<Enrollment>> getUpcomingCoursesByClient(Client client, ZoneId zone)
+    {
+        return getUpcomingCoursesByClient(client, zone, 7);
+    }
+
+    /**
+     * Fetches at most {@code limit} upcoming enrollments for the given {@code client},
+     * ordered by start {@code time} ascending. “Upcoming” means {@code time} is
+     * greater than or equal to the current instant in the provided {@link java.time.ZoneId}.
+     * <p>
+     * Query shape:
+     * <ul>
+     *   <li>{@code whereEqualTo("client.id", client.getId())}</li>
+     *   <li>{@code whereGreaterThanOrEqualTo("time", nowTs)}</li>
+     *   <li>{@code orderBy("time", ASC)}</li>
+     *   <li>{@code limit(limit)}</li>
+     * </ul>
+     * Each document is converted to an {@link Enrollment} and collected into a list.
+     * <p>
+     * <strong>Schema note:</strong> This implementation assumes the enrollment stores the
+     * client as an embedded object with an {@code id} field (hence {@code "client.id"}).
+     * If you store a {@link com.google.firebase.firestore.DocumentReference} instead, replace
+     * the equality filter with:
+     * {@code whereEqualTo("client", db.collection("clients").document(client.getId()))}.
+     * <p>
+     * <strong>Indexing:</strong> Firestore may require a composite index for the combination
+     * of the equality filter on {@code client.id} and the range/order on {@code time}.
+     * If an index error is thrown, follow the link in the exception to create it.
+     *
+     * @param client the client whose upcoming enrollments are requested; must not be {@code null}
+     * @param zone the time zone used to compute “now” via {@link java.time.Clock#system(java.time.ZoneId)}
+     * @param limit maximum number of enrollments to return; must be positive
+     * @return a {@link com.google.android.gms.tasks.Task} that resolves to a list (possibly empty)
+     *         of up to {@code limit} {@link Enrollment} items ordered by {@code time} ascending;
+     *         the task may fail with the underlying Firestore exception
+     * @throws NullPointerException if the Firestore task fails and its exception is unexpectedly {@code null}
+     *                              (propagated via {@link java.util.Objects#requireNonNull(Object)})
+     */
+    private Task<List<Enrollment>> getUpcomingCoursesByClient(Client client, ZoneId zone, int limit)
+    {
+        Instant now = Instant.now(Clock.system(zone));
+        Timestamp nowTs = new Timestamp(java.util.Date.from(now));
+
+        return db.collection(enrollmentCollection)
+                .whereEqualTo(FieldPath.of("client", "id"), client.getId())
+                .whereGreaterThanOrEqualTo("time", nowTs)
+                .orderBy("time", Query.Direction.ASCENDING)
+                .limit(limit)
+                .get()
+                .continueWith(task ->
+                {
+                    if (!task.isSuccessful())
+                        throw Objects.requireNonNull(task.getException());
+
+                    List<Enrollment> list = new ArrayList<>();
+                    for (DocumentSnapshot doc : task.getResult())
+                    {
+                        Enrollment e = doc.toObject(Enrollment.class);
+                        if (e != null)
+                            list.add(e);
+                    }
+                    return list;
+                });
     }
 }

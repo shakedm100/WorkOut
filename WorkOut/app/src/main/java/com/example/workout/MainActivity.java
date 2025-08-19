@@ -5,8 +5,6 @@ import com.example.workout.Client.MapActivity;
 import com.example.workout.Client.ProfileActivity;
 import com.example.workout.Client.SearchActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import android.Manifest;
@@ -17,18 +15,29 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 // ViewModel imports
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 //
 
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+
+import Adapters.CourseAdapter;
+import Adapters.UpcomingEnrollmentsAdapter;
 import Model.Client;
+import Model.Course;
+import Model.Enrollment;
+import Model.Repository.CourseRepository;
 import Model.Repository.GeneralRepository;
 
 public class MainActivity extends AppCompatActivity
@@ -37,6 +46,12 @@ public class MainActivity extends AppCompatActivity
     private TextView textView;
     private Button button;
     private GeneralRepository generalRepository;
+    private RecyclerView recycler;
+    private TextView emptyView;
+    private UpcomingEnrollmentsAdapter adapter;
+    private CourseRepository courseRepository;
+
+    private ZoneId zone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -58,27 +73,31 @@ public class MainActivity extends AppCompatActivity
             {
                 // you’re already here
                 return true;
-            } else if (id == R.id.nav_profile)
+            }
+            else if (id == R.id.nav_profile)
             {
                 Intent intent = new Intent(this, ProfileActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 return true;
-            } else if (id == R.id.nav_search)
+            }
+            else if (id == R.id.nav_search)
             {
                 Intent intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 startActivity(intent);
                 return true;
-            } else if (id == R.id.nav_map)
+            }
+            else if (id == R.id.nav_map)
             {
                 Intent intent = new Intent(this, MapActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
                 startActivity(intent);
                 return true;
-            } else if (id == R.id.nav_Calendar)
+            }
+            else if (id == R.id.nav_Calendar)
             {
                 Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("client", client);
@@ -110,40 +129,82 @@ public class MainActivity extends AppCompatActivity
                     generalRepository.uploadTokenToFirestore(token);
                 });
 
-        // ViewModel changes
+        courseRepository = new CourseRepository();
+        zone = ZoneId.systemDefault();
 
-        // get the instance as the MyViewModel class with the functions
+        recycler = findViewById(R.id.todayRecycler);
+        emptyView = findViewById(R.id.emptyView);
 
-        // listen to new data
+        loadUpcomingCourses();
+    }
 
-        // Update ViewModel data on button click
+    private void loadUpcomingCourses()
+    {
+        adapter = new UpcomingEnrollmentsAdapter(e -> {
+            // It is possible to add here an onClick event, such as go to the course on the map
+        });
+
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+        recycler.setAdapter(adapter);
+
+
+        courseRepository.getUpcomingCoursesByClient(client, zone)
+                .addOnSuccessListener(enrollments ->
+                {
+                    adapter.submit(enrollments);
+                    emptyView.setText("No upcoming courses");
+                    emptyView.setVisibility(enrollments.isEmpty() ? View.VISIBLE : View.GONE);
+                })
+                .addOnFailureListener(e ->
+                {
+                    emptyView.setText("Failed to load courses");
+                    emptyView.setVisibility(View.VISIBLE);
+                    Log.e("MainActivity", "loadToday failed", e);
+                });
+    }
+
+    // ViewModel changes
+
+    // get the instance as the MyViewModel class with the functions
+
+    // listen to new data
+
+    // Update ViewModel data on button click
         /*button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //viewModel.updateText("Hello from ViewModel!");
             }
         });*/
-    }
 
     // Declare the launcher at the top of your Activity/Fragment:
     private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                if (!isGranted) {
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->
+            {
+                if (!isGranted)
+                {
                     Toast.makeText(this, "The app won't show notifications!", Toast.LENGTH_LONG).show();
                 }
             });
 
-    private void askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    private void askNotificationPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-                    PackageManager.PERMISSION_GRANTED) {
+                    PackageManager.PERMISSION_GRANTED)
+            {
                 // FCM SDK (and your app) can post notifications.
-            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            }
+            else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS))
+            {
                 // TODO: display an educational UI explaining to the user the features that will be enabled
                 //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
                 //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
                 //       If the user selects "No thanks," allow the user to continue without notifications.
-            } else {
+            }
+            else
+            {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
