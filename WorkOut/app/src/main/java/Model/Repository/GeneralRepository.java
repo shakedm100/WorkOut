@@ -17,6 +17,7 @@ import java.util.Objects;
 import Model.Address;
 import Model.City;
 import Model.Location;
+import ViewModel.GenericUiState;
 
 //import android.location.Address;
 import android.util.Log;
@@ -297,5 +298,19 @@ public class GeneralRepository
         {
             Log.w("FCM", "User not logged in. Cannot upload token.");
         }
+    }
+
+    public boolean allLetters(String word)
+    {
+        String[] words = word.split(" "); // split by space
+        boolean isNameValid;
+        for (int i = 0; i < words.length; i++)
+        {
+            isNameValid = words[i].chars().allMatch(Character::isLetter);
+            if (!isNameValid)
+                return false; // an unvalid name was found
+        }
+
+        return true; // all letters are valid
     }
 }

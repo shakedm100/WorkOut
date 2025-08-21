@@ -94,6 +94,7 @@ public class UpdateClientViewModel extends ViewModel
             return;
         }
 
+        // TODO: replace with the function in generalRepo
         nameSplit = lastName.split(" ");
         for (int i = 0; i < nameSplit.length; i++)
         {

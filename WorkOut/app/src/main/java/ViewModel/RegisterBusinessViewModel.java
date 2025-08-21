@@ -165,6 +165,7 @@ public class RegisterBusinessViewModel extends ViewModel
         }
 
         // all fields are valid -> try to insert
+        // TODO: CHANGE return to async response to the VIEW!
         businessRepository.insertBusiness(username, password, phone, email, businessName, location, policy, address)
                 .addOnSuccessListener(business ->
                 {
