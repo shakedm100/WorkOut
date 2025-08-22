@@ -213,13 +213,27 @@
 
     <Button
         android:id="@+id/registrationButton"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
+        android:layout_marginTop="84dp"
         android:backgroundTint="@color/background"
         android:text="@string/register"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addressText" />
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="144dp"
+        android:backgroundTint="@color/background"
+        android:text="Cancel"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressText" />
 
@@ -228,8 +242,8 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="12dp"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registrationButton"
@@ -268,14 +282,14 @@
 
     <TextView
         android:id="@+id/businessRegisterStatusTextView"
-        android:layout_width="219dp"
-        android:layout_height="62dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="100dp"
         android:layout_marginTop="36dp"
         android:text=""
         android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/progressBar"
-        app:layout_constraintTop_toBottomOf="@+id/registrationButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cancelButton"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
