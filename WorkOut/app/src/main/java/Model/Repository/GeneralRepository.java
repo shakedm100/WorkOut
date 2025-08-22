@@ -300,15 +300,15 @@ public class GeneralRepository
         }
     }
 
-    public boolean allLetters(String word)
+    public boolean allLetters(String name)
     {
-        String[] words = word.split(" "); // split by space
+        String[] words = name.split(" "); // split by space
         boolean isNameValid;
         for (int i = 0; i < words.length; i++)
         {
             isNameValid = words[i].chars().allMatch(Character::isLetter);
             if (!isNameValid)
-                return false; // an unvalid name was found
+                return false; // an invalid name was found
         }
 
         return true; // all letters are valid

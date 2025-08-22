@@ -31,14 +31,13 @@ public class UpdateClientActivity extends AppCompatActivity
 {
     // UI elements
     private UpdateClientViewModel updateClientViewModel;
-    private EditText editTextEmail, editTextFirstName, editTextLastName;
+    private EditText editTextFirstName, editTextLastName;
     private EditText editTextPhoneNumber, editTextStreet;
     private Spinner spinnerPhonePrefix;
     private AutoCompleteTextView cityAutoComplete;
     private Button updateButton, cancelButton;
     private ProgressBar progressBarUpdate;
     private TextView updateStateTextView;
-
     Client client;
 
     @Override
@@ -52,7 +51,6 @@ public class UpdateClientActivity extends AppCompatActivity
         updateClientViewModel = new ViewModelProvider(this).get(UpdateClientViewModel.class);
 
         // Initialize UI elements
-        //editTextEmail = findViewById(R.id.updateEmailText);
         editTextFirstName = findViewById(R.id.updateFirstNameText);
         editTextLastName = findViewById(R.id.updateLastNameText);
         spinnerPhonePrefix = findViewById(R.id.updatePrefixSpinner);
@@ -67,7 +65,6 @@ public class UpdateClientActivity extends AppCompatActivity
         // set all the existing data to the edit text
         editTextFirstName.setText(client.getFirstName());
         editTextLastName.setText(client.getLastName());
-        //editTextEmail.setText(client.getEmail());
         editTextPhoneNumber.setText(client.getPhone().getNumber());
         editTextStreet.setText(client.getAddress().getName());
 
@@ -77,11 +74,11 @@ public class UpdateClientActivity extends AppCompatActivity
         adapterPhonePrefixes.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerPhonePrefix.setAdapter(adapterPhonePrefixes);
 
-        int position = adapterPhonePrefixes.getPosition(client.getPhone().getNumber()); // uses equals()
+        int position = adapterPhonePrefixes.getPosition(client.getPhone().getPrefix().getCode()); // uses equals()
         if (position >= 0)
             spinnerPhonePrefix.setSelection(position);
-
-        // TODO: handle error if position is -1?
+        else
+            spinnerPhonePrefix.setSelection(0);
 
         // set autocomplete value
 
@@ -91,7 +88,6 @@ public class UpdateClientActivity extends AppCompatActivity
         cityAutoComplete.setAdapter(adapter);
         City matchedCity = adapter.getItem(0);
         cityAutoComplete.setText(matchedCity.getEnglishName(), false); // false prevents dropdown from opening
-        //cityAutoComplete.setText(client.getAddress().getCity().getEnglishName(), false); // false prevents dropdown from opening
 
         // Setup Observers for LiveData
         setupObservers();
@@ -103,7 +99,6 @@ public class UpdateClientActivity extends AppCompatActivity
         updateClientViewModel.getUpdateUiState().observe(this, updateUiState -> {
             if (updateUiState == null) return;
             Intent intent;
-
             switch (updateUiState.getStatus()) {
                 case IDLE:
                     progressBarUpdate.setVisibility(View.GONE);
@@ -113,20 +108,18 @@ public class UpdateClientActivity extends AppCompatActivity
                 case LOADING:
                     progressBarUpdate.setVisibility(View.VISIBLE);
                     updateButton.setEnabled(false);
-                    updateStateTextView.setVisibility(View.GONE);
+                    updateStateTextView.setVisibility(View.VISIBLE);
                     break;
                 case SUCCESS:
                     progressBarUpdate.setVisibility(View.GONE);
                     updateButton.setEnabled(true);
                     updateStateTextView.setVisibility(View.GONE);
-                    Toast.makeText(UpdateClientActivity.this,
-                            "Update Successful!", Toast.LENGTH_LONG).show();
-                    // navigate to login screen after success
+                    // navigate to the main screen after success
                     intent = new Intent(this, MainActivity.class);
                     intent.putExtra("client", client); // add the client
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                    finish(); // Finish update -> can't go back
+                    finish(); // Finish update -> back to the previous screen
                     break;
                 case ERROR:
                     progressBarUpdate.setVisibility(View.GONE);
@@ -145,9 +138,9 @@ public class UpdateClientActivity extends AppCompatActivity
             String lastName = editTextLastName.getText().toString().trim();
 
             String phonePrefixStr = "";
-            if (spinnerPhonePrefix.getSelectedItem() != null) {
+            if (spinnerPhonePrefix.getSelectedItem() != null)
                 phonePrefixStr = spinnerPhonePrefix.getSelectedItem().toString();
-            }
+
 
             String cityName = cityAutoComplete.getText().toString().trim();
             City selectedCity = null;
@@ -167,8 +160,17 @@ public class UpdateClientActivity extends AppCompatActivity
             String street = editTextStreet.getText().toString().trim();
 
             // Call the ViewModel method to perform update
-            updateClientViewModel.updateClient(this.getApplicationContext(), firstName, lastName, phonePrefixStr, phoneNumber, selectedCity, street, client);
-        });
+            updateClientViewModel.updateClient(this.getApplicationContext(), firstName, lastName, phonePrefixStr, phoneNumber,
+                    selectedCity, street, client).addOnSuccessListener(task -> {
+                        if(task)
+                        {
+                            Toast.makeText(this, "Successfully updated details", Toast.LENGTH_LONG).show();
+                        }
+                        }).addOnFailureListener(e ->
+                        {
+                            Toast.makeText(this, "Failed to update details", Toast.LENGTH_LONG).show();
+                        });
+            });
 
         // get back to the profile page
         cancelButton.setOnClickListener(v -> {
@@ -195,7 +197,7 @@ public class UpdateClientActivity extends AppCompatActivity
                                 cityAutoComplete.setAdapter(adapterCities);
                                 adapterCities.notifyDataSetChanged();
                             })
-                            .addOnFailureListener(e -> { // TODO: remove it?
+                            .addOnFailureListener(e -> {
                                 Toast.makeText(UpdateClientActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                 }
