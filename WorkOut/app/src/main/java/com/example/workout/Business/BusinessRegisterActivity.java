@@ -33,7 +33,7 @@ public class BusinessRegisterActivity extends AppCompatActivity
     private Spinner spinnerPhonePrefix;
     private AutoCompleteTextView cityAutoComplete;
     private ProgressBar statusProgressBar;
-    private Button buttonRegister;
+    private Button buttonRegister, cancelButton;
     private TextView businessRegisterStatusTextView;
 
     @Override
@@ -54,9 +54,8 @@ public class BusinessRegisterActivity extends AppCompatActivity
         statusProgressBar = findViewById(R.id.progressBar);
         businessRegisterStatusTextView = findViewById(R.id.businessRegisterStatusTextView);
         editPolicyText = findViewById(R.id.policyText);
+        cancelButton = findViewById(R.id.cancelButton);
 
-        // ApplicationProvider.getApplicationContext();
-        //         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
         registerBusinessViewModel = new ViewModelProvider(this).get(RegisterBusinessViewModel.class);
 
         List<String> phonePrefixes = registerBusinessViewModel.getAllPhonePrefixes();
@@ -130,8 +129,6 @@ public class BusinessRegisterActivity extends AppCompatActivity
                     statusProgressBar.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
                     businessRegisterStatusTextView.setVisibility(View.GONE);
-                    Toast.makeText(BusinessRegisterActivity.this,
-                            "Registration Successful!", Toast.LENGTH_LONG).show();
                     // navigate to login screen after success
                     intent = new Intent(BusinessRegisterActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -183,15 +180,21 @@ public class BusinessRegisterActivity extends AppCompatActivity
             }
 
             // try to register
-            registerBusinessViewModel.registerBusiness(this.getApplicationContext(),
-                    username, password, phonePrefixStr, phoneNumberStr, email, name, selectedCity, addressStr, policy
-            );
+            registerBusinessViewModel.registerBusiness(this.getApplicationContext(), username, password, phonePrefixStr,
+                    phoneNumberStr, email, name, selectedCity, addressStr, policy)
+                    .addOnSuccessListener(task -> {
+                    if(task)
+                    {
+                        Toast.makeText(this, "Business registered successfully!", Toast.LENGTH_LONG).show();
+                    }
+                    }).addOnFailureListener(e ->
+                    {
+                        Toast.makeText(this, "Failed to register business", Toast.LENGTH_LONG).show();
+                    });
         });
 
-        // TODO: add back to login button
-        // Button backToLoginButton = findViewById(R.id.backToLoginButtonRegister);
-        // backToLoginButton.setOnClickListener(v -> {
-        //     finish(); // Simply finish RegisterActivity to go back to LoginActivity
-        // });
+         cancelButton.setOnClickListener(v -> {
+             finish(); // Simply finish RegisterActivity to go back to LoginActivity
+         });
     }
 }

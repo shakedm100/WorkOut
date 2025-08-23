@@ -5,21 +5,25 @@ import static com.google.android.gms.tasks.Tasks.await;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.workout.LoginActivity;
 import com.example.workout.R;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -52,6 +56,7 @@ import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.CourseRepository;
 import Model.Schedule;
+import ViewModel.Business.AddOrEditClassViewModel;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -64,11 +69,13 @@ import android.content.Context;
 
 public class AddOrEditClassActivity extends AppCompatActivity
 {
-
+    private AddOrEditClassViewModel addOrEditClassViewModel;
     private boolean isTest;
     private EditText courseNameEditText, capacityEditText, descriptionEditText;
     private Spinner dayOfWeekSpinner, courseTypeSpinner, categorySpinner;
-    private Button saveButton, startTimeButton, endTimeButton, deleteButton;
+    private Button saveButton, startTimeButton, endTimeButton, deleteButton, backButton;
+    private ProgressBar progressBar;
+    private TextView textViewStatus;
     private RangeSlider ageSlider;
     private AgeRange ageRange;
     ViewGroup container;
@@ -77,6 +84,8 @@ public class AddOrEditClassActivity extends AppCompatActivity
     protected CourseRepository courseRepository;
     private LocalTime startTime, endTime;
     private int initialHour, initialMinute, endHour, endMinute;
+
+    private MaterialTimePicker startPicker, endPicker;
 
     // Dummy comment
     @Override
@@ -108,11 +117,12 @@ public class AddOrEditClassActivity extends AppCompatActivity
         ageSlider = new RangeSlider(this);
         startTimeButton = findViewById(R.id.startTimeButton);
         endTimeButton = findViewById(R.id.endTimeButton);
+        progressBar = findViewById(R.id.addOrEditProgressBar);
+        textViewStatus = findViewById(R.id.addOrEditTestTextView);
+        backButton = findViewById(R.id.backButton);
+
         initialHour = 12;
         initialMinute = 0;
-
-//        requestNotificationPermission();
-//        createNotificationChannel();
 
         createCourseTypeSpinner();
         createCategorySpinner();
@@ -121,7 +131,8 @@ public class AddOrEditClassActivity extends AppCompatActivity
 
         if (currentCourse != null) // Then it's update course
         {
-            courseNameEditText.setHint(currentCourse.getName());
+            deleteButton.setVisibility(View.VISIBLE);
+            courseNameEditText.setText(currentCourse.getName());
 
             ArrayList<Float> values = new ArrayList<>();
             values.add((float) currentCourse.getAgeRange().getMinAge());
@@ -144,67 +155,18 @@ public class AddOrEditClassActivity extends AppCompatActivity
             endMinute = calendar.get(Calendar.MINUTE);
         }
 
-        // Press on save
-        saveButton.setOnClickListener(v ->
-        {
-            buildCourseFromFieldsAndQuery(false);
-        });
-
-        // Press on Delete
-        deleteButton.setOnClickListener(v -> {
-            courseRepository.deleteCourse(currentCourse, currentBusiness)
-                    .addOnSuccessListener(result -> {
-                        if (Boolean.TRUE.equals(result))
-                        {
-                            // send a cancellation notification to all the participants
-                            if (currentCourse.getParticipants().size() > 0)
-                            {
-                                // TODO:create a notification
-                            }
-                            Toast.makeText(this, "Successfully deleted the course", Toast.LENGTH_LONG).show();
-                            buildCourseFromFieldsAndQuery(true);
-                        } else {
-                            Toast.makeText(this, "Failed to delete the course", Toast.LENGTH_LONG).show();
-                            // TODO: Show error on screen - create a view model
-                        }
-                    })
-                    .addOnFailureListener(this, e -> {
-                        Toast.makeText(this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-            finish();
-        });
-
-
         MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H).setHour(initialHour).setMinute(initialMinute);
-        MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
+        startPicker = builder.setTitleText("Select start time").build();
 
         builder = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_24H).setHour(endHour).setMinute(endMinute);
-        MaterialTimePicker endPicker = builder.setTitleText("Select end time").build();
+        endPicker = builder.setTitleText("Select end time").build();
 
-        startPicker.addOnPositiveButtonClickListener(v ->
-        {
-            int hours = startPicker.getHour();
-            int minutes = startPicker.getMinute();
-            startTime = LocalTime.of(hours, minutes);
-        });
+        addOrEditClassViewModel = new AddOrEditClassViewModel();
 
-        endPicker.addOnPositiveButtonClickListener(v ->
-        {
-            int hours = endPicker.getHour();
-            int minutes = endPicker.getMinute();
-            endTime = LocalTime.of(hours, minutes);
-        });
-
-        findViewById(R.id.startTimeButton).setOnClickListener(v ->
-        {
-            startPicker.show(getSupportFragmentManager(), "START_PICKER");
-        });
-        findViewById(R.id.endTimeButton).setOnClickListener(v ->
-        {
-            endPicker.show(getSupportFragmentManager(), "END_PICKER");
-        });
+        setupObservers();
+        setupListeners();
     }
 
     private void createCourseTypeSpinner()
@@ -325,7 +287,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     {
         CourseType courseType = CourseType.valueOf(courseTypeSpinner.getSelectedItem().toString());
         String courseName = courseNameEditText.getText().toString().trim();
-        int capacity = Integer.parseInt(capacityEditText.getText().toString());
+        String capacity = capacityEditText.getText().toString();
         // Use the page's age range
         // Convert LocalDate to TimeStamp
         Schedule schedule = null;
@@ -346,84 +308,63 @@ public class AddOrEditClassActivity extends AppCompatActivity
         Category category = Category.valueOf(categorySpinner.getSelectedItem().toString());
         String description = descriptionEditText.getText().toString();
 
-
         if (currentCourse == null) // Insert
         {
-            int duration = (int)Duration.between(startTime, endTime).toMinutes();
-            courseRepository.insertCourse(currentBusiness, courseName, schedule,
-                    capacity, courseType, ageRange, category, description, duration).addOnSuccessListener(task ->
-            {
-                if(task != null)
-                {
-                    Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
-                    TextView temp = findViewById(R.id.addOrEditTestTextView);
-                    temp.setText("Successfully added the course");
-                    if(!isTest)
-                        finish();
-                }
-            }).addOnFailureListener(e ->
-            {
-                Toast.makeText(this, "Failed to add the course", Toast.LENGTH_LONG).show();
-                // TODO: Show error on screen
-            });
+            deleteButton.setVisibility(View.GONE);
+
+            // call to VM to check arguments and insertion
+            addOrEditClassViewModel.insertCourse(currentBusiness, courseName, schedule,
+                    capacity, courseType, ageRange, category, description, startTime, endTime)
+                    .addOnSuccessListener(task -> {
+                        if(task)
+                        {
+                            Toast.makeText(this, "Successfully added the course", Toast.LENGTH_LONG).show();
+                            if(!isTest)
+                                finish();
+                        }
+                    }).addOnFailureListener(e ->
+                    {
+                        Toast.makeText(this, "Failed to add the course", Toast.LENGTH_LONG).show();
+                    });
         }
         else // Update
         {
             if (deleteClass)
+            {
+                finish();
                 return;
+            }
 
-            int duration;
+            // get the original time of the class
+            Date date = currentCourse.getSchedule().getOccurrence().toDate();
+            Instant instant = date.toInstant();
+            LocalTime ogStartTime = instant.atZone(ZoneOffset.UTC).toLocalTime();
+
             if(startTime == null)
-            {
-                Date date = currentCourse.getSchedule().getOccurrence().toDate();
-                Instant instant = date.toInstant();
-                startTime = instant.atZone(ZoneOffset.UTC).toLocalTime();
-                duration = currentCourse.getDuration();
-            }
-            else
-            {
-                duration = (int)Duration.between(startTime, endTime).toMinutes();
-            }
+                startTime = ogStartTime;
 
+            if (endTime == null)
+                endTime = ogStartTime.plusMinutes(currentCourse.getDuration());
 
             if(schedule == null)
             {
                 schedule = currentCourse.getSchedule();
-                schedule.setDay(dayOfWeek);
+                schedule.setDay(dayOfWeek); // ?
             }
 
-            if (courseType != currentCourse.getType())
-                currentCourse.setType(courseType);
-            if (!courseName.equals(currentCourse.getName()) && !courseName.isEmpty())
-                currentCourse.setName(courseName);
-            if (capacity != currentCourse.getCapacity())
-                currentCourse.setCapacity(capacity);
-            if (!schedule.equals(currentCourse.getSchedule()))
-                currentCourse.setSchedule(schedule);
-            if(!ageRange.equals(currentCourse.getAgeRange()))
-                currentCourse.setAgeRange(ageRange);
-            if (category != currentCourse.getCategory())
-                currentCourse.setCategory(category);
-            if (!description.equals(currentCourse.getDescription()))
-                currentCourse.setDescription(description);
-            if(duration != currentCourse.getDuration())
-                currentCourse.setDuration(duration);
-
-            courseRepository.updateCourse(currentCourse, currentBusiness).addOnSuccessListener(task ->
-            {
-                if(task != null)
-                {
-                    Toast.makeText(this, "Successfully updated the course", Toast.LENGTH_LONG).show();
-                    TextView temp = findViewById(R.id.addOrEditTestTextView);
-                    temp.setText("Successfully updated the course");
-                    if(!isTest)
-                        finish();
-                }
-            }).addOnFailureListener(e ->
-            {
-                Toast.makeText(this, "Failed to update the course", Toast.LENGTH_LONG).show();
-                // TODO: Show error on screen
-            });
+            addOrEditClassViewModel.updateCourse(currentBusiness, courseName, schedule, capacity,
+                    courseType, ageRange, category, description, startTime, endTime, currentCourse)
+                    .addOnSuccessListener(task -> {
+                        if(task)
+                        {
+                            Toast.makeText(this, "Successfully updated the course", Toast.LENGTH_LONG).show();
+                            if(!isTest)
+                                finish();
+                        }
+                    }).addOnFailureListener(e ->
+                    {
+                        Toast.makeText(this, "Failed to update the course", Toast.LENGTH_LONG).show();
+                    });
         }
     }
 
@@ -441,41 +382,92 @@ public class AddOrEditClassActivity extends AppCompatActivity
         isTest = true;
     }
 
-    // notifications
-    /*
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "MyChannel";
-            String description = "My Notification Channel";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("my_channel_id", name, importance);
-            channel.setDescription(description);
+    private void setupObservers()
+    {
+        addOrEditClassViewModel.getAddOrEditUiState().observe(this, addOrEditUiState ->
+        {
+            if (addOrEditUiState == null)
+                return; // should not happen if initialized
 
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            switch (addOrEditUiState.getStatus())
+            {
+                case IDLE:
+                    progressBar.setVisibility(View.GONE);
+                    textViewStatus.setVisibility(View.GONE);
+                    break;
+                case LOADING:
+                    progressBar.setVisibility(View.VISIBLE);
+                    saveButton.setEnabled(false);
+                    deleteButton.setEnabled(false);
+                    textViewStatus.setVisibility(View.VISIBLE);
+                    break;
+                case SUCCESS:
+                    progressBar.setVisibility(View.GONE);
+                    saveButton.setEnabled(true);
+                    deleteButton.setEnabled(true);
+                    textViewStatus.setVisibility(View.GONE);
+                    break;
+                case ERROR:
+                    progressBar.setVisibility(View.GONE);
+                    saveButton.setEnabled(true);
+                    deleteButton.setEnabled(true);
+                    textViewStatus.setText(addOrEditUiState.getErrorMessage());
+                    textViewStatus.setVisibility(View.VISIBLE);
+                    break;
             }
-        }
+        });
     }
 
-    private void showNotification() {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "my_channel_id")
-                .setSmallIcon(R.drawable.notification_icon) // make sure this icon exists
-                .setContentTitle("Hello")
-                .setContentText("This is a test notification.")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+    private void setupListeners()
+    {
+        // Press on Back button
+        backButton.setOnClickListener(v ->
+        {
+            finish();
+        });
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(1001, builder.build());
+        // Press on save button
+        saveButton.setOnClickListener(v ->
+        {
+            buildCourseFromFieldsAndQuery(false);
+        });
+
+        // Press on Delete button
+        deleteButton.setOnClickListener(v -> {
+            addOrEditClassViewModel.deleteCourse(currentCourse, currentBusiness)
+                    .addOnSuccessListener(result -> {
+                        if (result)
+                        {
+                            Toast.makeText(this, "Successfully deleted the course", Toast.LENGTH_LONG).show();
+                            buildCourseFromFieldsAndQuery(true);
+                            finish();
+                        }
+                    }).addOnFailureListener(this, e -> {
+                        Toast.makeText(this, "Course deletion failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        });
+
+        startPicker.addOnPositiveButtonClickListener(v ->
+        {
+            int hours = startPicker.getHour();
+            int minutes = startPicker.getMinute();
+            startTime = LocalTime.of(hours, minutes);
+        });
+
+        endPicker.addOnPositiveButtonClickListener(v ->
+        {
+            int hours = endPicker.getHour();
+            int minutes = endPicker.getMinute();
+            endTime = LocalTime.of(hours, minutes);
+        });
+
+        findViewById(R.id.startTimeButton).setOnClickListener(v ->
+        {
+            startPicker.show(getSupportFragmentManager(), "START_PICKER");
+        });
+        findViewById(R.id.endTimeButton).setOnClickListener(v ->
+        {
+            endPicker.show(getSupportFragmentManager(), "END_PICKER");
+        });
     }
-
-     */
 }

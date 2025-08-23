@@ -41,7 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     private AutoCompleteTextView cityAutoComplete;
     private RadioGroup radioGroupGender;
     private RadioButton radioMale, radioFemale;
-    private Button buttonRegister;
+    private Button buttonRegister, cancelButton;
     private ProgressBar progressBarRegister;
     private TextView textViewRegisterState;
 
@@ -75,6 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
         buttonRegister = findViewById(R.id.registrationButton);
         progressBarRegister = findViewById(R.id.registerProgressBar);
         textViewRegisterState = findViewById(R.id.stateTextView);
+        cancelButton = findViewById(R.id.cancelButton);
 
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
@@ -151,8 +152,6 @@ public class RegisterActivity extends AppCompatActivity {
                     progressBarRegister.setVisibility(View.GONE);
                     buttonRegister.setEnabled(true);
                     textViewRegisterState.setVisibility(View.GONE);
-                    Toast.makeText(RegisterActivity.this,
-                            "Registration Successful!", Toast.LENGTH_LONG).show();
                     // navigate to login screen after success
                     intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -204,7 +203,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
 
-
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
             String street = editTextStreet.getText().toString().trim();
 
@@ -216,16 +214,21 @@ public class RegisterActivity extends AppCompatActivity {
                 gender = Gender.Female;
 
             // Call the ViewModel method to perform registration
-            registerViewModel.registerUser(
-                    email, password, username, firstName, lastName,
-                    phonePrefixStr, phoneNumber, birthdate, selectedCity, street, gender
-            );
+            registerViewModel.registerUser(email, password, username, firstName, lastName,
+                    phonePrefixStr, phoneNumber, birthdate, selectedCity, street, gender, this.getApplicationContext())
+                    .addOnSuccessListener(task -> {
+                        if(task)
+                        {
+                            Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
+                        }
+                        }).addOnFailureListener(e ->
+                        {
+                            Toast.makeText(this, "Failed to register: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
         });
 
-        // TODO: add back to login button -> when active screens will be available
-        // Button backToLoginButton = findViewById(R.id.backToLoginButtonRegister);
-        // backToLoginButton.setOnClickListener(v -> {
-        //     finish(); // Simply finish RegisterActivity to go back to LoginActivity
-        // });
+         cancelButton.setOnClickListener(v -> {
+             finish(); // Simply finish RegisterActivity to go back to LoginActivity
+         });
     }
 }

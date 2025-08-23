@@ -93,8 +93,9 @@
         <EditText
             android:id="@+id/descriptionEditText"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             android:ems="10"
+            android:layout_marginTop="20dp"
             tools:ignore="autofill"
             android:hint="@string/course_description"
             android:inputType="text" />
@@ -103,7 +104,7 @@
             android:id="@+id/buttonSave"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
             android:backgroundTint="@color/background"
             android:text="@string/save"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -115,18 +116,43 @@
             android:id="@+id/buttonDelete"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
             android:backgroundTint="@color/background"
             android:text="@string/delete"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/black"
             android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/background"
+            android:text="Back"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/black"
+            android:textSize="20sp"
             android:textStyle="bold" />
+
+        <ProgressBar
+            android:id="@+id/addOrEditProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/addOrEditTestTextView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"/>
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            android:textSize="15sp"
+            tools:visibility="visible" />
     </LinearLayout>
 </ScrollView>

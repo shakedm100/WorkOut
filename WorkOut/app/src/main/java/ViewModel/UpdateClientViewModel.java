@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,18 +25,14 @@ import Model.Repository.GeneralRepository;
 
 public class UpdateClientViewModel extends ViewModel
 {
-
     private final ClientRepository clientRepository;
 
     private final GeneralRepository generalRepository;
 
     private final MutableLiveData<GenericUiState<String>> _updateUiState = new MutableLiveData<>(GenericUiState.idle());
     public LiveData<GenericUiState<String>> updateUiState = _updateUiState;
+    private TaskCompletionSource<Boolean> taskCompletionSource;
 
-//    public RegisterViewModel(ClientRepository clientRepository, GeneralRepository generalRepository) {
-//        this.clientRepository = clientRepository;
-//        this.generalRepository = generalRepository;
-//    }
 
     public UpdateClientViewModel()
     {
@@ -62,150 +59,158 @@ public class UpdateClientViewModel extends ViewModel
         return generalRepository.getCityByNamePartially(input);
     }
 
-    /**
-     * Attempts to register a new User with the given parameters.
-     */
-    public void updateClient(Context context, String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
+    public boolean checkArguments(String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
     {
-        _updateUiState.postValue(GenericUiState.loading("Validating input..."));
-        boolean isNameValid;
         // basic validation checks
         if (firstName == null || firstName.trim().isEmpty())
         {
             _updateUiState.postValue(GenericUiState.error("Please enter a first name."));
-            return;
+            return false;
         }
-
-        String[] nameSplit = firstName.split(" ");
-        for (int i = 0; i < nameSplit.length; i++)
-        {
-            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
-            if (!isNameValid)
-            {
-                _updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
-                return;
-            }
-        }
-
 
         if (lastName == null || lastName.trim().isEmpty())
         {
             _updateUiState.postValue(GenericUiState.error("Please enter a last name."));
-            return;
+            return false;
         }
 
-        nameSplit = lastName.split(" ");
-        for (int i = 0; i < nameSplit.length; i++)
+        if (!generalRepository.allLetters(firstName))
         {
-            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
-            if (!isNameValid)
-            {
-                _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
-                return;
-            }
+            _updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
+            return false;
+        }
+
+        if (!generalRepository.allLetters(lastName))
+        {
+            _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
+            return false;
         }
 
         if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty())
         {
             _updateUiState.postValue(GenericUiState.error("Please select a phone prefix."));
-            return;
+            return false;
         }
 
         PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
         if (prefix == null)
         {
             _updateUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
-            return;
+            return false;
         }
 
         if (phoneNumberStr == null || phoneNumberStr.trim().isEmpty() || !phoneNumberStr.trim().matches("\\d+"))
         {
             _updateUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
-            return;
+            return false;
         }
         if (!phoneNumberStr.trim().matches("[0-9]+"))
         {
             _updateUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
-            return;
+            return false;
         }
 
         if (phoneNumberStr.trim().length() != 7)
         {
             _updateUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
-            return;
+            return false;
         }
 
         if (city == null)
         {
             _updateUiState.postValue(GenericUiState.error("City is null."));
-            return;
+            return false;
         }
         if (street == null || street.trim().isEmpty())
         {
             _updateUiState.postValue(GenericUiState.error("Please enter a street address."));
-            return;
+            return false;
         }
 
-        // Trim inputs after validation
-        final String finalFirstName = firstName.trim();
-        final String finalLastName = lastName.trim();
-        final String finalPhoneNumber = phoneNumberStr.trim();
-        final String finalStreet = street.trim();
-
-        _updateUiState.postValue(GenericUiState.loading("Verifying city information..."));
-
-        Phone finalPhone = new Phone(prefix, finalPhoneNumber);
-        Address finalAddress = new Address(city, finalStreet);
-
-        // parse address to location and try to create a valid location
-        Geocoder geocoder = new Geocoder(context, new Locale("en", "IL"));
-        Location location = generalRepository.convertAddressToLocation2(geocoder, finalAddress);
-
-        // failed to get the long/lat of the given address
-        if (location == null)
+        if (client == null)
         {
-            _updateUiState.postValue(GenericUiState.error("Invalid address."));
-            return;
+            _updateUiState.postValue(GenericUiState.error("Client can not be null!"));
+            return false;
         }
 
-        // check if any change was made
-        if (client.getFirstName().equals(finalFirstName) &&
-                client.getLastName().equals(finalLastName) &&
-                client.getPhone().equals(finalPhone) &&
-                client.getAddress().equals(finalAddress))
+        return true;
+    }
+    /**
+     * Attempts to register a new User with the given parameters.
+     */
+    public Task<Boolean> updateClient(Context context, String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
+    {
+        taskCompletionSource = new TaskCompletionSource<>();
+        _updateUiState.postValue(GenericUiState.loading("Validating input..."));
+
+        if (!checkArguments(firstName, lastName, phonePrefixStr, phoneNumberStr, city, street, client))
+            taskCompletionSource.setResult(false);
+
+        else
         {
-            _updateUiState.postValue(GenericUiState.error("No changes were made."));
-            return;
+            // Trim inputs after validation
+            PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
+            final String finalFirstName = firstName.trim();
+            final String finalLastName = lastName.trim();
+            final String finalPhoneNumber = phoneNumberStr.trim();
+            final String finalStreet = street.trim();
+
+            _updateUiState.postValue(GenericUiState.loading("Verifying city information..."));
+
+            Phone finalPhone = new Phone(prefix, finalPhoneNumber);
+            Address finalAddress = new Address(city, finalStreet);
+
+            // parse address to location and try to create a valid location
+            Geocoder geocoder = new Geocoder(context, new Locale("en", "IL"));
+            Location location = generalRepository.convertAddressToLocation2(geocoder, finalAddress);
+
+            // failed to get the long/lat of the given address
+            if (location == null)
+            {
+                _updateUiState.postValue(GenericUiState.error("Invalid address."));
+                taskCompletionSource.setResult(false);
+                return taskCompletionSource.getTask();
+            }
+
+            // check if any changes were made
+            if (client.getFirstName().equals(finalFirstName) &&
+                    client.getLastName().equals(finalLastName) &&
+                    client.getPhone().equals(finalPhone) &&
+                    client.getAddress().equals(finalAddress))
+            {
+                _updateUiState.postValue(GenericUiState.error("No changes were made."));
+                taskCompletionSource.setResult(false);
+            }
+
+            if (!taskCompletionSource.getTask().isComplete())
+            {
+                // set the new client details after validation
+                client.setFirstName(finalFirstName);
+                client.setLastName(finalLastName);
+                client.setPhone(finalPhone);
+                client.setAddress(finalAddress);
+
+                clientRepository.updateClientByID(client)
+                        .addOnSuccessListener(updateResult ->
+                        {
+                            _updateUiState.postValue(GenericUiState.success("Update successful!"));
+                            taskCompletionSource.setResult(true);
+                        })
+                        .addOnFailureListener(updateException ->
+                        {
+                            _updateUiState.postValue(GenericUiState.error("Update failed: " + updateException.getMessage()));
+                            taskCompletionSource.setResult(false);
+                        });
+            }
         }
 
-        // get data to roll back if the update fails
-        String oldFirstName = client.getFirstName();
-        String oldLastName = client.getLastName();
-        Phone oldPhone = client.getPhone();
-        Address oldAddress = client.getAddress();
-
-        // set the new client details after validation
-        client.setFirstName(finalFirstName);
-        client.setLastName(finalLastName);
-        client.setPhone(finalPhone);
-        client.setAddress(finalAddress);
-
-        clientRepository.updateClientByID(client)
-                .addOnSuccessListener(updateResult ->
-                {
-                    _updateUiState.postValue(GenericUiState.success("Update successful!" + finalFirstName));
-                })
-                .addOnFailureListener(updateException ->
-                {
-                    // roll back in case of a failure
-                    client.setFirstName(oldFirstName);
-                    client.setLastName(oldLastName);
-                    client.setPhone(oldPhone);
-                    client.setAddress(oldAddress);
-                    _updateUiState.postValue(GenericUiState.error("Update failed: " + updateException.getMessage()));
-                });
+        return taskCompletionSource.getTask();
     }
 
+    /**
+     * Get the status of the current UI state.
+     * @return the current state of the UI.
+     */
     public LiveData<GenericUiState<String>> getUpdateUiState()
     {
         return updateUiState;
