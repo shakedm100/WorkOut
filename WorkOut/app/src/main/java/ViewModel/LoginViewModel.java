@@ -8,6 +8,9 @@ import android.util.Log;
 
 // If you created LoginUiState.java:
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+
 import Model.Business;
 import Model.Repository.BusinessRepository;
 import Model.Repository.ClientRepository; // Assuming this is your repository
@@ -21,13 +24,8 @@ public class LoginViewModel extends ViewModel
     private final ClientRepository clientRepository;
     private final BusinessRepository businessRepository;
     // T is String here, representing a success token or message
-    private final MutableLiveData<GenericUiState<User>> _loginUiState =
-            new MutableLiveData<>(GenericUiState.idle());
-    public LiveData<GenericUiState<User>> loginUiState = _loginUiState;
-
-    //    public LoginViewModel(ClientRepository clientRepository) {
-    //        this.clientRepository = clientRepository;
-    //    }
+    private final MutableLiveData<GenericUiState<User>> _loginUiState = new MutableLiveData<>(GenericUiState.idle());
+    private TaskCompletionSource<Boolean> taskCompletionSource;
 
     public LoginViewModel()
     {
@@ -35,35 +33,50 @@ public class LoginViewModel extends ViewModel
         this.businessRepository = new BusinessRepository();
     }
 
-    public void loginUser(String username, String password)
+    public Task<Boolean> loginUser(String username, String password)
     {
+        taskCompletionSource = new TaskCompletionSource<>();
         _loginUiState.postValue(GenericUiState.loading());
 
-        clientRepository.checkLogin(username, password)
-                .addOnSuccessListener(client ->
-                { // Assuming 'client' gives you some success data
-                    // String token = client.getToken(); // Example
-                    // For login, the success data might be a user object, a session token, or just a confirmation.
-                    // Let's assume it's a success message or token as a String.
-                    _loginUiState.postValue(GenericUiState.success(client)); // Or pass token
-                })
-                .addOnFailureListener(e ->
-                {
-                    businessRepository.checkLogin(username, password)
-                            .addOnSuccessListener(business ->
-                            {
-                                // Business login successful
-                                // String sessionInfo = business.getSessionInfo(); // Example
-                                _loginUiState.postValue(GenericUiState.success(business)); // Or pass token/business data
-                            })
-                            .addOnFailureListener(businessError ->
-                            {
-                                //TODO: Change the error message
-                                _loginUiState.postValue(GenericUiState.error(e.getMessage()));
-                            });
-                });
+        // validation
+        if (username.isEmpty())
+        {
+            _loginUiState.postValue(GenericUiState.error("Username can not be empty"));
+            taskCompletionSource.setResult(false);
+            return taskCompletionSource.getTask();
+        }
 
+        if (password.isEmpty())
+        {
+            _loginUiState.postValue(GenericUiState.error("Password can not be empty"));
+            taskCompletionSource.setResult(false);
+        }
 
+        if (!taskCompletionSource.getTask().isComplete())
+        {
+            clientRepository.checkLogin(username, password)
+                    .addOnSuccessListener(client ->
+                    {
+                        _loginUiState.postValue(GenericUiState.success(client));
+                        taskCompletionSource.setResult(true);
+                    })
+                    .addOnFailureListener(e ->
+                    {
+                        businessRepository.checkLogin(username, password)
+                                .addOnSuccessListener(business ->
+                                {
+                                    _loginUiState.postValue(GenericUiState.success(business));
+                                    taskCompletionSource.setResult(true);
+                                })
+                                .addOnFailureListener(businessError ->
+                                {
+                                    _loginUiState.postValue(GenericUiState.error("No user was found"));
+                                    taskCompletionSource.setResult(false);
+                                });
+                    });
+        }
+
+        return taskCompletionSource.getTask();
     }
 
     // --- Google Sign-In with Tokens ---
@@ -115,6 +128,6 @@ public class LoginViewModel extends ViewModel
 
     public LiveData<GenericUiState<User>> getLoginUiState()
     {
-        return loginUiState;
+        return _loginUiState;
     }
 }

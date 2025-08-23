@@ -97,32 +97,6 @@ public class LoginActivity extends AppCompatActivity
         isRegisterClient = true;
         toggleGroup = findViewById(R.id.registerToggle);
         toggleGroup.check(R.id.toggle_client);
-//        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) ->
-//        {
-//            if(isChecked) // Shouldn't be possible
-//                return;
-//
-//            if(checkedId == R.id.toggle_client)
-//                isRegisterClient = true;
-//            else
-//                isRegisterClient = false;
-//        });
-//
-//        registerButton.setOnClickListener(task -> {
-//            Intent intent;
-//            if(isRegisterClient)
-//                intent = new Intent(this, RegisterActivity.class);
-//            else
-//                intent = new Intent(this, BusinessRegisterActivity.class);
-//            startActivity(intent);
-//        });
-//
-//        Button registerBusinessButton = findViewById(R.id.registerButton);
-//        // TODO: move to suitable function
-//        registerBusinessButton.setOnClickListener(task -> {
-//            Intent newIntent = new Intent(this, BusinessRegisterActivity.class);
-//            startActivity(newIntent);
-//        });
 
         loginButton = findViewById(R.id.loginButton);
         /*loginButton.setOnClickListener(click ->
@@ -157,13 +131,12 @@ public class LoginActivity extends AppCompatActivity
                 case LOADING:
                     progressBar.setVisibility(View.VISIBLE);
                     loginButton.setEnabled(false);
-                    loginStatusTextView.setVisibility(View.GONE);
+                    loginStatusTextView.setVisibility(View.VISIBLE);
                     break;
                 case SUCCESS:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
                     loginStatusTextView.setVisibility(View.GONE);
-                    Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_LONG).show();
                     Intent intent;
                     if (loginUiState.getData() instanceof Client)
                     {
@@ -178,6 +151,7 @@ public class LoginActivity extends AppCompatActivity
                     }
                     startActivity(intent);
                     finish(); // Finish LoginActivity so user can't go back
+                    break;
                 case ERROR:
                     progressBar.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
@@ -217,22 +191,19 @@ public class LoginActivity extends AppCompatActivity
             String username = editTextUsername.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();
 
-            // validation
-            if (username.isEmpty())
-            {
-                editTextUsername.setError("Username cannot be empty");
-                return;
-            }
-
-            if (password.isEmpty())
-            {
-                editTextPassword.setError("Password cannot be empty");
-                return;
-            }
-
             // Call the ViewModel method
-            loginViewModel.loginUser(username, password);
-        });
+            loginViewModel.loginUser(username, password)
+                    .addOnSuccessListener(task ->
+                    {
+                        if(task)
+                        {
+                            Toast.makeText(this, "Logged in successfully!", Toast.LENGTH_LONG).show();
+                        }
+                    }).addOnFailureListener(e ->
+                    {
+                        Toast.makeText(this, "Failed to log in: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+                });
     }
 
     private final ActivityResultLauncher<IntentSenderRequest> authorizeLauncher =
