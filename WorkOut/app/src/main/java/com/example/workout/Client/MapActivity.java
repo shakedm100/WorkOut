@@ -317,17 +317,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-    private boolean existInBusinessesFromCourses(Business business)
-    {
-        for (Business current : businesses)
-        {
-            if (business.getId().equals(current.getId()))
-                return true;
-        }
-
-        return false;
-    }
-
     private void enableMyLocation()
     {
         if (ContextCompat.checkSelfPermission(this,
@@ -375,17 +364,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         for (Business current : businesses)
         {
-            if (existInBusinessesFromCourses(current) || !isFromSearch)
-            {
-                Location location = current.getLocation();
-                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(position);
-                markerOptions.title(current.getBusinessName());
-                Marker marker = googleMap.addMarker(markerOptions);
-                if (marker != null)
-                    marker.setTag(current);
-            }
+            Location location = current.getLocation();
+            LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(position);
+            markerOptions.title(current.getBusinessName());
+            Marker marker = googleMap.addMarker(markerOptions);
+            if (marker != null)
+                marker.setTag(current);
         }
     }
 

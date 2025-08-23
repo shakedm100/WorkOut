@@ -68,6 +68,7 @@ import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
 import Model.SearchStrategies.SearchDateStrategy;
+import Model.SearchStrategies.SearchDayOfWeekStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -92,6 +93,7 @@ public class SearchActivity extends AppCompatActivity
     private Button searchButton;
     private boolean isList, isTest;
     private BusinessRepository businessRepository;
+    Day dayOfWeek;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -264,6 +266,9 @@ public class SearchActivity extends AppCompatActivity
                 intent.putExtra("client", current);
                 if (!isTest)
                     startActivity(intent);
+            }).addOnFailureListener(task ->
+            {
+                // TODO: Show error to user
             });
         }
     }
@@ -435,9 +440,13 @@ public class SearchActivity extends AppCompatActivity
         {
             tasks.add(searchCourseTypeByCourse());
         }
-        if (times[0] != null && times[1] != null && !dayOfWeek.equals("Choose Day"))
+        if (times[0] != null && times[1] != null)
         {
             tasks.add(searchDayTimeByCourse());
+        }
+        if(!dayOfWeek.equals("Choose Day"))
+        {
+            tasks.add(searchDayOfWeekByCourse());
         }
 
 
@@ -510,9 +519,13 @@ public class SearchActivity extends AppCompatActivity
         {
             tasks.add(searchCourseTypeByBusiness());
         }
-        if (times[0] != null && times[1] != null && !dayOfWeek.equals("Choose Day"))
+        if (times[0] != null && times[1] != null)
         {
             tasks.add(searchDayTimeByBusiness());
+        }
+        if(!dayOfWeek.equals("Choose Day"))
+        {
+            tasks.add(searchDayOfWeekByBusiness());
         }
 
         // If no filters, return empty immediately
@@ -692,6 +705,36 @@ public class SearchActivity extends AppCompatActivity
         {
             searchStrategy = new SearchDateStrategy();
             return courseRepository.searchByStrategy(searchStrategy, times);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Task<List<Course>> searchDayOfWeekByCourse()
+    {
+        try
+        {
+            String dayOfWeekSpinnerValue = dayOfWeekSpinner.getSelectedItem().toString();
+            dayOfWeek = Day.valueOf(dayOfWeekSpinnerValue);
+            searchStrategy = new SearchDayOfWeekStrategy();
+            return courseRepository.searchByStrategy(searchStrategy, dayOfWeek);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Task<List<Business>> searchDayOfWeekByBusiness()
+    {
+        try
+        {
+            String dayOfWeekSpinnerValue = dayOfWeekSpinner.getSelectedItem().toString();
+            dayOfWeek = Day.valueOf(dayOfWeekSpinnerValue);
+            searchStrategy = new SearchDayOfWeekStrategy();
+            return businessRepository.searchByStrategy(searchStrategy, dayOfWeek);
         }
         catch (Exception e)
         {
