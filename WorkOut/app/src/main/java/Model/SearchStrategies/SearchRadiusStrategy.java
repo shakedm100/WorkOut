@@ -39,7 +39,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
      */
     public SearchRadiusStrategy(double radius)
     {
-        this.radius = radius;
+        this.radius = radius * 1000;
         db = FirebaseFirestore.getInstance();
         courseRepository = new CourseRepository();
     }
@@ -71,23 +71,24 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
     /**
      * Helper function that calculates the distance between two locations
      *
-     * @param currentLocation  the reference location
-     * @param businessLocation the target location
+     * @param a  the reference location
+     * @param b the target location
      * @return distance in kilometers between the two points
      */
-    private double distance(Location currentLocation, Location businessLocation)
-    {
-        double currentLat = convertLatitudeToKM(currentLocation.getLatitude());
-        double currentLong = convertLongitudeToKM(currentLocation.getLongitude(), currentLocation.getLatitude());
+    private double distance(Location a, Location b) {
+        double meanLat = (a.getLatitude() + b.getLatitude()) / 2.0;
 
-        double businessLat = convertLatitudeToKM(businessLocation.getLatitude());
-        double businessLong = convertLongitudeToKM(businessLocation.getLongitude(), currentLocation.getLatitude());
+        double aLatKm  = convertLatitudeToKM(a.getLatitude());
+        double bLatKm  = convertLatitudeToKM(b.getLatitude());
 
-        double powX = Math.pow((currentLat - businessLat), 2);
-        double powY = Math.pow((currentLong - businessLong), 2);
+        double aLonKm  = convertLongitudeToKM(a.getLongitude(), meanLat);
+        double bLonKm  = convertLongitudeToKM(b.getLongitude(), meanLat);
 
-        return Math.sqrt(powX + powY);
+        double dx = aLonKm - bLonKm;
+        double dy = aLatKm - bLatKm;
+        return Math.hypot(dx, dy) * 1000; // meter
     }
+
 
     /**
      * Searches for {@link Business} documents whose locations fall within the
@@ -97,7 +98,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
      *
      * @param current the center {@link Location} for the search
      * @return a Task completing with a List of matching {@link Business} objects,
-     *         each populated with its subcollection of courses.
+     * each populated with its subcollection of courses.
      */
     @Override
     public Task<List<Business>> searchBusinesses(Location current)
@@ -187,7 +188,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
      *
      * @param current the center {@link Location} for the search
      * @return a Task completing with a List of matching {@link Course} objects,
-     *         each annotated with its parent businessId.
+     * each annotated with its parent businessId.
      */
     @Override
     public Task<List<Course>> searchCourses(Location current)
@@ -195,7 +196,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
         double lat = current.getLatitude();
         double lon = current.getLongitude();
 
-        // 1) Compute bounding‐box deltas for radius (in kilometers)
+        // Compute bounding‐box deltas for radius (in kilometers)
         double latDelta = radius / 110.574;
         double lonDelta = radius / (111.320 * Math.cos(Math.toRadians(lat)));
 
@@ -204,30 +205,34 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
         double minLon = lon - lonDelta;
         double maxLon = lon + lonDelta;
 
-        // 2) Query the “businesses” collection for all businesses in the bounding box
+        // Query the “businesses” collection for all businesses in the bounding box
         return db.collection("businesses")
-                .whereGreaterThanOrEqualTo("location.latitude",  minLat)
-                .whereLessThanOrEqualTo(    "location.latitude",  maxLat)
+                .whereGreaterThanOrEqualTo("location.latitude", minLat)
+                .whereLessThanOrEqualTo("location.latitude", maxLat)
                 .whereGreaterThanOrEqualTo("location.longitude", minLon)
-                .whereLessThanOrEqualTo(    "location.longitude", maxLon)
+                .whereLessThanOrEqualTo("location.longitude", maxLon)
                 .get()
 
-                // 3) Filter out any businesses that lie outside the true circle (radius),
+                // Filter out any businesses that lie outside the true circle (radius),
                 //    then collect their IDs for the next step
-                .onSuccessTask(bizSnap -> {
+                .onSuccessTask(bizSnap ->
+                {
                     List<String> inBoxBizIds = new ArrayList<>();
-                    for (DocumentSnapshot ds : bizSnap) {
+                    for (DocumentSnapshot ds : bizSnap)
+                    {
                         Business b = ds.toObject(Business.class);
                         if (b == null || b.getLocation() == null) continue;
                         b.setId(ds.getId());
 
                         double d = distance(current, b.getLocation());
-                        if (d <= radius) {
+                        if (d <= radius)
+                        {
                             inBoxBizIds.add(ds.getId());
                         }
                     }
 
-                    if (inBoxBizIds.isEmpty()) {
+                    if (inBoxBizIds.isEmpty())
+                    {
                         return Tasks.forResult(Collections.emptyList());
                     }
 
@@ -238,13 +243,16 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
                                     .document(bizId)
                                     .collection("courses")
                                     .get()
-                                    .continueWith(courseSnapTask -> {
-                                        if (!courseSnapTask.isSuccessful()) {
+                                    .continueWith(courseSnapTask ->
+                                    {
+                                        if (!courseSnapTask.isSuccessful())
+                                        {
                                             throw Objects.requireNonNull(courseSnapTask.getException());
                                         }
 
                                         List<Course> bizCourses = new ArrayList<>();
-                                        for (DocumentSnapshot cs : courseSnapTask.getResult()) {
+                                        for (DocumentSnapshot cs : courseSnapTask.getResult())
+                                        {
                                             Course c = cs.toObject(Course.class);
                                             if (c == null) continue;
 
@@ -266,15 +274,18 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
                 })
 
                 // 6) Flatten List<List<Course>> → List<Course>
-                .continueWith(finalTask -> {
-                    if (!finalTask.isSuccessful()) {
+                .continueWith(finalTask ->
+                {
+                    if (!finalTask.isSuccessful())
+                    {
                         throw Objects.requireNonNull(finalTask.getException());
                     }
 
                     @SuppressWarnings("unchecked")
                     List<List<Course>> listOfCourseLists = (List<List<Course>>) finalTask.getResult();
                     List<Course> allCourses = new ArrayList<>();
-                    for (List<Course> sublist : listOfCourseLists) {
+                    for (List<Course> sublist : listOfCourseLists)
+                    {
                         allCourses.addAll(sublist);
                     }
                     return allCourses;

@@ -293,7 +293,7 @@ public class CourseRepository
      * Executes a custom search strategy for {@link Course}s.
      *
      * @param searchStrategy strategy implementing {@link SearchStrategyInterface}
-     * @param data           filter data passed to the strategy
+     * @param data filter data passed to the strategy
      * @return a Task completing with matching courses.
      */
     public Task<List<Course>> searchByStrategy(SearchStrategyInterface searchStrategy, Object data)
