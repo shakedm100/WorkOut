@@ -68,35 +68,11 @@ public class UpdateClientViewModel extends ViewModel
             return false;
         }
 
-//        String[] nameSplit = firstName.split(" ");
-//        for (int i = 0; i < nameSplit.length; i++)
-//        {
-//            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
-//            if (!isNameValid)
-//            {
-//                _updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
-//                return false;
-//            }
-//        }
-
-
         if (lastName == null || lastName.trim().isEmpty())
         {
             _updateUiState.postValue(GenericUiState.error("Please enter a last name."));
             return false;
         }
-
-//        // TODO: replace with the function in generalRepo
-//        nameSplit = lastName.split(" ");
-//        for (int i = 0; i < nameSplit.length; i++)
-//        {
-//            isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
-//            if (!isNameValid)
-//            {
-//                _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
-//                return false;
-//            }
-//        }
 
         if (!generalRepository.allLetters(firstName))
         {
@@ -165,8 +141,8 @@ public class UpdateClientViewModel extends ViewModel
     public Task<Boolean> updateClient(Context context, String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
     {
         taskCompletionSource = new TaskCompletionSource<>();
-
         _updateUiState.postValue(GenericUiState.loading("Validating input..."));
+
         if (!checkArguments(firstName, lastName, phonePrefixStr, phoneNumberStr, city, street, client))
             taskCompletionSource.setResult(false);
 
@@ -193,6 +169,7 @@ public class UpdateClientViewModel extends ViewModel
             {
                 _updateUiState.postValue(GenericUiState.error("Invalid address."));
                 taskCompletionSource.setResult(false);
+                return taskCompletionSource.getTask();
             }
 
             // check if any changes were made
@@ -216,7 +193,7 @@ public class UpdateClientViewModel extends ViewModel
                 clientRepository.updateClientByID(client)
                         .addOnSuccessListener(updateResult ->
                         {
-                            _updateUiState.postValue(GenericUiState.success("Update successful!" + finalFirstName));
+                            _updateUiState.postValue(GenericUiState.success("Update successful!"));
                             taskCompletionSource.setResult(true);
                         })
                         .addOnFailureListener(updateException ->
