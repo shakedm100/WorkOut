@@ -21,18 +21,11 @@ import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import Model.Client;
-import ViewModel.ClientProfileViewModel;
 
 public class ProfileActivity extends AppCompatActivity
 {
-
-    private ClientProfileViewModel clientProfileViewModel;
-    private TextView textViewName, textViewEmail;
-    private EditText editTextName, editTextEmail;
-    private Button buttonSaveChanges;
-    private ProgressBar progressBarProfile;
     private BottomNavigationView bottomNavigationView;
-    Client current;
+    private Client current;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity
         logout.setOnClickListener(task ->
         {
             Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
 
@@ -64,8 +58,6 @@ public class ProfileActivity extends AppCompatActivity
             intent.putExtra("client", current);
             startActivity(intent);
         });
-
-        // DVIR
 
         Button messagesButton = findViewById(R.id.notificationsButton);
         messagesButton.setOnClickListener(task ->
@@ -82,8 +74,6 @@ public class ProfileActivity extends AppCompatActivity
             intent.putExtra("client", current);
             startActivity(intent);
         });
-
-        //
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
@@ -137,91 +127,4 @@ public class ProfileActivity extends AppCompatActivity
             return false;
         });
     }
-
-    // <- remove this when uncomment
-        /*
-        // Initialize Views
-        textViewFirstName = findViewById(R.id.firstNameText);
-        textViewLastName = findViewById(R.id.lastNameText);
-
-        textViewEmail = findViewById(R.id.emailText);
-        buttonSaveChanges = findViewById(R.id.);
-        progressBarProfile = findViewById(R.id.progressBarProfile);
-
-        // Get current client ID (e.g., from Intent)
-        String currentClientId = getIntent().getStringExtra("CLIENT_ID");
-        // For testing, you might hardcode it initially
-        //currentClientId = "someClientId";
-
-
-        // Initialize ViewModel
-        ClientRepository clientRepository = new ClientRepository(); // Use DI or a proper factory
-        //ViewModelFactory factory = new ViewModelFactory(getApplication(), clientRepository);
-        //clientProfileViewModel = new ViewModelProvider(this, factory).get(ClientProfileViewModel.class);
-        clientProfileViewModel = new ViewModelProvider(this).get(ClientProfileViewModel.class);
-
-        setupObservers();
-        setupClickListeners();
-
-        // Fetch initial profile data
-        if (currentClientId != null && !currentClientId.isEmpty()) {
-            clientProfileViewModel.fetchClientProfile(currentClientId);
-        }
-    }
-    private void setupObservers()
-    {
-        clientProfileViewModel.getProfileDataState().observe(this, profileDataState -> {
-            switch (profileDataState.getStatus())
-            {
-                case IDLE:
-                    progressBarProfile.setVisibility(View.GONE);
-                    buttonSaveChanges.setEnabled(true);
-                    break;
-                case LOADING:
-                    progressBarProfile.setVisibility(View.VISIBLE);
-                    buttonSaveChanges.setEnabled(false);
-                    break;
-                case SUCCESS:
-                    progressBarProfile.setVisibility(View.GONE);
-                    buttonSaveChanges.setEnabled(true);
-                    // Update UI with profile data
-                    //Client client = profileDataState.getData();
-                    Toast.makeText(ProfileActivity.this, "Update Successful!", Toast.LENGTH_LONG).show();
-                    // navigate to home activity when success occurs
-                    Intent intent = new Intent(ProfileActivity.this, MainActivity.class); // move to home page
-                    startActivity(intent);
-                    finish(); // Optional: finish ProfileActivity so user can't go back
-                    break;
-                case ERROR:
-                    progressBarProfile.setVisibility(View.GONE);
-                    buttonSaveChanges.setEnabled(true);
-                    Toast.makeText(ProfileActivity.this, profileDataState.getErrorMessage(), Toast.LENGTH_LONG).show();
-                    break;
-
-            }
-        });
-    }
-
-    private void setupClickListeners()
-    {
-        buttonSaveChanges.setOnClickListener(v -> {
-            String username = ed.getText().toString().trim();
-            String password = editTextPassword.getText().toString().trim();
-
-            // Basic validation
-            if (username.isEmpty()) {
-                editTextUsername.setError("Username cannot be empty");
-                return;
-            }
-            if (password.isEmpty()) {
-                editTextPassword.setError("Password cannot be empty");
-                return;
-            }
-
-            // Call the ViewModel method
-            clientProfileViewModel.updateClientProfile(username, password);
-        });
-    }
-
-         */
 }

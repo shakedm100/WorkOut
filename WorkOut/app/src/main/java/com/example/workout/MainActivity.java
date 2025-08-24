@@ -16,6 +16,7 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -136,6 +137,21 @@ public class MainActivity extends AppCompatActivity
         emptyView = findViewById(R.id.emptyView);
 
         loadUpcomingCourses();
+
+        ConstraintLayout root = findViewById(R.id.main);
+        enableRightClickLogout(root);
+    }
+
+    // when right click is pressed in the home page
+    private void enableRightClickLogout(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            view.setOnContextClickListener(v -> {
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                return true;
+            });
+        }
     }
 
     private void loadUpcomingCourses()

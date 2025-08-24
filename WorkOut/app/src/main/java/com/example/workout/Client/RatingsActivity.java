@@ -98,20 +98,18 @@ public class RatingsActivity extends AppCompatActivity
             {
                 case IDLE:
                     ratingsProgressBar.setVisibility(View.GONE);
-                    //buttonRegister.setEnabled(true);
+                    submitRatingButton.setEnabled(true);
                     ratingsStatusTextView.setVisibility(View.GONE);
                     break;
                 case LOADING:
                     ratingsProgressBar.setVisibility(View.VISIBLE);
-                    //buttonRegister.setEnabled(false);
+                    submitRatingButton.setEnabled(false);
                     ratingsStatusTextView.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     ratingsProgressBar.setVisibility(View.GONE);
-                    //buttonRegister.setEnabled(true);
+                    submitRatingButton.setEnabled(false);
                     ratingsStatusTextView.setVisibility(View.GONE);
-                    Toast.makeText(RatingsActivity.this,
-                            "Rating added Successful!", Toast.LENGTH_LONG).show();
                     // navigate to main screen after success
                     intent = new Intent(RatingsActivity.this, MainActivity.class);
                     intent.putExtra("client", client);
@@ -121,7 +119,7 @@ public class RatingsActivity extends AppCompatActivity
                     break;
                 case ERROR:
                     ratingsProgressBar.setVisibility(View.GONE);
-                    //buttonRegister.setEnabled(true);
+                    submitRatingButton.setEnabled(true);
                     ratingsStatusTextView.setText(ratingUiState.getErrorMessage());
                     ratingsStatusTextView.setVisibility(View.VISIBLE);
                     break;
@@ -137,9 +135,29 @@ public class RatingsActivity extends AppCompatActivity
             String comment = commentEditText.getText().toString().trim();
             //Rating rating = new Rating(stars, comment, client);
             if(currentRating == null)
-                clientRatingViewModel.addRating(stars, comment, client, business);
+                clientRatingViewModel.addRating(stars, comment, client, business)
+                        .addOnSuccessListener(task -> {
+                            if(task)
+                            {
+                                Toast.makeText(this, "Successfully added a review", Toast.LENGTH_LONG).show();
+                            }
+                            })
+                        .addOnFailureListener(e ->
+                            {
+                                Toast.makeText(this, "Failed to add a review", Toast.LENGTH_LONG).show();
+                            });
             else
-                clientRatingViewModel.updateRating(business, new Rating(stars, comment, client));
+                clientRatingViewModel.updateRating(business, new Rating(stars, comment, client))
+                        .addOnSuccessListener(task -> {
+                            if(task)
+                            {
+                                Toast.makeText(this, "Successfully updated a review", Toast.LENGTH_LONG).show();
+                            }
+                            })
+                        .addOnFailureListener(e ->
+                            {
+                                Toast.makeText(this, "Failed to update a review", Toast.LENGTH_LONG).show();
+                            });
         });
     }
 
