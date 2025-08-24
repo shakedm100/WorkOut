@@ -21,6 +21,7 @@ import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
 import Model.Repository.BusinessRepository;
+import Model.Repository.ClientRepository;
 import Model.Repository.GeneralRepository;
 import ViewModel.GenericUiState;
 
@@ -30,6 +31,12 @@ public class BusinessUpdateDetailsViewModel extends ViewModel
     private TaskCompletionSource<Boolean> taskCompletionSource;
     private GeneralRepository generalRepository;
     private BusinessRepository businessRepository;
+
+    public BusinessUpdateDetailsViewModel()
+    {
+        this.businessRepository = new BusinessRepository();
+        this.generalRepository = new GeneralRepository();
+    }
 
     /**
      * Returns all the available phone prefixes.
@@ -50,26 +57,13 @@ public class BusinessUpdateDetailsViewModel extends ViewModel
         return generalRepository.getCityByNamePartially(input);
     }
 
-    public boolean checkArguments(String name, String email,
-                                  String phonePrefixStr, String phoneNumberStr, City city,
+    public boolean checkArguments(String name, String phonePrefixStr, String phoneNumberStr, City city,
                                   String street, String policy, Business business)
     {
         // basic validation checks
         if (name == null || name.trim().isEmpty())
         {
             updateUiState.postValue(GenericUiState.error("Please enter a name for the business."));
-            return false;
-        }
-
-        if (email == null || email.trim().isEmpty())
-        {
-            updateUiState.postValue(GenericUiState.error("Please enter an email address."));
-            return false;
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches())
-        {
-            updateUiState.postValue(GenericUiState.error("Please enter a valid email address format."));
             return false;
         }
 
@@ -131,14 +125,14 @@ public class BusinessUpdateDetailsViewModel extends ViewModel
     /**
      * Attempts to register a new User with the given parameters.
      */
-    public Task<Boolean> updateBusiness(Context context, String name, String email,
+    public Task<Boolean> updateBusiness(Context context, String name,
                                         String phonePrefixStr, String phoneNumberStr, City city,
                                         String street, String policy, Business business)
     {
         taskCompletionSource = new TaskCompletionSource<>();
         updateUiState.postValue(GenericUiState.loading("Validating input..."));
 
-        if (!checkArguments(name, email, phonePrefixStr, phoneNumberStr, city, street, policy, business))
+        if (!checkArguments(name, phonePrefixStr, phoneNumberStr, city, street, policy, business))
             taskCompletionSource.setResult(false);
 
         else
@@ -146,7 +140,6 @@ public class BusinessUpdateDetailsViewModel extends ViewModel
             // Trim inputs after validation
             PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
             final String finalName = name.trim();
-            final String finalEmail = email.trim();
             final String finalPhoneNumber = phoneNumberStr.trim();
             final String finalStreet = street.trim();
             final String finalPolicy = policy.trim();
@@ -169,7 +162,6 @@ public class BusinessUpdateDetailsViewModel extends ViewModel
 
             // check if any changes were made
             if (business.getBusinessName().equals(finalName) &&
-                    business.getEmail().equals(finalEmail) &&
                     business.getPhone().equals(finalPhone) &&
                     business.getAddress().equals(finalAddress) &&
                     business.getPolicy().equals(finalPolicy))
@@ -182,7 +174,6 @@ public class BusinessUpdateDetailsViewModel extends ViewModel
             {
                 // set the new client details after validation
                 business.setBusinessName(finalName);
-                business.setEmail(finalEmail);
                 business.setPhone(finalPhone);
                 business.setAddress(finalAddress);
                 business.setPolicy(finalPolicy);
