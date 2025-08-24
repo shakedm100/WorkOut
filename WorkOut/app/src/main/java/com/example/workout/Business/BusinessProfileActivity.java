@@ -11,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.workout.Client.UpdateClientActivity;
 import com.example.workout.LoginActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -48,6 +49,14 @@ public class BusinessProfileActivity extends AppCompatActivity
 
         business = getIntent().getParcelableExtra("business");
         username.setText(business.getBusinessName());
+
+        Button accountButton = findViewById(R.id.accountButton);
+        accountButton.setOnClickListener(task ->
+        {
+            Intent intent = new Intent(this, BusinessUpdateActivity.class);
+            intent.putExtra("business", business);
+            startActivity(intent);
+        });
 
         setUpBottomNavigationView();
     }

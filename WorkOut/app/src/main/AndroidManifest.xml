@@ -61,6 +61,7 @@
         <activity android:name=".Business.BusinessCalendarActivity"/>
         <activity android:name=".Client.HistoryActivity"/>
         <activity android:name=".Client.UpdateClientActivity"/>
+        <activity android:name=".Business.BusinessUpdateActivity"/>
 
         <service
             android:name=".NotificationsService"
