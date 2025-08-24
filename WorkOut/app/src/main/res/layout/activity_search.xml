@@ -37,9 +37,9 @@
         android:id="@+id/categorySearchSpinner"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="80dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="10dp"
         android:background="@drawable/rectangle_border"
         android:hint="@string/category"
         android:inputType="text"
@@ -53,29 +53,29 @@
         android:id="@+id/distanceSearchEditText"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginStart="5dp"
-        android:background="@drawable/rectangle_border"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
-        tool:ignore="autofill"
-        android:layout_marginEnd="5dp"
-        android:hint="@string/distance_km"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/rectangle_border"
         android:ems="10"
+        android:hint="@string/distance_km"
         android:inputType="numberDecimal"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/typeSpinner" />
+        app:layout_constraintTop_toBottomOf="@+id/typeSpinner"
+        tool:ignore="autofill" />
 
     <Spinner
         android:id="@+id/dayOfWeekSearchSpinner"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:textSize="18sp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="10dp"
         android:background="@drawable/rectangle_border"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/distanceSearchEditText" />
@@ -84,11 +84,11 @@
         android:id="@+id/typeSpinner"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
-        android:textSize="18sp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginEnd="10dp"
         android:background="@drawable/rectangle_border"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/categorySearchSpinner" />
@@ -110,17 +110,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_goneMarginBottom="8dp" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="Age Range:"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dayOfWeekSearchSpinner" />
+
     <LinearLayout
         android:id="@+id/search_slider_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dayOfWeekSearchSpinner" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/viewModeToggle"
