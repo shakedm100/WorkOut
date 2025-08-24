@@ -18,6 +18,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/updateBusinessToolbar"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:title="Update business details"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
+
     <TextView
         android:id="@+id/updateTitle"
         android:layout_width="wrap_content"

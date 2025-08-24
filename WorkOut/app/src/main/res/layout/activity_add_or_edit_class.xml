@@ -12,6 +12,13 @@
         android:layout_marginTop="50dp"
         android:orientation="vertical">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/addOrEditToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:title="History"
+            android:titleTextColor="@android:color/white" />
+
         <EditText
             android:id="@+id/courseNameEditText"
             android:layout_width="match_parent"
@@ -125,18 +132,6 @@
             android:textStyle="bold"
             android:visibility="gone"
             tools:visibility="visible" />
-
-        <Button
-            android:id="@+id/backButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/background"
-            android:text="Back"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/addOrEditProgressBar"

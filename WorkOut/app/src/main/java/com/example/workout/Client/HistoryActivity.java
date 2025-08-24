@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.workout.R;
 
@@ -20,6 +21,7 @@ import Model.Repository.CourseRepository;
 
 public class HistoryActivity extends AppCompatActivity
 {
+    private Toolbar toolbar;
     CourseRepository courseRepository;
     ArrayList<Enrollment> history;
     Client current;
@@ -29,6 +31,21 @@ public class HistoryActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        // create back arrow
+        toolbar = findViewById(R.id.historyToolbar);
+        setSupportActionBar(toolbar);
+
+        // Enable back arrow in the toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+        // Handle arrow click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
 
         current = this.getIntent().getParcelableExtra("client");
         courseRepository = new CourseRepository();

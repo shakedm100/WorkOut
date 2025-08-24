@@ -20,6 +20,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/updateClientToolbar"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:title="Update client details"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
+
     <EditText
         android:id="@+id/updateLastNameText"
         android:layout_width="200dp"
@@ -170,23 +181,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/updateAddressText" />
 
-    <Button
-        android:id="@+id/cancelUpdateButton"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:backgroundTint="@color/background"
-        android:text="@string/cancel"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/updateButton" />
-
     <Spinner
         android:id="@+id/updatePrefixSpinner"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="45dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="12dp"
@@ -198,11 +195,10 @@
         android:layout_width="250dp"
         android:layout_height="40dp"
         android:layout_marginStart="80dp"
-        android:layout_marginTop="152dp"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/cancelUpdateButton"
         tools:hint="Status"
+        tools:layout_editor_absoluteY="617dp"
         tools:visibility="visible" />
 
     <ProgressBar
@@ -210,12 +206,12 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="180dp"
         android:visibility="invisible"
-        tools:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cancelUpdateButton" />
+        app:layout_constraintTop_toBottomOf="@+id/updateButton"
+        tools:visibility="visible" />
 
     <AutoCompleteTextView
         android:id="@+id/UpdateCityAutoComplete"

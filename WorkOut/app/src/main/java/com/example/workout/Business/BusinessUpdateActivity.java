@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.workout.Client.ProfileActivity;
@@ -41,6 +42,7 @@ public class BusinessUpdateActivity extends AppCompatActivity
     private Button updateButton;
     private ProgressBar progressBarUpdate;
     private TextView updateStateTextView;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,6 +64,17 @@ public class BusinessUpdateActivity extends AppCompatActivity
         updateButton = findViewById(R.id.updateButton);
         progressBarUpdate = findViewById(R.id.progressBar);
         updateStateTextView = findViewById(R.id.businessUpdateStatusTextView);
+
+        // create back arrow
+        toolbar = findViewById(R.id.updateBusinessToolbar);
+        setSupportActionBar(toolbar);
+
+        // Enable back arrow in the toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         // set all the existing data to the edit text
         editTextName.setText(business.getBusinessName());
@@ -208,5 +221,8 @@ public class BusinessUpdateActivity extends AppCompatActivity
             @Override
             public void afterTextChanged(Editable s) { }
         });
+
+        // Handle arrow click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 }
