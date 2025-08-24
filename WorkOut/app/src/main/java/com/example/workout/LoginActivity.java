@@ -51,6 +51,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 
 import com.google.android.gms.auth.api.identity.AuthorizationClient;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -66,7 +67,6 @@ public class LoginActivity extends AppCompatActivity
     // request code for the OAuth consent screen
     private static final int REQUEST_AUTHORIZE = 2001;
     private CredentialManager credentialManager;
-    private FirebaseAuth auth;
     private LoginViewModel loginViewModel;
     private EditText editTextUsername;
     private EditText editTextPassword;
@@ -99,11 +99,6 @@ public class LoginActivity extends AppCompatActivity
         toggleGroup.check(R.id.toggle_client);
 
         loginButton = findViewById(R.id.loginButton);
-        /*loginButton.setOnClickListener(click ->
-        {
-            checkIfUserAndPassword();
-        });*/
-
 
         // initialize ViewModel
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -113,6 +108,8 @@ public class LoginActivity extends AppCompatActivity
 
         // create button click listener
         setupButtonClickListeners();
+
+        loginViewModel.loginOnStartup();
     }
 
     // show the respond

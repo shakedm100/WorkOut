@@ -755,5 +755,37 @@ public class ClientRepository
         business.addRating(rating);
     }
 
+    /**
+     * Looks up a client by their unique username.
+     *
+     * @param id the username to query
+     * @return a Task completing with the found {@link Client},
+     *         or failing with {@link IllegalArgumentException} if not found,
+     *         or any Firestore exception.
+     */
+    public Task<Client> getClientByID(String id)
+    {
+        return db.collection(collection).document(id).get().continueWith(task ->
+        {
+            if (!task.isSuccessful())
+            {
+                throw Objects.requireNonNull(task.getException());
+            }
 
+            DocumentSnapshot snap = task.getResult();
+            if (snap == null || !snap.exists())
+            {
+                throw new NoSuchElementException("No such client: " + id);
+            }
+
+            Client client = snap.toObject(Client.class);
+            if (client == null)
+            {
+                throw new IllegalStateException("Failed to map document to Business");
+            }
+
+            client.setId(snap.getId());
+            return client;
+        });
+    }
 }

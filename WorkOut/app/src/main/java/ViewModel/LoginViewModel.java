@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import Model.Address;
 import Model.Business;
@@ -125,19 +127,19 @@ public class LoginViewModel extends ViewModel
                     {
                         // Google's API can be unreliable with retrieving more then basic data
                         // Removing all null options to avoid null exception
-                        if(client.getFirstName() == null)
+                        if (client.getFirstName() == null)
                             client.setFirstName("");
-                        if(client.getLastName() == null)
+                        if (client.getLastName() == null)
                             client.setLastName("");
-                        if(client.getGender() == null)
+                        if (client.getGender() == null)
                             client.setGender(Gender.Male);
-                        if(client.getPhone() == null)
+                        if (client.getPhone() == null)
                         {
                             PhonePrefix prefix = PhonePrefix.inferPreFix("054");
                             Phone phone = new Phone(prefix, "0000000");
                             client.setPhone(phone);
                         }
-                        if(client.getAddress() == null)
+                        if (client.getAddress() == null)
                         {
                             Address address = new Address(new City("No available city"), "");
                             client.setAddress(address);
@@ -158,6 +160,81 @@ public class LoginViewModel extends ViewModel
                     Log.e(TAG, "handleGoogleAuthWithFirebase failed in repository: " + e.getMessage(), e);
                     _loginUiState.postValue(GenericUiState.error("Google Sign-In failed: " + e.getMessage()));
                 });
+    }
+
+    public void loginOnStartup()
+    {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user == null)
+        {
+            Log.d(TAG, "Trying to auto login with no FirebaseUser");
+            return;
+        }
+
+        if (user.getEmail() == null || user.getEmail().isEmpty())
+        {
+            Log.d(TAG, "No email found");
+            return;
+        }
+
+        if (user.getUid().isEmpty())
+        {
+            Log.d(TAG, "No UID found");
+            return;
+        }
+
+        clientRepository.getClientByID(user.getUid())
+                .addOnSuccessListener(client ->
+                {
+                    // Client object should be populated by the repository,
+                    // including any first-login flags or details from People API.
+                    if (client != null)
+                    {
+                        // Google's API can be unreliable with retrieving more then basic data
+                        // Removing all null options to avoid null exception
+                        if (client.getFirstName() == null)
+                            client.setFirstName("");
+                        if (client.getLastName() == null)
+                            client.setLastName("");
+                        if (client.getGender() == null)
+                            client.setGender(Gender.Male);
+                        if (client.getPhone() == null)
+                        {
+                            PhonePrefix prefix = PhonePrefix.inferPreFix("054");
+                            Phone phone = new Phone(prefix, "0000000");
+                            client.setPhone(phone);
+                        }
+                        if (client.getAddress() == null)
+                        {
+                            Address address = new Address(new City("No available city"), "");
+                            client.setAddress(address);
+                        }
+
+                        Log.d(TAG, "Auto Sign-in successful. Client: " + client.getUsername() + ", First Login: " + client.isFirstLogin());
+                        _loginUiState.postValue(GenericUiState.success(client));
+                    }
+                    else
+                    {
+                        // This case should ideally be handled within the repository and result in a failure
+                        Log.e(TAG, "ClientRepository returned null client after auto sign-In success callback.");
+                        _loginUiState.postValue(GenericUiState.error("Auto Sign-In failed to retrieve client data."));
+                    }
+                })
+                .addOnFailureListener(e ->
+                {
+                    businessRepository.getBusinessesById(user.getUid())
+                            .addOnSuccessListener(business ->
+                            {
+                                _loginUiState.postValue(GenericUiState.success(business));
+                            })
+                            .addOnFailureListener(businessError ->
+                            {
+                                _loginUiState.postValue(GenericUiState.error("No user was found"));
+                            });
+                });
+
     }
 
 

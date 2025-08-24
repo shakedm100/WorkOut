@@ -19,6 +19,7 @@ import com.example.workout.MainActivity;
 import com.example.workout.MessagesActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import Model.Client;
 
@@ -46,6 +47,13 @@ public class ProfileActivity extends AppCompatActivity
         Button logout = findViewById(R.id.clientLogoutButton);
         logout.setOnClickListener(task ->
         {
+            FirebaseAuth.getInstance().signOut();
+
+            getSharedPreferences("auth_prefs", MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                    .apply();
+
             Intent intent = new Intent(this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
