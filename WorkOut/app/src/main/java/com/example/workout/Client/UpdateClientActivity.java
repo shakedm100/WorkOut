@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.workout.MainActivity;
 import com.example.workout.R;
@@ -35,10 +36,11 @@ public class UpdateClientActivity extends AppCompatActivity
     private EditText editTextPhoneNumber, editTextStreet;
     private Spinner spinnerPhonePrefix;
     private AutoCompleteTextView cityAutoComplete;
-    private Button updateButton, cancelButton;
+    private Button updateButton;
     private ProgressBar progressBarUpdate;
     private TextView updateStateTextView;
-    Client client;
+    private Toolbar toolbar;
+    private Client client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,7 +62,16 @@ public class UpdateClientActivity extends AppCompatActivity
         updateButton = findViewById(R.id.updateButton);
         progressBarUpdate = findViewById(R.id.updateProgressBar);
         updateStateTextView = findViewById(R.id.updateStateTextView);
-        cancelButton = findViewById(R.id.cancelUpdateButton);
+
+        toolbar = findViewById(R.id.updateClientToolbar);
+        setSupportActionBar(toolbar);
+
+        // Enable back arrow in the toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         // set all the existing data to the edit text
         editTextFirstName.setText(client.getFirstName());
@@ -108,7 +119,7 @@ public class UpdateClientActivity extends AppCompatActivity
                 case LOADING:
                     progressBarUpdate.setVisibility(View.VISIBLE);
                     updateButton.setEnabled(false);
-                    updateStateTextView.setVisibility(View.VISIBLE);
+                    updateStateTextView.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBarUpdate.setVisibility(View.GONE);
@@ -131,7 +142,8 @@ public class UpdateClientActivity extends AppCompatActivity
         });
     }
 
-    private void setupClickListeners() {
+    private void setupClickListeners()
+    {
         updateButton.setOnClickListener(v -> {
 
             String firstName = editTextFirstName.getText().toString().trim();
@@ -172,13 +184,6 @@ public class UpdateClientActivity extends AppCompatActivity
                         });
             });
 
-        // get back to the profile page
-        cancelButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("client", client);
-            startActivity(intent);
-         });
-
         // get city autocomplete values when letters are typed
         cityAutoComplete.addTextChangedListener(new TextWatcher() {
             @Override
@@ -206,5 +211,8 @@ public class UpdateClientActivity extends AppCompatActivity
             @Override
             public void afterTextChanged(Editable s) { }
         });
+
+        // Handle arrow click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 }

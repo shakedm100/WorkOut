@@ -58,6 +58,7 @@ import Model.Repository.CourseRepository;
 import Model.Schedule;
 import ViewModel.Business.AddOrEditClassViewModel;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -73,7 +74,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     private boolean isTest;
     private EditText courseNameEditText, capacityEditText, descriptionEditText;
     private Spinner dayOfWeekSpinner, courseTypeSpinner, categorySpinner;
-    private Button saveButton, startTimeButton, endTimeButton, deleteButton, backButton;
+    private Button saveButton, startTimeButton, endTimeButton, deleteButton;
     private ProgressBar progressBar;
     private TextView textViewStatus;
     private RangeSlider ageSlider;
@@ -84,6 +85,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
     protected CourseRepository courseRepository;
     private LocalTime startTime, endTime;
     private int initialHour, initialMinute, endHour, endMinute;
+    private Toolbar toolbar;
 
     private MaterialTimePicker startPicker, endPicker;
 
@@ -119,7 +121,16 @@ public class AddOrEditClassActivity extends AppCompatActivity
         endTimeButton = findViewById(R.id.endTimeButton);
         progressBar = findViewById(R.id.addOrEditProgressBar);
         textViewStatus = findViewById(R.id.addOrEditTestTextView);
-        backButton = findViewById(R.id.backButton);
+
+        // set up a back arrow
+        toolbar = findViewById(R.id.addOrEditToolBar);
+        setSupportActionBar(toolbar);
+        // Enable back arrow in the toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         initialHour = 12;
         initialMinute = 0;
@@ -399,7 +410,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
                     progressBar.setVisibility(View.VISIBLE);
                     saveButton.setEnabled(false);
                     deleteButton.setEnabled(false);
-                    textViewStatus.setVisibility(View.VISIBLE);
+                    textViewStatus.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBar.setVisibility(View.GONE);
@@ -420,12 +431,6 @@ public class AddOrEditClassActivity extends AppCompatActivity
 
     private void setupListeners()
     {
-        // Press on Back button
-        backButton.setOnClickListener(v ->
-        {
-            finish();
-        });
-
         // Press on save button
         saveButton.setOnClickListener(v ->
         {
@@ -469,5 +474,8 @@ public class AddOrEditClassActivity extends AppCompatActivity
         {
             endPicker.show(getSupportFragmentManager(), "END_PICKER");
         });
+
+        // Handle arrow click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 }
