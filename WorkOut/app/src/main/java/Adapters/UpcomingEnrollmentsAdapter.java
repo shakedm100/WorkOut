@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import Model.Course;
 import Model.Enrollment;
@@ -93,15 +94,19 @@ public class UpcomingEnrollmentsAdapter extends RecyclerView.Adapter<UpcomingEnr
                 end = cal.getTime();
             }
 
+            TimeZone tz = TimeZone.getTimeZone("Asia/Jerusalem");
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            timeFormat.setTimeZone(tz);
+
             String startStr = timeFormat.format(start);
             String endStr = timeFormat.format(end);
-            ZoneId zone = ZoneId.systemDefault(); // or a specific zone
-            DateTimeFormatter dateFmt =
-                    DateTimeFormatter.ofLocalizedDate(java.time.format.FormatStyle.MEDIUM)
-                            .withLocale(Locale.getDefault());
 
-            Instant startInstant = enrollment.getTime().toDate().toInstant();
-            String dateOnly = startInstant.atZone(zone).toLocalDate().format(dateFmt);
+            SimpleDateFormat dateOnlyFormat =
+                    new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+            dateOnlyFormat.setTimeZone(tz);
+
+            String dateOnly = dateOnlyFormat.format(enrollment.getTime().toDate());
 
             timeRange = dateOnly + " at " + startStr + " - " + endStr;
         }
