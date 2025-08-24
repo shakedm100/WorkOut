@@ -16,7 +16,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.workout.LoginActivity;
 import com.example.workout.MainActivity;
-import com.example.workout.MessagesActivity;
 import com.example.workout.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,14 +62,6 @@ public class ProfileActivity extends AppCompatActivity
         historyButton.setOnClickListener(task ->
         {
             Intent intent = new Intent(this, HistoryActivity.class);
-            intent.putExtra("client", current);
-            startActivity(intent);
-        });
-
-        Button messagesButton = findViewById(R.id.notificationsButton);
-        messagesButton.setOnClickListener(task ->
-        {
-            Intent intent = new Intent(this, MessagesActivity.class);
             intent.putExtra("client", current);
             startActivity(intent);
         });

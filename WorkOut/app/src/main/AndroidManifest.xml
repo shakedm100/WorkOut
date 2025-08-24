@@ -46,7 +46,6 @@
         <activity android:name=".Client.MapActivity" />
         <activity android:name=".Client.ProfileActivity"/>
         <activity android:name=".Client.RatingsActivity"/>
-        <activity android:name=".MessagesActivity"/>
         <activity android:name=".Client.SearchActivity"/>
         <activity android:name=".Client.RegisterActivity"/>
         <activity android:name=".MainActivity"/>

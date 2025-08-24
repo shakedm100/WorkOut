@@ -60,40 +60,8 @@
         android:backgroundTint="@color/background"
         android:text="@string/account"
         android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/policyButton"
-        app:layout_constraintEnd_toEndOf="@id/policyButton"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/backgroundImage"
         app:layout_constraintTop_toBottomOf="@+id/backgroundImage" />
-
-    <Button
-        android:id="@+id/policyButton"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/background"
-        android:text="@string/policy"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="@id/accountButton"
-        app:layout_constraintEnd_toEndOf="@id/reviewsButton"
-        app:layout_constraintTop_toBottomOf="@+id/accountButton"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
-        android:id="@+id/reviewsButton"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/background"
-        android:text="@string/reviews"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/businessLogoutButton"
-        app:layout_constraintEnd_toEndOf="@id/businessLogoutButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/policyButton" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -118,6 +86,6 @@
         android:text="@string/logout"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reviewsButton" />
+        app:layout_constraintTop_toBottomOf="@+id/accountButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
