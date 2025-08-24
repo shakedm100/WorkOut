@@ -67,7 +67,6 @@ import Model.Repository.CourseRepository;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
-import Model.SearchStrategies.SearchDateStrategy;
 import Model.SearchStrategies.SearchDayOfWeekStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
@@ -82,9 +81,6 @@ public class SearchActivity extends AppCompatActivity
     private Spinner categorySpinner, courseTypeSpinner, dayOfWeekSpinner;
     private EditText editDistanceLocation;
     private ViewGroup container;
-    private Button startTimeButton, endTimeButton;
-    private LocalTime startTime, endTime;
-    private Timestamp[] times;
     private final int LOCATION_PERMISSION_REQUEST = 1001;
     private final int defaultRadius = 100;
     private BottomNavigationView bottomNavigationView;
@@ -117,13 +113,8 @@ public class SearchActivity extends AppCompatActivity
         container = findViewById(R.id.search_slider_container);
         ageRange = new AgeRange(0, 99);
         dayOfWeekSpinner = findViewById(R.id.dayOfWeekSearchSpinner);
-        startTime = LocalTime.of(0, 0);
-        endTime = LocalTime.of(23, 59);
-        times = new Timestamp[2];
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_search);
-        startTimeButton = findViewById(R.id.startTimeButton);
-        endTimeButton = findViewById(R.id.endTimeButton);
         toggleGroup = findViewById(R.id.viewModeToggle);
         searchButton = findViewById(R.id.searchButton);
 
@@ -147,43 +138,8 @@ public class SearchActivity extends AppCompatActivity
         setUpAgeSlider();
         setUpDayOfWeekSpinner();
         setUpBottomNavigationView();
-        setUpTimePicker();
 
         searchButton.setOnClickListener(event -> executeAndGoToResults());
-    }
-
-    private void setUpTimePicker()
-    {
-        MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_24H).setHour(0).setMinute(0);
-        MaterialTimePicker startPicker = builder.setTitleText("Select start time").build();
-
-        builder = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour(23).setMinute(59);
-        MaterialTimePicker endPicker = builder.setTitleText("Select end time").build();
-
-        startPicker.addOnPositiveButtonClickListener(v ->
-        {
-            int hours = startPicker.getHour();
-            int minutes = startPicker.getMinute();
-            startTime = LocalTime.of(hours, minutes);
-        });
-
-        endPicker.addOnPositiveButtonClickListener(v ->
-        {
-            int hours = endPicker.getHour();
-            int minutes = endPicker.getMinute();
-            endTime = LocalTime.of(hours, minutes);
-        });
-
-        startTimeButton.setOnClickListener(v ->
-        {
-            startPicker.show(getSupportFragmentManager(), "START_PICKER");
-        });
-        endTimeButton.setOnClickListener(v ->
-        {
-            endPicker.show(getSupportFragmentManager(), "END_PICKER");
-        });
     }
 
     private void setUpBottomNavigationView()
@@ -404,26 +360,6 @@ public class SearchActivity extends AppCompatActivity
         String courseType = courseTypeSpinner.getSelectedItem().toString().trim();
         String dayOfWeek = dayOfWeekSpinner.getSelectedItem().toString().trim();
 
-        if (startTime.getHour() != 0 || startTime.getMinute() != 0 ||
-                endTime.getHour() != 23 || endTime.getMinute() != 59)
-        {
-            LocalDate epochDate = LocalDate.of(1970, 1, 1);
-            LocalDateTime combined = LocalDateTime.of(epochDate, startTime);
-            Instant instant = combined.toInstant(ZoneOffset.UTC);
-            long secondsSinceEpoch = instant.getEpochSecond();
-            int nanos = instant.getNano();
-            Timestamp starTimeTimestamp = new Timestamp(secondsSinceEpoch, nanos);
-
-            combined = LocalDateTime.of(epochDate, endTime);
-            instant = combined.toInstant(ZoneOffset.UTC);
-            secondsSinceEpoch = instant.getEpochSecond();
-            nanos = instant.getNano();
-            Timestamp endTimeTimestamp = new Timestamp(secondsSinceEpoch, nanos);
-
-            times[0] = starTimeTimestamp;
-            times[1] = endTimeTimestamp;
-        }
-
         if (!category.equals("Choose Category"))
         {
             tasks.add(searchCourseCategory());
@@ -439,10 +375,6 @@ public class SearchActivity extends AppCompatActivity
         if (!courseType.equals("Choose Course Type"))
         {
             tasks.add(searchCourseTypeByCourse());
-        }
-        if (times[0] != null && times[1] != null)
-        {
-            tasks.add(searchDayTimeByCourse());
         }
         if(!dayOfWeek.equals("Choose Day"))
         {
@@ -483,26 +415,6 @@ public class SearchActivity extends AppCompatActivity
         String courseType = courseTypeSpinner.getSelectedItem().toString().trim();
         String dayOfWeek = dayOfWeekSpinner.getSelectedItem().toString().trim();
 
-        if (startTime.getHour() != 0 || startTime.getMinute() != 0 ||
-                endTime.getHour() != 23 || endTime.getMinute() != 59)
-        {
-            LocalDate epochDate = LocalDate.of(1970, 1, 1);
-            LocalDateTime combined = LocalDateTime.of(epochDate, startTime);
-            Instant instant = combined.toInstant(ZoneOffset.UTC);
-            long secondsSinceEpoch = instant.getEpochSecond();
-            int nanos = instant.getNano();
-            Timestamp starTimeTimestamp = new Timestamp(secondsSinceEpoch, nanos);
-
-            combined = LocalDateTime.of(epochDate, endTime);
-            instant = combined.toInstant(ZoneOffset.UTC);
-            secondsSinceEpoch = instant.getEpochSecond();
-            nanos = instant.getNano();
-            Timestamp endTimeTimestamp = new Timestamp(secondsSinceEpoch, nanos);
-
-            times[0] = starTimeTimestamp;
-            times[1] = endTimeTimestamp;
-        }
-
         if (!category.equals("Choose Category"))
         {
             tasks.add(searchBusinessCategory());
@@ -518,10 +430,6 @@ public class SearchActivity extends AppCompatActivity
         if (!courseType.equals("Choose Course Type"))
         {
             tasks.add(searchCourseTypeByBusiness());
-        }
-        if (times[0] != null && times[1] != null)
-        {
-            tasks.add(searchDayTimeByBusiness());
         }
         if(!dayOfWeek.equals("Choose Day"))
         {
@@ -699,19 +607,6 @@ public class SearchActivity extends AppCompatActivity
         }
     }
 
-    private Task<List<Course>> searchDayTimeByCourse()
-    {
-        try
-        {
-            searchStrategy = new SearchDateStrategy();
-            return courseRepository.searchByStrategy(searchStrategy, times);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
     private Task<List<Course>> searchDayOfWeekByCourse()
     {
         try
@@ -735,19 +630,6 @@ public class SearchActivity extends AppCompatActivity
             dayOfWeek = Day.valueOf(dayOfWeekSpinnerValue);
             searchStrategy = new SearchDayOfWeekStrategy();
             return businessRepository.searchByStrategy(searchStrategy, dayOfWeek);
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Task<List<Business>> searchDayTimeByBusiness()
-    {
-        try
-        {
-            searchStrategy = new SearchDateStrategy();
-            return businessRepository.searchByStrategy(searchStrategy, times);
         }
         catch (Exception e)
         {
