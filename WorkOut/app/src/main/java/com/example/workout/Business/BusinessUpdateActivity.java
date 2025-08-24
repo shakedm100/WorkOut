@@ -32,9 +32,10 @@ import ViewModel.Business.BusinessUpdateDetailsViewModel;
 public class BusinessUpdateActivity extends AppCompatActivity
 {
     private Business business;
+
     // UI elements
     private BusinessUpdateDetailsViewModel updateBusinessDetailsViewModel;
-    private EditText editTextName, editTextEmail, editTextPhoneNumber, editTextStreet, editTextPolicy;
+    private EditText editTextName, editTextPhoneNumber, editTextStreet, editTextPolicy;
     private Spinner spinnerPhonePrefix;
     private AutoCompleteTextView cityAutoComplete;
     private Button updateButton;
@@ -53,7 +54,6 @@ public class BusinessUpdateActivity extends AppCompatActivity
 
         // Initialize UI elements
         editTextName = findViewById(R.id.nameText);
-        editTextEmail = findViewById(R.id.emailText);
         spinnerPhonePrefix = findViewById(R.id.businessPrefixSpinner);
         editTextPhoneNumber = findViewById(R.id.phoneText);
         cityAutoComplete = findViewById(R.id.cityAutoComplete);
@@ -65,9 +65,9 @@ public class BusinessUpdateActivity extends AppCompatActivity
 
         // set all the existing data to the edit text
         editTextName.setText(business.getBusinessName());
-        editTextEmail.setText(business.getEmail());
         editTextPhoneNumber.setText(business.getPhone().getNumber());
         editTextStreet.setText(business.getAddress().getName());
+        editTextPolicy.setText(business.getPolicy());
 
         // set spinner value
         List<String> phonePrefixes = updateBusinessDetailsViewModel.getAllPhonePrefixes();
@@ -82,7 +82,6 @@ public class BusinessUpdateActivity extends AppCompatActivity
             spinnerPhonePrefix.setSelection(0);
 
         // set autocomplete value
-
         List<City> cities = new ArrayList<>();
         cities.add(business.getAddress().getCity());
         ArrayAdapter<City> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
@@ -93,6 +92,7 @@ public class BusinessUpdateActivity extends AppCompatActivity
 
         // Setup Observers for LiveData
         setupObservers();
+
         // Setup Click Listeners for buttons
         setupClickListeners();
     }
@@ -116,7 +116,7 @@ public class BusinessUpdateActivity extends AppCompatActivity
                     progressBarUpdate.setVisibility(View.GONE);
                     updateButton.setEnabled(true);
                     updateStateTextView.setVisibility(View.GONE);
-                    // navigate to the main screen after success
+                    // navigate to the home screen after success
                     intent = new Intent(this, BusinessHomeActivity.class);
                     intent.putExtra("business", business); // add the business
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -139,7 +139,6 @@ public class BusinessUpdateActivity extends AppCompatActivity
 
             // Trim strings
             String name = editTextName.getText().toString().trim();
-            String email = editTextEmail.getText().toString().trim();
             String policy = editTextPolicy.getText().toString().trim();
             String phoneNumber = editTextPhoneNumber.getText().toString().trim();
             String street = editTextStreet.getText().toString().trim();
@@ -163,13 +162,11 @@ public class BusinessUpdateActivity extends AppCompatActivity
             }
 
             // Call the ViewModel method to perform update
-            updateBusinessDetailsViewModel.updateBusiness(this.getApplicationContext(), name, email, phonePrefixStr, phoneNumber,
+            updateBusinessDetailsViewModel.updateBusiness(this.getApplicationContext(), name, phonePrefixStr, phoneNumber,
                     selectedCity, street, policy, business)
                     .addOnSuccessListener(task -> {
                         if(task)
-                        {
                             Toast.makeText(this, "Successfully updated business details", Toast.LENGTH_LONG).show();
-                        }
                     })
                     .addOnFailureListener(e ->
                     {

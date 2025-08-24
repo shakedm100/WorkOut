@@ -20,8 +20,8 @@ import Model.Business;
 
 public class BusinessProfileActivity extends AppCompatActivity
 {
-    BottomNavigationView bottomNavigationView;
-    Business business;
+    private BottomNavigationView bottomNavigationView;
+    private Business business;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,7 +48,10 @@ public class BusinessProfileActivity extends AppCompatActivity
         TextView username = findViewById(R.id.userName);
 
         business = getIntent().getParcelableExtra("business");
-        username.setText(business.getBusinessName());
+        if (business != null)
+            username.setText(business.getBusinessName());
+        else
+            username.setText("Business");
 
         Button accountButton = findViewById(R.id.accountButton);
         accountButton.setOnClickListener(task ->
