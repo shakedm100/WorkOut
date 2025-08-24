@@ -8,11 +8,36 @@
     tools:context=".Client.SearchResultsActivity"
     android:fitsSystemWindows="true">
 
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:contentDescription="Search result"
+        android:src="@color/background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/searchTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Search Results"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="40sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/backgroundImage" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/searchResultsToolbar"
         android:layout_width="0dp"
         android:layout_height="80dp"
-        android:background="@color/azure"
         android:title="@string/search_results"
         android:titleTextColor="@android:color/white"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,6 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:paddingTop="30dp"
         app:layout_constraintTop_toBottomOf="@id/searchResultsToolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

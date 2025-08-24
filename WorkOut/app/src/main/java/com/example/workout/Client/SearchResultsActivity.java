@@ -61,8 +61,10 @@ public class SearchResultsActivity extends AppCompatActivity
         // Toolbar setup
         Toolbar toolbar = findViewById(R.id.searchResultsToolbar);
         setSupportActionBar(toolbar);
+
         if (getSupportActionBar() != null)
         {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
