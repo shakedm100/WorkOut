@@ -24,7 +24,6 @@ import Model.Location;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
-import Model.SearchStrategies.SearchDateStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -116,7 +115,7 @@ public class SearchStrategyTest
     @Test
     public void searchDateTest() throws ExecutionException, InterruptedException, TimeoutException
     {
-        searchStrategy = new SearchDateStrategy();
+        searchStrategy = new SearchTimeStrategy();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, 2025);

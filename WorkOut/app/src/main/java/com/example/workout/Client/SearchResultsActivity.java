@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import android.graphics.Typeface;
 import android.util.TypedValue;
@@ -141,18 +142,27 @@ public class SearchResultsActivity extends AppCompatActivity
                     .append(ar.getMaxAge()).append("\n");
 
             Schedule s = course.getSchedule();
-            String dayString = s.getDay().toString();
             Date occurrenceDate = s.getOccurrence().toDate();
+
+            TimeZone tz = TimeZone.getTimeZone("Asia/Jerusalem");
+
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            timeFormat.setTimeZone(tz);
+
             String startTime = timeFormat.format(occurrenceDate);
-            Calendar calendar = Calendar.getInstance();
+
+            Calendar calendar = Calendar.getInstance(tz);
             calendar.setTime(occurrenceDate);
             calendar.add(Calendar.MINUTE, course.getDuration());
-            Date endTime = calendar.getTime();
-            String endTimeString = timeFormat.format(endTime);
+
+            String endTimeString = timeFormat.format(calendar.getTime());
+
+            String dayString = s.getDay().toString();
+
             sb.append("Schedule: ")
                     .append(dayString).append(" at ")
                     .append(startTime).append(" - ").append(endTimeString).append("\n");
+
 
             sb.append("Category: ").append(course.getCategory().name()).append("\n");
             sb.append("Description: ").append(course.getDescription()).append("\n");
