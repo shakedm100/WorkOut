@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.workout.LoginActivity;
@@ -33,8 +34,9 @@ public class BusinessRegisterActivity extends AppCompatActivity
     private Spinner spinnerPhonePrefix;
     private AutoCompleteTextView cityAutoComplete;
     private ProgressBar statusProgressBar;
-    private Button buttonRegister, cancelButton;
+    private Button buttonRegister;
     private TextView businessRegisterStatusTextView;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,7 +56,17 @@ public class BusinessRegisterActivity extends AppCompatActivity
         statusProgressBar = findViewById(R.id.progressBar);
         businessRegisterStatusTextView = findViewById(R.id.businessRegisterStatusTextView);
         editPolicyText = findViewById(R.id.policyText);
-        cancelButton = findViewById(R.id.cancelButton);
+
+        // create back arrow
+        toolbar = findViewById(R.id.registerBusiness);
+        setSupportActionBar(toolbar);
+
+        // Enable back arrow in the toolbar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         registerBusinessViewModel = new ViewModelProvider(this).get(RegisterBusinessViewModel.class);
 
@@ -193,8 +205,7 @@ public class BusinessRegisterActivity extends AppCompatActivity
                     });
         });
 
-         cancelButton.setOnClickListener(v -> {
-             finish(); // Simply finish RegisterActivity to go back to LoginActivity
-         });
+        // Handle arrow click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 }

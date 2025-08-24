@@ -18,6 +18,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/registerBusiness"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:title="Register business"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
+
+
     <TextView
         android:id="@+id/registrationTitle"
         android:layout_width="wrap_content"
@@ -224,26 +236,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressText" />
 
-    <Button
-        android:id="@+id/cancelButton"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
-        android:backgroundTint="@color/background"
-        android:text="Cancel"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addressText" />
-
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginStart="180dp"
+        android:layout_marginTop="24dp"
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registrationButton"
@@ -284,12 +283,12 @@
         android:id="@+id/businessRegisterStatusTextView"
         android:layout_width="250dp"
         android:layout_height="40dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="24dp"
         android:text=""
         android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cancelButton"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

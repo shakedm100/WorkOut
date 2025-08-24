@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import Model.City;
@@ -41,22 +42,15 @@ public class RegisterActivity extends AppCompatActivity {
     private AutoCompleteTextView cityAutoComplete;
     private RadioGroup radioGroupGender;
     private RadioButton radioMale, radioFemale;
-    private Button buttonRegister, cancelButton;
+    private Button buttonRegister;
     private ProgressBar progressBarRegister;
     private TextView textViewRegisterState;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_client);
-
-        // Initialize ViewModel (Using a Factory is good practice if ViewModel has dependencies)
-        // For ClientRepository, it's good to pass it via factory for testability.
-        // If your ViewModelFactory isn't set up yet for RegisterViewModel, you might temporarily
-        // instantiate ClientRepository directly in the ViewModel for now, but aim to use a factory.
-        //ClientRepository clientRepository = new ClientRepository(); // Ideally from a DI source
-        //ViewModelFactory viewModelFactory = new ViewModelFactory(getApplication(), clientRepository); // Adjust factory if needed
-        //registerViewModel = new ViewModelProvider(this, viewModelFactory).get(RegisterViewModel.class);
 
         // Initialize UI elements (Ensure IDs match your registration_page.xml)
         editTextEmail = findViewById(R.id.emailText);
@@ -75,7 +69,17 @@ public class RegisterActivity extends AppCompatActivity {
         buttonRegister = findViewById(R.id.registrationButton);
         progressBarRegister = findViewById(R.id.registerProgressBar);
         textViewRegisterState = findViewById(R.id.stateTextView);
-        cancelButton = findViewById(R.id.cancelButton);
+
+        toolbar = findViewById(R.id.registerToolbar);
+        setSupportActionBar(toolbar);
+
+        // Enable back arrow in the toolbar
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         registerViewModel = new ViewModelProvider(this).get(RegisterViewModel.class);
 
@@ -86,16 +90,6 @@ public class RegisterActivity extends AppCompatActivity {
         spinnerPhonePrefix.setAdapter(adapterPhonePrefixes);
 
         // set autocomplete values
-        // TODO: find out how to send the string correctly -> crashes
-//        registerViewModel.getAllCities(cityAutoComplete.getText().toString()).addOnSuccessListener(cities -> {
-//            ArrayAdapter<City> adapterCities = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, cities);
-//            AutoCompleteTextView textView = (AutoCompleteTextView) cityAutoComplete;
-//            textView.setThreshold(3); // must type 3 characters to load results
-//            textView.setAdapter(adapterCities);
-//        }).addOnFailureListener(e -> {
-//            Toast.makeText(this, "Failed to load cities: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//        });
-
         // TextWatcher basically listens to the user's inputs
         // this will trigger the firebase and activate the query each time the user inputs at least 3 chars
         cityAutoComplete.addTextChangedListener(new TextWatcher() {
@@ -126,8 +120,8 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         // Setup Observers for LiveData
-
         setupObservers();
+
         // Setup Click Listeners for buttons
         setupClickListeners();
     }
@@ -185,10 +179,6 @@ public class RegisterActivity extends AppCompatActivity {
                 phonePrefixStr = spinnerPhonePrefix.getSelectedItem().toString();
             }
 
-            // TODO: make sure that's the correct way to get the string
-            //String city = cityAutoComplete.getText().toString().trim();
-            //City city = (City) cityAutoComplete.getOnItemSelectedListener();
-
             String cityName = cityAutoComplete.getText().toString().trim();
             City selectedCity = null;
             if (cityAutoComplete.getAdapter() != null)
@@ -227,8 +217,7 @@ public class RegisterActivity extends AppCompatActivity {
                         });
         });
 
-         cancelButton.setOnClickListener(v -> {
-             finish(); // Simply finish RegisterActivity to go back to LoginActivity
-         });
+        // Handle arrow click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 }

@@ -123,7 +123,7 @@ public class BusinessUpdateActivity extends AppCompatActivity
                 case LOADING:
                     progressBarUpdate.setVisibility(View.VISIBLE);
                     updateButton.setEnabled(false);
-                    updateStateTextView.setVisibility(View.VISIBLE);
+                    updateStateTextView.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBarUpdate.setVisibility(View.GONE);

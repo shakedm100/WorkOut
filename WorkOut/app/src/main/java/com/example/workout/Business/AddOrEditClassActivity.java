@@ -410,7 +410,7 @@ public class AddOrEditClassActivity extends AppCompatActivity
                     progressBar.setVisibility(View.VISIBLE);
                     saveButton.setEnabled(false);
                     deleteButton.setEnabled(false);
-                    textViewStatus.setVisibility(View.VISIBLE);
+                    textViewStatus.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBar.setVisibility(View.GONE);

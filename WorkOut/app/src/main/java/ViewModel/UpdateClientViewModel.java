@@ -16,7 +16,6 @@ import java.util.Locale;
 import Model.Address;
 import Model.City;
 import Model.Client;
-import Model.Gender;
 import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
@@ -29,8 +28,7 @@ public class UpdateClientViewModel extends ViewModel
 
     private final GeneralRepository generalRepository;
 
-    private final MutableLiveData<GenericUiState<String>> _updateUiState = new MutableLiveData<>(GenericUiState.idle());
-    public LiveData<GenericUiState<String>> updateUiState = _updateUiState;
+    private final MutableLiveData<GenericUiState<String>> updateUiState = new MutableLiveData<>(GenericUiState.idle());
     private TaskCompletionSource<Boolean> taskCompletionSource;
 
 
@@ -64,72 +62,72 @@ public class UpdateClientViewModel extends ViewModel
         // basic validation checks
         if (firstName == null || firstName.trim().isEmpty())
         {
-            _updateUiState.postValue(GenericUiState.error("Please enter a first name."));
+            updateUiState.postValue(GenericUiState.error("Please enter a first name."));
             return false;
         }
 
         if (lastName == null || lastName.trim().isEmpty())
         {
-            _updateUiState.postValue(GenericUiState.error("Please enter a last name."));
+            updateUiState.postValue(GenericUiState.error("Please enter a last name."));
             return false;
         }
 
         if (!generalRepository.allLetters(firstName))
         {
-            _updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
+            updateUiState.postValue(GenericUiState.error("First name must contain only letters."));
             return false;
         }
 
         if (!generalRepository.allLetters(lastName))
         {
-            _updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
+            updateUiState.postValue(GenericUiState.error("Last name must contain only letters."));
             return false;
         }
 
         if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty())
         {
-            _updateUiState.postValue(GenericUiState.error("Please select a phone prefix."));
+            updateUiState.postValue(GenericUiState.error("Please select a phone prefix."));
             return false;
         }
 
         PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
         if (prefix == null)
         {
-            _updateUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
+            updateUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
             return false;
         }
 
         if (phoneNumberStr == null || phoneNumberStr.trim().isEmpty() || !phoneNumberStr.trim().matches("\\d+"))
         {
-            _updateUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
+            updateUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
             return false;
         }
         if (!phoneNumberStr.trim().matches("[0-9]+"))
         {
-            _updateUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
+            updateUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
             return false;
         }
 
         if (phoneNumberStr.trim().length() != 7)
         {
-            _updateUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
+            updateUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
             return false;
         }
 
         if (city == null)
         {
-            _updateUiState.postValue(GenericUiState.error("City is null."));
+            updateUiState.postValue(GenericUiState.error("City is null."));
             return false;
         }
         if (street == null || street.trim().isEmpty())
         {
-            _updateUiState.postValue(GenericUiState.error("Please enter a street address."));
+            updateUiState.postValue(GenericUiState.error("Please enter a street address."));
             return false;
         }
 
         if (client == null)
         {
-            _updateUiState.postValue(GenericUiState.error("Client can not be null!"));
+            updateUiState.postValue(GenericUiState.error("Client can not be null!"));
             return false;
         }
 
@@ -141,7 +139,7 @@ public class UpdateClientViewModel extends ViewModel
     public Task<Boolean> updateClient(Context context, String firstName, String lastName, String phonePrefixStr, String phoneNumberStr, City city, String street, Client client)
     {
         taskCompletionSource = new TaskCompletionSource<>();
-        _updateUiState.postValue(GenericUiState.loading("Validating input..."));
+        updateUiState.postValue(GenericUiState.loading("Validating input..."));
 
         if (!checkArguments(firstName, lastName, phonePrefixStr, phoneNumberStr, city, street, client))
             taskCompletionSource.setResult(false);
@@ -155,7 +153,7 @@ public class UpdateClientViewModel extends ViewModel
             final String finalPhoneNumber = phoneNumberStr.trim();
             final String finalStreet = street.trim();
 
-            _updateUiState.postValue(GenericUiState.loading("Verifying city information..."));
+            updateUiState.postValue(GenericUiState.loading("Verifying city information..."));
 
             Phone finalPhone = new Phone(prefix, finalPhoneNumber);
             Address finalAddress = new Address(city, finalStreet);
@@ -167,7 +165,7 @@ public class UpdateClientViewModel extends ViewModel
             // failed to get the long/lat of the given address
             if (location == null)
             {
-                _updateUiState.postValue(GenericUiState.error("Invalid address."));
+                updateUiState.postValue(GenericUiState.error("Invalid address."));
                 taskCompletionSource.setResult(false);
                 return taskCompletionSource.getTask();
             }
@@ -178,7 +176,7 @@ public class UpdateClientViewModel extends ViewModel
                     client.getPhone().equals(finalPhone) &&
                     client.getAddress().equals(finalAddress))
             {
-                _updateUiState.postValue(GenericUiState.error("No changes were made."));
+                updateUiState.postValue(GenericUiState.error("No changes were made."));
                 taskCompletionSource.setResult(false);
             }
 
@@ -193,12 +191,12 @@ public class UpdateClientViewModel extends ViewModel
                 clientRepository.updateClientByID(client)
                         .addOnSuccessListener(updateResult ->
                         {
-                            _updateUiState.postValue(GenericUiState.success("Update successful!"));
+                            updateUiState.postValue(GenericUiState.success("Update successful!"));
                             taskCompletionSource.setResult(true);
                         })
                         .addOnFailureListener(updateException ->
                         {
-                            _updateUiState.postValue(GenericUiState.error("Update failed: " + updateException.getMessage()));
+                            updateUiState.postValue(GenericUiState.error("Update failed: " + updateException.getMessage()));
                             taskCompletionSource.setResult(false);
                         });
             }

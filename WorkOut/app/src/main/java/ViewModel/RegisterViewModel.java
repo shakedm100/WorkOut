@@ -32,8 +32,7 @@ public class RegisterViewModel extends ViewModel
 
     private final GeneralRepository generalRepository;
 
-    private final MutableLiveData<GenericUiState<String>> _registerUiState = new MutableLiveData<>(GenericUiState.idle());
-    public LiveData<GenericUiState<String>> registerUiState = _registerUiState;
+    private final MutableLiveData<GenericUiState<String>> registerUiState = new MutableLiveData<>(GenericUiState.idle());
 
 //    public RegisterViewModel(ClientRepository clientRepository, GeneralRepository generalRepository) {
 //        this.clientRepository = clientRepository;
@@ -71,19 +70,19 @@ public class RegisterViewModel extends ViewModel
         // basic validation checks
         if (username == null || username.trim().isEmpty())
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a username."));
+            registerUiState.postValue(GenericUiState.error("Please enter a username."));
             return false;
         }
 
         if (password == null || password.isEmpty() || password.length() < 6)
         {
-            _registerUiState.postValue(GenericUiState.error("Password must be at least 6 characters."));
+            registerUiState.postValue(GenericUiState.error("Password must be at least 6 characters."));
             return false;
         }
 
         if (firstName == null || firstName.trim().isEmpty())
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a first name."));
+            registerUiState.postValue(GenericUiState.error("Please enter a first name."));
             return false;
         }
 
@@ -94,32 +93,32 @@ public class RegisterViewModel extends ViewModel
             isNameValid = nameSplit[i].chars().allMatch(Character::isLetter);
             if (!isNameValid)
             {
-                _registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
+                registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
                 return false;
             }
         }
 
         if (lastName == null || lastName.trim().isEmpty())
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a last name."));
+            registerUiState.postValue(GenericUiState.error("Please enter a last name."));
             return false;
         }
 
         if (!generalRepository.allLetters(firstName))
         {
-            _registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
+            registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
             return false;
         }
 
         if (!generalRepository.allLetters(lastName))
         {
-            _registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
+            registerUiState.postValue(GenericUiState.error("First name must contain only letters."));
             return false;
         }
 
         if (email == null || email.trim().isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches())
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a valid email address."));
+            registerUiState.postValue(GenericUiState.error("Please enter a valid email address."));
             return false;
         }
 
@@ -127,52 +126,52 @@ public class RegisterViewModel extends ViewModel
         generalRepository.canRegisterUser("clients", username, email)
                 .addOnSuccessListener(exists -> {
                     if (exists) {
-                        _registerUiState.postValue(GenericUiState.error("Username or Email are already taken!"));
+                        registerUiState.postValue(GenericUiState.error("Username or Email are already taken!"));
                     }
                 })
                 .addOnFailureListener(e -> {
-                    _registerUiState.postValue(GenericUiState.error("Something went wrong!"));
+                    registerUiState.postValue(GenericUiState.error("Something went wrong!"));
                 });
 
         if (phonePrefixStr == null || phonePrefixStr.trim().isEmpty())
         {
-            _registerUiState.postValue(GenericUiState.error("Please select a phone prefix."));
+            registerUiState.postValue(GenericUiState.error("Please select a phone prefix."));
             return false;
         }
 
         PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
         if (prefix == null)
         {
-            _registerUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
+            registerUiState.postValue(GenericUiState.error("Invalid phone prefix selected."));
             return false;
         }
 
         if (phoneNumberStr == null || phoneNumberStr.trim().isEmpty() || !phoneNumberStr.trim().matches("\\d+"))
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
+            registerUiState.postValue(GenericUiState.error("Please enter a valid phone number."));
             return false;
         }
         if (!phoneNumberStr.trim().matches("[0-9]+"))
         {
-            _registerUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
+            registerUiState.postValue(GenericUiState.error("Phone number must contain only numbers."));
             return false;
         }
 
         if (phoneNumberStr.trim().length() != 7)
         {
-            _registerUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
+            registerUiState.postValue(GenericUiState.error("Phone number must have 7 digits."));
             return false;
         }
 
         if (birthday == null || birthday.trim().isEmpty())
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a birthday."));
+            registerUiState.postValue(GenericUiState.error("Please enter a birthday."));
             return false;
         }
 
         if (!birthday.matches("\\d{2}/\\d{2}/\\d{4}"))
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter birthday with the following template: DD/MM/YYYY"));
+            registerUiState.postValue(GenericUiState.error("Please enter birthday with the following template: DD/MM/YYYY"));
             return false;
         }
 
@@ -186,13 +185,13 @@ public class RegisterViewModel extends ViewModel
             // check validation
             if (day <= 0 || month <= 0 || year <= 0)
             {
-                _registerUiState.postValue(GenericUiState.error("All the values must be positive!"));
+                registerUiState.postValue(GenericUiState.error("All the values must be positive!"));
                 return false;
             }
 
             if (day > 31 || month > 12 || year > 2025 || year < 1900)
             {
-                _registerUiState.postValue(GenericUiState.error("Day must be between 1 and 31, month between 1 and 12, and year between 1900 and 2025!"));
+                registerUiState.postValue(GenericUiState.error("Day must be between 1 and 31, month between 1 and 12, and year between 1900 and 2025!"));
                 return false;
             }
 
@@ -202,20 +201,20 @@ public class RegisterViewModel extends ViewModel
                 {
                     if (day > 29)
                     {
-                        _registerUiState.postValue(GenericUiState.error("Day can be up to 29!"));
+                        registerUiState.postValue(GenericUiState.error("Day can be up to 29!"));
                         return false;
                     }
 
                     else if (day > 28)
                     {
-                        _registerUiState.postValue(GenericUiState.error("Day can be up to 28!"));
+                        registerUiState.postValue(GenericUiState.error("Day can be up to 28!"));
                         return false;
                     }
                 }
 
                 if (day > 30)
                 {
-                    _registerUiState.postValue(GenericUiState.error("Day can be up to 30!"));
+                    registerUiState.postValue(GenericUiState.error("Day can be up to 30!"));
                     return false;
                 }
             }
@@ -223,18 +222,18 @@ public class RegisterViewModel extends ViewModel
 
         if (gender == null)
         {
-            _registerUiState.postValue(GenericUiState.error("Please select a gender."));
+            registerUiState.postValue(GenericUiState.error("Please select a gender."));
             return false;
         }
 
         if (city == null)
         {
-            _registerUiState.postValue(GenericUiState.error("City is null."));
+            registerUiState.postValue(GenericUiState.error("City is null."));
             return false;
         }
         if (street == null || street.trim().isEmpty())
         {
-            _registerUiState.postValue(GenericUiState.error("Please enter a street address."));
+            registerUiState.postValue(GenericUiState.error("Please enter a street address."));
             return false;
         }
 
@@ -247,7 +246,7 @@ public class RegisterViewModel extends ViewModel
         // failed to get the long/lat of the given address
         if (location == null)
         {
-            _registerUiState.postValue(GenericUiState.error("Invalid address."));
+            registerUiState.postValue(GenericUiState.error("Invalid address."));
             return false;
         }
 
@@ -261,7 +260,7 @@ public class RegisterViewModel extends ViewModel
                              String phonePrefixStr, String phoneNumberStr, String birthday, City city, String street, Gender gender, Context context) // String cityName
     {
         taskCompletionSource = new TaskCompletionSource<>();
-        _registerUiState.postValue(GenericUiState.loading("Validating input..."));
+        registerUiState.postValue(GenericUiState.loading("Validating input..."));
 
         if (!checkArguments(email, password, username, firstName, lastName, phonePrefixStr, phoneNumberStr, birthday, city, street, gender, context))
             taskCompletionSource.setResult(false);
@@ -278,7 +277,7 @@ public class RegisterViewModel extends ViewModel
             final String finalStreet = street.trim();
             PhonePrefix prefix = PhonePrefix.fromString(phonePrefixStr.trim());
 
-            _registerUiState.postValue(GenericUiState.loading("Verifying city information..."));
+            registerUiState.postValue(GenericUiState.loading("Verifying city information..."));
 
             Phone phone = new Phone(prefix, finalPhoneNumber);
             Address address = new Address(city, finalStreet);
@@ -286,12 +285,12 @@ public class RegisterViewModel extends ViewModel
             clientRepository.insertClient(finalUsername, password, phone, finalEmail, finalFirstName, finalLastName, address, gender)
                     .addOnSuccessListener(regResult ->
                     {
-                        _registerUiState.postValue(GenericUiState.success("Registration successful! Welcome " + finalFirstName));
+                        registerUiState.postValue(GenericUiState.success("Registration successful! Welcome " + finalFirstName));
                         taskCompletionSource.setResult(true);
                     })
                     .addOnFailureListener(insertException ->
                     {
-                        _registerUiState.postValue(GenericUiState.error("Registration failed: " + insertException.getMessage()));
+                        registerUiState.postValue(GenericUiState.error("Registration failed: " + insertException.getMessage()));
                         taskCompletionSource.setResult(false);
                     });
         }
@@ -303,11 +302,4 @@ public class RegisterViewModel extends ViewModel
     {
         return registerUiState;
     }
-
-    // Optional: Method to reset the state if needed from the Activity/Fragment
-    public void resetRegisterState()
-    {
-        _registerUiState.postValue(GenericUiState.idle());
-    }
-
 }

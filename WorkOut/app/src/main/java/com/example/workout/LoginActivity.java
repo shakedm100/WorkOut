@@ -131,7 +131,7 @@ public class LoginActivity extends AppCompatActivity
                 case LOADING:
                     progressBar.setVisibility(View.VISIBLE);
                     loginButton.setEnabled(false);
-                    loginStatusTextView.setVisibility(View.VISIBLE);
+                    loginStatusTextView.setVisibility(View.GONE);
                     break;
                 case SUCCESS:
                     progressBar.setVisibility(View.GONE);
