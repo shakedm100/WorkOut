@@ -4,6 +4,7 @@ import static com.google.android.gms.tasks.Tasks.await;
 
 import static org.junit.Assert.*;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 
 import org.junit.Test;
@@ -20,10 +21,12 @@ import Model.Business;
 import Model.Category;
 import Model.Course;
 import Model.CourseType;
+import Model.Day;
 import Model.Location;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
+import Model.SearchStrategies.SearchDayOfWeekStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -115,6 +118,36 @@ public class SearchStrategyTest
     @Test
     public void searchDayOfWeekTest() throws ExecutionException, InterruptedException, TimeoutException
     {
-        // TODO: Implement day of week test
+        searchStrategy = new SearchDayOfWeekStrategy();
+
+        @SuppressWarnings("unchecked")
+                ArrayList<Business> businesses = (ArrayList<Business>) await(
+                        searchStrategy.searchBusinesses(Day.Monday),10, TimeUnit.SECONDS);
+
+        assertNotNull(businesses);
+        assertFalse(businesses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+                ArrayList<Course> courses = (ArrayList<Course>) await(
+                        searchStrategy.searchCourses(Day.Monday), 10, TimeUnit.SECONDS);
+
+        assertNotNull(courses);
+        assertFalse(courses.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Business> businesses_null = (ArrayList<Business>) await(
+                searchStrategy.searchBusinesses(Day.Sunday),10, TimeUnit.SECONDS);
+
+        //assert(businesses_null);
+        assertTrue(businesses_null.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses_null = (ArrayList<Course>) await(
+                searchStrategy.searchCourses(Day.Sunday), 10, TimeUnit.SECONDS);
+
+        //assertNull(courses_null);
+        assertTrue(courses_null.isEmpty());
+
+        // mock part
     }
 }
