@@ -41,6 +41,15 @@ public class LoginViewModel extends ViewModel
         this.businessRepository = new BusinessRepository();
     }
 
+    /**
+     * Test-only
+     */
+    public LoginViewModel(ClientRepository clientRepo, BusinessRepository bizRepo)
+    {
+        this.clientRepository = clientRepo;
+        this.businessRepository = bizRepo;
+    }
+
     public Task<Boolean> loginUser(String username, String password)
     {
         taskCompletionSource = new TaskCompletionSource<>();

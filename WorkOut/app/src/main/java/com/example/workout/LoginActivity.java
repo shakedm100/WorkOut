@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import Model.Client;
 import ViewModel.LoginViewModel;
+import ViewModel.ViewModelFactoryProvider;
 
 import android.util.Log;
 
@@ -101,7 +102,8 @@ public class LoginActivity extends AppCompatActivity
         loginButton = findViewById(R.id.loginButton);
 
         // initialize ViewModel
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        loginViewModel = new ViewModelProvider(this, ViewModelFactoryProvider.factory)
+                .get(LoginViewModel.class);
 
         // get LiveData from ViewModel
         setupObservers();
@@ -109,7 +111,7 @@ public class LoginActivity extends AppCompatActivity
         // create button click listener
         setupButtonClickListeners();
 
-        loginViewModel.loginOnStartup();
+        //loginViewModel.loginOnStartup();
     }
 
     // show the respond
@@ -147,7 +149,7 @@ public class LoginActivity extends AppCompatActivity
                         intent.putExtra("business", loginUiState.getData());
                     }
                     startActivity(intent);
-                    finish(); // Finish LoginActivity so user can't go back
+                    //finish(); // Finish LoginActivity so user can't go back
                     break;
                 case ERROR:
                     progressBar.setVisibility(View.GONE);
