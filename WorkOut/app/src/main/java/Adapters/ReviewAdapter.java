@@ -41,7 +41,6 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.RatingView
         holder.username.setText(rating.getClient().getUsername());
         holder.RatingText.setText(rating.getComment());
         holder.ratingBar.setRating(rating.getStars());
-        // אפשר גם לטעון תמונת פרופיל כאן אם יש לך URL (עם Glide למשל)
     }
 
     @Override
