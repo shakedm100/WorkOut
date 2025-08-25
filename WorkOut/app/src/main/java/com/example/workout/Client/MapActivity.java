@@ -56,7 +56,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
     private BusinessRepository businessRepository;
-    private final int defaultRadius = 100;
+    private final int defaultRadius = 100; // 100 KM
     private Location modelLocation;
     private Client client;
     private ArrayList<Business> businesses;
@@ -234,11 +234,27 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Button courseSignUpButton = view.findViewById(R.id.map_bottom_sign_up_button);
 
         nameTextView.setText(business.getBusinessName());
-        String cityText = "City: " + business.getAddress().getCity().getEnglishName();
+        String cityText, addressText, phoneText;
+
+        if(business.getAddress() != null)
+            addressText = "Address: " + business.getAddress().getName();
+        else
+            addressText = "Address: missing";
+
+        if(business.getAddress() != null && business.getAddress().getCity() != null)
+            cityText = "City: " + business.getAddress().getCity().getEnglishName();
+        else
+            cityText = "City: missing";
+
+        if(business.getPhone() != null)
+            phoneText = business.getPhone().toString();
+        else
+            phoneText = "missing";
+
         cityTextView.setText(cityText);
-        String addressText = "Address: " + business.getAddress().getName();
         addressTextView.setText(addressText);
-        phoneTextView.setText(business.getPhone().toString());
+        phoneTextView.setText(phoneText);
+
         ratingBar.setRating(business.averageRating());
 
         int ratingsCount = business.getRatings() != null ? business.getRatings().size() : 0;
@@ -259,6 +275,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 courses.append(", ").append(course.getName());
             }
         }
+
+        if(business.getCourses().isEmpty())
+            courses.append("no courses yet");
 
         coursesListTextView.setText(courses);
 
