@@ -34,11 +34,13 @@ public class LoginViewModel extends ViewModel
     // T is String here, representing a success token or message
     private final MutableLiveData<GenericUiState<User>> _loginUiState = new MutableLiveData<>(GenericUiState.idle());
     private TaskCompletionSource<Boolean> taskCompletionSource;
+    private final boolean autoLoginEnabled;
 
     public LoginViewModel()
     {
         this.clientRepository = new ClientRepository();
         this.businessRepository = new BusinessRepository();
+        autoLoginEnabled = true;
     }
 
     /**
@@ -48,6 +50,7 @@ public class LoginViewModel extends ViewModel
     {
         this.clientRepository = clientRepo;
         this.businessRepository = bizRepo;
+        autoLoginEnabled = false;
     }
 
     public Task<Boolean> loginUser(String username, String password)
@@ -250,5 +253,10 @@ public class LoginViewModel extends ViewModel
     public LiveData<GenericUiState<User>> getLoginUiState()
     {
         return _loginUiState;
+    }
+
+    public boolean isAutoLoginEnabled()
+    {
+        return autoLoginEnabled;
     }
 }

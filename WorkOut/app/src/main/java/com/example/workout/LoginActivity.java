@@ -111,7 +111,8 @@ public class LoginActivity extends AppCompatActivity
         // create button click listener
         setupButtonClickListeners();
 
-        //loginViewModel.loginOnStartup();
+        if(loginViewModel.isAutoLoginEnabled())
+            loginViewModel.loginOnStartup();
     }
 
     // show the respond
@@ -149,7 +150,7 @@ public class LoginActivity extends AppCompatActivity
                         intent.putExtra("business", loginUiState.getData());
                     }
                     startActivity(intent);
-                    //finish(); // Finish LoginActivity so user can't go back
+                    finish(); // Finish LoginActivity so user can't go back
                     break;
                 case ERROR:
                     progressBar.setVisibility(View.GONE);
