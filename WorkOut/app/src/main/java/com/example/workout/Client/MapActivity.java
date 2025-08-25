@@ -151,14 +151,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
-                startActivity(intent);
                 return true;
             }
             else if (id == R.id.nav_profile)
             {
                 Intent intent = new Intent(this, ProfileActivity.class);
                 intent.putExtra("client", client);
-                startActivity(intent);
                 startActivity(intent);
                 return true;
             }
@@ -178,7 +176,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             {
                 Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("client", client);
-                startActivity(intent);
                 startActivity(intent);
                 return true;
             }

@@ -152,7 +152,6 @@ public class SearchActivity extends AppCompatActivity
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
-                startActivity(intent);
                 return true;
             }
             else if (id == R.id.nav_profile)
@@ -172,14 +171,12 @@ public class SearchActivity extends AppCompatActivity
                 Intent intent = new Intent(this, MapActivity.class);
                 intent.putExtra("client", current);
                 startActivity(intent);
-                startActivity(intent);
                 return true;
             }
             else if (id == R.id.nav_Calendar)
             {
                 Intent intent = new Intent(this, CalendarActivity.class);
                 intent.putExtra("client", current);
-                startActivity(intent);
                 startActivity(intent);
                 return true;
             }

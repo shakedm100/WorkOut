@@ -78,7 +78,7 @@ public class LoginViewModel extends ViewModel
                                 })
                                 .addOnFailureListener(businessError ->
                                 {
-                                    _loginUiState.postValue(GenericUiState.error("No user was found"));
+                                    _loginUiState.postValue(GenericUiState.error("Authentication failed"));
                                     taskCompletionSource.setResult(false);
                                 });
                     });

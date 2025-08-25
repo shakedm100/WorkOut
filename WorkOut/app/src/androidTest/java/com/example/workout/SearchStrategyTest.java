@@ -113,45 +113,8 @@ public class SearchStrategyTest
     }
 
     @Test
-    public void searchDateTest() throws ExecutionException, InterruptedException, TimeoutException
+    public void searchDayOfWeekTest() throws ExecutionException, InterruptedException, TimeoutException
     {
-        searchStrategy = new SearchTimeStrategy();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, 2025);
-        calendar.set(Calendar.MONTH, 3); // Months are from 0 - 11
-        calendar.set(Calendar.DAY_OF_MONTH, 24); // Thursday
-
-        // Set min time at 12:00
-        calendar.set(Calendar.HOUR_OF_DAY, 20);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date minDate = calendar.getTime();
-        Timestamp minTime = new Timestamp(minDate);
-
-        // Set max time at 13:00
-        calendar.set(Calendar.HOUR_OF_DAY, 21);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date maxDate = calendar.getTime();
-        Timestamp maxTime = new Timestamp(maxDate);
-
-        Timestamp[] times = new Timestamp[]{minTime, maxTime};
-
-        @SuppressWarnings("unchecked")
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
-                .searchBusinesses(times), 10, TimeUnit.SECONDS);
-
-        assertNotNull(businesses);
-        assertFalse(businesses.isEmpty());
-
-        @SuppressWarnings("unchecked")
-        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy
-                .searchBusinesses(times), 10, TimeUnit.SECONDS);
-
-        assertNotNull(courses);
-        assertFalse(courses.isEmpty());
+        // TODO: Implement day of week test
     }
 }

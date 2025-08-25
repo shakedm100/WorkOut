@@ -123,7 +123,6 @@ public class CalendarActivity extends AppCompatActivity
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
-                startActivity(intent);
                 return true;
             }
             else if (id == R.id.nav_profile)
@@ -138,14 +137,12 @@ public class CalendarActivity extends AppCompatActivity
                 Intent intent = new Intent(this, SearchActivity.class);
                 intent.putExtra("client", client);
                 startActivity(intent);
-                startActivity(intent);
                 return true;
             }
             else if (id == R.id.nav_map)
             {
                 Intent intent = new Intent(this, MapActivity.class);
                 intent.putExtra("client", client);
-                startActivity(intent);
                 startActivity(intent);
                 return true;
             }

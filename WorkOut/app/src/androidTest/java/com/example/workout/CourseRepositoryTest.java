@@ -98,7 +98,7 @@ public class CourseRepositoryTest
         // sample business
         business = new Business("bid", "testEverything", testPhone,
                 "testEverything@mail", "EasyBusy", new Location(12345, 2145435),
-                "Policy");
+                "Policy", new Address(new City("Rosh Haayin"), "Ofra Haza 4"));
         Schedule schedule = new Schedule(Day.Wednesday, Timestamp.now());
         sampleCourse = new Course("cid", CourseType.Group, "YogaClass", new ArrayList<>(),
                 10, new AgeRange(20, 40), schedule,

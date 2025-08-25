@@ -85,6 +85,7 @@ dependencies {
         "include" to listOf("*.aar", "*.jar")
     )))*/
     implementation(libs.firebase.messaging)
+    implementation(libs.espresso.intents)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
