@@ -60,7 +60,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location modelLocation;
     private Client client;
     private ArrayList<Business> businesses;
-    private boolean isFromSearch;
     private BottomNavigationView bottomNavigationView;
     private FloatingActionButton recenterButton;
 
@@ -101,7 +100,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         businesses = getIntent().getParcelableArrayListExtra("business_list");
         if (businesses == null)
         {
-            isFromSearch = false;
             businesses = new ArrayList<>();
         }
 
@@ -184,7 +182,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapReady(GoogleMap map)
+    public void onMapReady(@NonNull GoogleMap map)
     {
         this.googleMap = map;
         googleMap.getUiSettings().setCompassEnabled(false);
@@ -258,7 +256,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
             else
             {
-                courses.append(", " + course.getName());
+                courses.append(", ").append(course.getName());
             }
         }
 
@@ -297,19 +295,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             return;
         }
 
-        SearchStrategyInterface distance = new SearchRadiusStrategy(defaultRadius);
+        SearchStrategyInterface<Location> distance = new SearchRadiusStrategy(defaultRadius);
         businessRepository.searchByStrategy(distance, modelLocation).addOnSuccessListener(businesses ->
         {
             for (Business current : businesses)
             {
-                Location location = current.getLocation();
-                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(position);
-                markerOptions.title(current.getBusinessName());
-                Marker marker = googleMap.addMarker(markerOptions);
-                if (marker != null)
-                    marker.setTag(current);
+                createMarker(current);
             }
         });
     }
@@ -361,15 +352,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         for (Business current : businesses)
         {
-            Location location = current.getLocation();
-            LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(position);
-            markerOptions.title(current.getBusinessName());
-            Marker marker = googleMap.addMarker(markerOptions);
-            if (marker != null)
-                marker.setTag(current);
+            createMarker(current);
         }
+    }
+
+    private void createMarker(Business business)
+    {
+        Location location = business.getLocation();
+        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(position);
+        markerOptions.title(business.getBusinessName());
+        Marker marker = googleMap.addMarker(markerOptions);
+        if (marker != null)
+            marker.setTag(business);
     }
 
     @Override
