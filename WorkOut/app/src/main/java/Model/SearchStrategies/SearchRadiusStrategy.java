@@ -45,6 +45,19 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
     }
 
     /**
+     * Injection constructor for testing.
+     *
+     * @param courseRepository the CourseRepository to use
+     * @param db               FirebaseFirestore instance to use
+     */
+    public SearchRadiusStrategy(CourseRepository courseRepository, FirebaseFirestore db, double radius)
+    {
+        this.courseRepository = courseRepository;
+        this.db = db;
+        this.radius = radius * 1000;
+    }
+
+    /**
      * Converts degrees of latitude into approximate kilometers.
      *
      * @param latitude degrees of latitude

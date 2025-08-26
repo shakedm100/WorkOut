@@ -89,7 +89,7 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
                 .onSuccessTask(courseSnap ->
                 {
                     Set<DocumentReference> bizRefs = new HashSet<>();
-                    for (DocumentSnapshot cs : courseSnap)
+                    for (DocumentSnapshot cs : courseSnap.getDocuments()) // added getDocs
                     {
                         DocumentReference bizRef = cs.getReference()
                                 .getParent()    // “courses”
@@ -132,7 +132,12 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
                                     .continueWith(cTask ->
                                     {
                                         if (!cTask.isSuccessful()) throw cTask.getException();
-                                        b.setCourses((ArrayList<Course>) cTask.getResult());         // populate
+                                        List<Course> courseList = cTask.getResult();
+                                        ArrayList<Course> courseArrayList = new ArrayList<>();
+                                        for (Course course : courseList)
+                                            courseArrayList.add(course);
+
+                                        b.setCourses(courseArrayList);         // populate
                                         return b;                                // now a Task<Business>
                                     })
                             )

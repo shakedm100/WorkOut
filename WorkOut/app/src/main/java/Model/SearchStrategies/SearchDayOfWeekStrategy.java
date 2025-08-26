@@ -27,6 +27,16 @@ public class SearchDayOfWeekStrategy implements SearchStrategyInterface<Day>
         db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Injection constructor for testing.
+     *
+     * @param db FirebaseFirestore instance to use
+     */
+    public SearchDayOfWeekStrategy(FirebaseFirestore db)
+    {
+        this.db = db;
+    }
+
     @Override
     public Task<List<Business>> searchBusinesses(Day day)
     {
@@ -123,7 +133,7 @@ public class SearchDayOfWeekStrategy implements SearchStrategyInterface<Day>
                 {
                     List<Task<List<Course>>> courseTasks = new ArrayList<>();
 
-                    for (DocumentSnapshot bizDoc : bizSnap)
+                    for (DocumentSnapshot bizDoc : bizSnap.getDocuments()) // get docs
                     {
                         String bizId = bizDoc.getId();
 

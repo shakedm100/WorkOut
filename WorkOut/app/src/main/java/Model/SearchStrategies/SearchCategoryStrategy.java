@@ -46,6 +46,18 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
     }
 
     /**
+     * Injection constructor for testing.
+     *
+     * @param courseRepository the CourseRepository to use
+     * @param db               FirebaseFirestore instance to use
+     */
+    public SearchCategoryStrategy(CourseRepository courseRepository, FirebaseFirestore db)
+    {
+        this.courseRepository = courseRepository;
+        this.db = db;
+    }
+
+    /**
      * Searches for {@link Business} entities that offer at least one {@link Course}
      * in the specified {@code category}.
      * <ol>
@@ -67,7 +79,8 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
                 .whereEqualTo("category", category).get().onSuccessTask(querySnap -> {
                     // group courses by their parent business ref
                     Map<DocumentReference, List<Course>> coursesByBiz = new HashMap<>();
-                    for (DocumentSnapshot cs : querySnap) {
+                    for (DocumentSnapshot cs : querySnap.getDocuments()) // added getDocs
+                        {
                         Course c = cs.toObject(Course.class);
                         DocumentReference bizRef = cs.getReference()
                                 .getParent()   // "courses"
@@ -143,7 +156,8 @@ public class SearchCategoryStrategy implements SearchStrategyInterface<Category>
                     }
 
                     List<Course> results = new ArrayList<>();
-                    for (DocumentSnapshot cs : task.getResult()) {
+                    for (DocumentSnapshot cs : task.getResult().getDocuments()) // added getDocs
+                        {
                         // 1) Turn the document into a Course object
                         Course c = cs.toObject(Course.class);
                         if (c == null) continue;
