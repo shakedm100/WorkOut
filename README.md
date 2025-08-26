@@ -67,14 +67,3 @@ app/
    * Enable Firebase Auth & Firestore in your Firebase console
 4. Sync Gradle and run the app on an emulator or device.
 
----
-
-## Running Tests
-
-Unit tests & instrumentation tests use **JUnit**, **Mockito**, and **Espresso**.
-Run them from Android Studio with:
-
-```
-./gradlew test
-./gradlew connectedAndroidTest
-```
