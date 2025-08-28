@@ -1,25 +1,19 @@
-package com.example.workout;
+package com.example.workout.SearchStrategy;
 
 import static com.google.android.gms.tasks.Tasks.await;
-import static com.google.android.gms.tasks.Tasks.forResult;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -34,30 +28,22 @@ import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import Model.Address;
 import Model.AgeRange;
 import Model.Business;
 import Model.Category;
 import Model.City;
-import Model.Client;
 import Model.Course;
 import Model.CourseType;
 import Model.Day;
 import Model.Location;
 import Model.Phone;
 import Model.PhonePrefix;
-import Model.Repository.BusinessRepository;
-import Model.Repository.ClientRepository;
 import Model.Repository.CourseRepository;
-import Model.Repository.GeneralRepository;
 import Model.Schedule;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
@@ -518,6 +504,13 @@ public class SearchStrategyTestMock
         List<DocumentSnapshot> onlyMatchingDocs = Arrays.asList(mockDoc1); // only validCourse
         when(mockQuerySnapshot.getDocuments()).thenReturn(onlyMatchingDocs);
         when(mockDb.collectionGroup(anyString()).whereEqualTo(anyString(), eq(valid_day))).thenReturn(mockQuery);
+
+        //when(mockDb.collection(anyString()).document(any()).collection(anyString()).get().continueWith(any())).thenReturn(Tasks.forResult(mockQuerySnapshot));
+
+//        Task<List<Course>> t = db.collection("businesses")
+//                .document(bizId)
+//                .collection("courses")
+//                .get()
 
         // Act for courses
         List<Course> courses_search_results = Tasks.await(dayOfWeekSearchStrategy.searchCourses(valid_day), 10, TimeUnit.SECONDS);

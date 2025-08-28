@@ -1,17 +1,12 @@
-package com.example.workout;
+package com.example.workout.SearchStrategy;
 
 import static com.google.android.gms.tasks.Tasks.await;
 
 import static org.junit.Assert.*;
 
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;

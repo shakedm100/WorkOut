@@ -150,7 +150,7 @@ public class SearchDayOfWeekStrategy implements SearchStrategyInterface<Day>
                                     }
 
                                     List<Course> matching = new ArrayList<>();
-                                    for (DocumentSnapshot cs : courseSnapTask.getResult())
+                                    for (DocumentSnapshot cs : courseSnapTask.getResult().getDocuments()) // get Docs
                                     {
                                         Course c = cs.toObject(Course.class);
                                         if (c == null || c.getSchedule() == null) continue;
