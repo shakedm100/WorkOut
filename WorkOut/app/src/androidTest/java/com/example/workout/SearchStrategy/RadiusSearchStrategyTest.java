@@ -24,6 +24,14 @@ import Model.Schedule;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
+/**
+ * Firestore-mocked tests for radius search strategy.
+ * --------------------------------------------------
+ * Businesses and courses match if the Business is located inside a given radius and a location.
+ * business.location.latitude >= minLat AND business.location.latitude <= maxLat
+ * business.location.longitude >= minLon AND business.location.longitude <= maxLon
+ */
+
 public class RadiusSearchStrategyTest
 {
     @Mock FirebaseFirestore db;
