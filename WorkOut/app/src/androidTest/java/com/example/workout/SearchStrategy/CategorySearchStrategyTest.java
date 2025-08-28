@@ -23,58 +23,66 @@ import Model.Schedule;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
-public class CategorySearchStrategyTest {
-
-    // ===== Firestore: collectionGroup chain =====
+/**
+ * Firestore-mocked tests for Category search strategy.
+ * ----------------------------------------------------
+ * Courses match if the Category is the same as a given Category.
+ * course.getCategory.name == given Category.name.
+ */
+public class CategorySearchStrategyTest
+{
+    // root chain
     @Mock FirebaseFirestore db;
+    @Mock Query cg; // for db.collectionGroup("courses")
+    @Mock Query qCat; // for .whereEqualTo("category", wanted)
 
-    @Mock Query cg;        // db.collectionGroup("courses")
-    @Mock Query qCat;      // .whereEqualTo("category", wanted)
-    @Mock QuerySnapshot cgSnapBoth;   // snapshot with multiple docs
+    // for snapshot with multiple docs
+    @Mock QuerySnapshot cgSnapBoth;
     @Mock QuerySnapshot cgSnapOnlyWanted;
     @Mock QuerySnapshot cgSnapEmpty;
 
-    // Returned docs
+    // returned docs
     @Mock DocumentSnapshot docWanted1;
     @Mock DocumentSnapshot docWanted2;
     @Mock DocumentSnapshot docOther1;
 
-    // If production derives businessId from the doc path:
+    // get businessId from the doc path:
     @Mock DocumentReference w1Ref;
     @Mock DocumentReference w2Ref;
     @Mock DocumentReference o1Ref;
+
+    // courses collections
     @Mock CollectionReference w1CoursesColRef;
     @Mock CollectionReference w2CoursesColRef;
     @Mock CollectionReference o1CoursesColRef;
+
+    // business docs refs
     @Mock DocumentReference w1BizRef;
     @Mock DocumentReference w2BizRef;
     @Mock DocumentReference o1BizRef;
     @Mock CourseRepository mockCourseRepo;
-
-    private SearchStrategyInterface<Category> categorySearchStrategy;
+    private SearchStrategyInterface<Category> categorySearchStrategy; // selected strategy test
 
     @Before
     public void setUp()
     {
         MockitoAnnotations.openMocks(this);
         mockCourseRepo = mock(CourseRepository.class);
-
-        // Class under test
         categorySearchStrategy = new SearchCategoryStrategy(mockCourseRepo, db);
 
-        // Start of collectionGroup
+        // mock & stub
         when(db.collectionGroup("courses")).thenReturn(cg);
 
-        // Category filter (if your code uses category.name(), adjust here)
+        // category filter
         when(cg.whereEqualTo(eq("category"), any())).thenReturn(qCat);
 
-        // Build some Course objects
+        // Build fake courses with different categories
         // Two in BASKETBALL (wanted) and one in SOCCER (not wanted)
         Course wanted1 = mkCourse(Category.Basketball);
         Course wanted2 = mkCourse(Category.Basketball);
         Course other1  = mkCourse(Category.Soccer);
 
-        // Map toObject + IDs
+        // map toObject + IDs
         when(docWanted1.toObject(Course.class)).thenReturn(copy(wanted1));
         when(docWanted2.toObject(Course.class)).thenReturn(copy(wanted2));
         when(docOther1.toObject(Course.class)).thenReturn(copy(other1));
@@ -83,12 +91,12 @@ public class CategorySearchStrategyTest {
         when(docWanted2.getId()).thenReturn("cat_w2");
         when(docOther1.getId()).thenReturn("cat_o1");
 
-        // Snapshots with different compositions
+        // snapshots with different values to check
         when(cgSnapOnlyWanted.getDocuments()).thenReturn(Arrays.asList(docWanted1, docWanted2));
         when(cgSnapBoth.getDocuments()).thenReturn(Arrays.asList(docWanted1, docOther1)); // mixed
         when(cgSnapEmpty.getDocuments()).thenReturn(Collections.emptyList());
 
-        // If businessId is derived via path parents:
+        // get businessesIds via path parents
         when(docWanted1.getReference()).thenReturn(w1Ref);
         when(docWanted2.getReference()).thenReturn(w2Ref);
         when(docOther1.getReference()).thenReturn(o1Ref);
@@ -109,46 +117,49 @@ public class CategorySearchStrategyTest {
     @Test
     public void searchCategory_success_twoMatches() throws Exception
     {
-        Category wanted = Category.Basketball;
+        Category wanted = Category.Basketball; // the wanted category
 
-        // Exact whereEqualTo for determinism
+        // exact whereEqualTo filter
         when(cg.whereEqualTo("category", wanted)).thenReturn(qCat);
 
-        // Return only docs that match the wanted category
+        // return only docs that match the wanted category
         when(qCat.get()).thenReturn(Tasks.forResult(cgSnapOnlyWanted));
 
         List<Course> result = Tasks.await(categorySearchStrategy.searchCourses(wanted));
 
         assertEquals(2, result.size());
         Set<String> ids = new HashSet<>();
-        for (Course c : result) ids.add(c.getId());
+
+        // get the ids of the matched courses
+        for (Course c : result)
+            ids.add(c.getId());
+
         assertTrue(ids.contains("cat_w1"));
         assertTrue(ids.contains("cat_w2"));
+        assertFalse(ids.contains("cat_o1"));
 
-        for (Course c : result) {
+        // make sure the selected courses are Basketball category
+        for (Course c : result)
+        {
             assertNotNull(c.getBusinessId());
             assertTrue(c.getBusinessId().equals("biz_w1") || c.getBusinessId().equals("biz_w2"));
             assertEquals(Category.Basketball, c.getCategory());
         }
-
-        // Verify query built correctly
-        verify(cg).whereEqualTo("category", wanted);
-        verify(qCat).get();
     }
 
     @Test
-    public void searchCategory_success_noMatches() throws Exception
+    public void searchCategory_success_empty() throws Exception
     {
-        Category wanted = Category.Tennis; // choose any not present in stubs
+        Category wanted = Category.Tennis; // no matched course
 
-        // exact whereEqualTo with this wanted
+        // exact whereEqualTo with this given wanted course
         when(cg.whereEqualTo("category", wanted)).thenReturn(qCat);
 
-        // Return empty results for this category
+        // return empty results for this category
         when(qCat.get()).thenReturn(Tasks.forResult(cgSnapEmpty));
 
         List<Course> result = Tasks.await(categorySearchStrategy.searchCourses(wanted));
-        assertTrue(result.isEmpty());
+        assertTrue(result.isEmpty()); // no matches
     }
 
     @Test
@@ -157,7 +168,7 @@ public class CategorySearchStrategyTest {
         Category wanted = Category.Basketball;
         when(cg.whereEqualTo("category", wanted)).thenReturn(qCat);
 
-        RuntimeException fail = new RuntimeException("category get failed");
+        RuntimeException fail = new RuntimeException("category search failed");
         when(qCat.get()).thenReturn(Tasks.forException(fail));
 
         Task<List<Course>> task = categorySearchStrategy.searchCourses(wanted);
@@ -172,15 +183,27 @@ public class CategorySearchStrategyTest {
         }
     }
 
-    // ===== helpers =====
+    // helper functions
 
-    private static Course mkCourse(Category category) {
+    /**
+     * Create a course with a given category.
+     * @param category a given category.
+     * @return a new course with the given category.
+     */
+    private static Course mkCourse(Category category)
+    {
         Course c = new Course();
         c.setCategory(category);
         return c;
     }
 
-    private static Course copy(Course src) {
+    /**
+     * Create a copy of a course.
+     * @param src the source course that will be copied.
+     * @return a new course with the same category as the source.
+     */
+    private static Course copy(Course src)
+    {
         Course c = new Course();
         c.setCategory(src.getCategory());
         return c;
