@@ -231,7 +231,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
                 .onSuccessTask(bizSnap ->
                 {
                     List<String> inBoxBizIds = new ArrayList<>();
-                    for (DocumentSnapshot ds : bizSnap)
+                    for (DocumentSnapshot ds : bizSnap.getDocuments()) // added getDocs
                     {
                         Business b = ds.toObject(Business.class);
                         if (b == null || b.getLocation() == null) continue;
@@ -264,7 +264,7 @@ public class SearchRadiusStrategy implements SearchStrategyInterface<Location>
                                         }
 
                                         List<Course> bizCourses = new ArrayList<>();
-                                        for (DocumentSnapshot cs : courseSnapTask.getResult())
+                                        for (DocumentSnapshot cs : courseSnapTask.getResult().getDocuments()) // added getDocs
                                         {
                                             Course c = cs.toObject(Course.class);
                                             if (c == null) continue;

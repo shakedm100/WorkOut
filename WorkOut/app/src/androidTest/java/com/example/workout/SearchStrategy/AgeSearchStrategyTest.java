@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.SearchStrategy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;

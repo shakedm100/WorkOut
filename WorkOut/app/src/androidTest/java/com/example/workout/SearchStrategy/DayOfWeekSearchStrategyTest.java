@@ -148,18 +148,20 @@ public class DayOfWeekSearchStrategyTest
     }
 
     @Test
-    public void searchDayOfWeek_failure() {
+    public void searchDayOfWeek_failure()
+    {
         // Make b1 courses fail
-        RuntimeException boom = new RuntimeException("boom");
-        when(b1CoursesCol.get()).thenReturn(Tasks.forException(boom));
+        RuntimeException fail = new RuntimeException("fail");
+        when(b1CoursesCol.get()).thenReturn(Tasks.forException(fail));
 
         Task<List<Course>> task = dayOfWeekSearchStrategy.searchCourses(Day.Sunday);
 
-        try {
+        try
+        {
             Tasks.await(task);
             fail("Expected ExecutionException");
         } catch (ExecutionException e) {
-            assertSame(boom, e.getCause());
+            assertSame(fail, e.getCause());
         } catch (Exception e) {
             fail("Expected ExecutionException, got: " + e);
         }

@@ -1,4 +1,4 @@
-package com.example.workout;
+package com.example.workout.SearchStrategy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -137,7 +137,7 @@ public class CategorySearchStrategyTest {
     }
 
     @Test
-    public void searchCategory_noMatches_emptySnapshot() throws Exception
+    public void searchCategory_success_noMatches() throws Exception
     {
         Category wanted = Category.Tennis; // choose any not present in stubs
 
@@ -182,11 +182,6 @@ public class CategorySearchStrategyTest {
 
     private static Course copy(Course src) {
         Course c = new Course();
-        if (src.getSchedule() != null) {
-            Schedule s = new Schedule();
-            s.setDay(src.getSchedule().getDay());
-            c.setSchedule(s);
-        }
         c.setCategory(src.getCategory());
         return c;
     }
