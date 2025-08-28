@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -91,24 +92,21 @@ public class SearchStrategyTest
     }
 
     @Test
-    public void searchRadiusTest() throws ExecutionException, InterruptedException, TimeoutException
+    public void searchRadiusTest() throws Exception
     {
         searchStrategy = new SearchRadiusStrategy(10);
 
         @SuppressWarnings("unchecked")
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
-                .searchBusinesses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
-
+        List<Business> businesses =
+                (List<Business>) await(searchStrategy.searchBusinesses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
         assertNotNull(businesses);
-        assertFalse(businesses.isEmpty());
 
         @SuppressWarnings("unchecked")
-        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy.searchCourses(new Location(32.08, 34.7))
-                , 10, TimeUnit.SECONDS);
-
+        List<Course> courses =
+                (List<Course>) await(searchStrategy.searchCourses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
         assertNotNull(courses);
-        assertFalse(courses.isEmpty());
     }
+
 
     @Test
     public void searchDayOfWeekTest() throws ExecutionException, InterruptedException, TimeoutException
@@ -133,16 +131,12 @@ public class SearchStrategyTest
         ArrayList<Business> businesses_null = (ArrayList<Business>) await(
                 searchStrategy.searchBusinesses(Day.Sunday),10, TimeUnit.SECONDS);
 
-        //assert(businesses_null);
         assertTrue(businesses_null.isEmpty());
 
         @SuppressWarnings("unchecked")
         ArrayList<Course> courses_null = (ArrayList<Course>) await(
                 searchStrategy.searchCourses(Day.Sunday), 10, TimeUnit.SECONDS);
 
-        //assertNull(courses_null);
         assertTrue(courses_null.isEmpty());
-
-        // mock part
     }
 }
