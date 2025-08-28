@@ -30,21 +30,19 @@ import Model.Location;
 import Model.SearchStrategies.SearchDayOfWeekStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
+
 /**
- * This test suite fully stubs the Firestore chain for:
- * db.collection("businesses").get()  -> QuerySnapshot(businesses)
- * for each business: document(bizId).collection("courses").get() -> QuerySnapshot(courses)
- * and each course doc: toObject(Course.class) and getId()
- *
- * Replace SearchDayOfWeekStrategy and fetchByDay with your class/method names.
+ * Firestore-mocked tests for day search strategy.
+ * -----------------------------------------------
+ * Courses match if the course occurs at a given day.
+ * course.schedule.day == given day.
  */
 public class DayOfWeekSearchStrategyTest
 {
-
-    // === Firestore root ===
+    // root
     @Mock FirebaseFirestore db;
 
-    // top-level "businesses" collection & snapshot
+    // "businesses" collection & snapshot
     @Mock CollectionReference businessesCol;
     @Mock QuerySnapshot businessesSnap;
 
@@ -52,13 +50,13 @@ public class DayOfWeekSearchStrategyTest
     @Mock DocumentSnapshot bizDoc1;
     @Mock DocumentSnapshot bizDoc2;
 
-    // per-business doc refs & nested "courses"
+    // business doc refs & nested "courses"
     @Mock DocumentReference b1DocRef;
     @Mock DocumentReference b2DocRef;
     @Mock CollectionReference b1CoursesCol;
     @Mock CollectionReference b2CoursesCol;
 
-    // per-business courses snapshots
+    // business courses snapshots
     @Mock QuerySnapshot coursesSnapB1;
     @Mock QuerySnapshot coursesSnapB2;
 
@@ -66,23 +64,19 @@ public class DayOfWeekSearchStrategyTest
     @Mock DocumentSnapshot b1c1Doc;
     @Mock DocumentSnapshot b1c2Doc;
     @Mock DocumentSnapshot b2c1Doc;
-
-    // class under test
-    SearchStrategyInterface<Day> dayOfWeekSearchStrategy;
+    SearchStrategyInterface<Day> dayOfWeekSearchStrategy; // test strategy
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // ===== CLASS UNDER TEST =====
         dayOfWeekSearchStrategy = new SearchDayOfWeekStrategy(db);
 
 
-        // ===== ROOT =====
+        // mock & stub relevant methods
         when(db.collection("businesses")).thenReturn(businessesCol);
         when(businessesCol.get()).thenReturn(Tasks.forResult(businessesSnap));
 
-        // let's say we have two businesses: b1, b2
+        // create two businesses: b1, b2
         when(bizDoc1.getId()).thenReturn("b1");
         when(bizDoc2.getId()).thenReturn("b2");
         when(businessesSnap.getDocuments()).thenReturn(Arrays.asList(bizDoc1, bizDoc2));
@@ -99,8 +93,8 @@ public class DayOfWeekSearchStrategyTest
         when(b1CoursesCol.get()).thenReturn(Tasks.forResult(coursesSnapB1));
         when(b2CoursesCol.get()).thenReturn(Tasks.forResult(coursesSnapB2));
 
-        // ===== COURSES DATA =====
-        // b1 has 2 courses: Sunday (kept), Monday (filtered out)
+        // create fake courses
+        // b1 has 2 courses: Sunday (match), Monday (not matched)
         Course b1Sun = mkCourse(Day.Sunday);
         Course b1Mon = mkCourse(Day.Monday);
         when(b1c1Doc.toObject(Course.class)).thenReturn(copy(b1Sun));
@@ -109,7 +103,7 @@ public class DayOfWeekSearchStrategyTest
         when(b1c2Doc.getId()).thenReturn("b1c2");
         when(coursesSnapB1.getDocuments()).thenReturn(Arrays.asList(b1c1Doc, b1c2Doc));
 
-        // b2 has 1 course: Sunday (kept)
+        // b2 has 1 course: Sunday (match)
         Course b2Sun = mkCourse(Day.Sunday);
         when(b2c1Doc.toObject(Course.class)).thenReturn(copy(b2Sun));
         when(b2c1Doc.getId()).thenReturn("b2c1");
@@ -117,11 +111,12 @@ public class DayOfWeekSearchStrategyTest
     }
 
     @Test
-    public void searchDayOfWeek_success() throws Exception {
+    public void searchDayOfWeek_success() throws Exception
+    {
         List<Course> result = Tasks.await(dayOfWeekSearchStrategy.searchCourses(Day.Sunday));
 
         // size check
-        assertEquals(2, result.size());
+        assertEquals(2, result.size()); // expected 2 courses
 
         // contains both ids
         List<String> ids = result.stream().map(Course::getId).toList();
@@ -129,16 +124,18 @@ public class DayOfWeekSearchStrategyTest
         assertTrue(ids.contains("b2c1")); // sunday
         assertFalse(ids.contains("b1c2")); // monday
 
-        // all are Sunday
-        for (Course c : result) {
+        // make sure they occur at Sunday
+        for (Course c : result)
+        {
             assertNotNull(c.getSchedule());
             assertEquals(Day.Sunday, c.getSchedule().getDay());
         }
     }
 
     @Test
-    public void searchDayOfWeek_failure_handlesNoBusinesses() throws Exception {
-        // Re-stub businesses to be empty
+    public void searchDayOfWeek_success_empty() throws Exception
+    {
+        // stub businesses to be empty
         when(businessesSnap.getDocuments()).thenReturn(Collections.emptyList());
 
         Task<List<Course>> task = dayOfWeekSearchStrategy.searchCourses(Day.Sunday);
@@ -150,7 +147,7 @@ public class DayOfWeekSearchStrategyTest
     @Test
     public void searchDayOfWeek_failure()
     {
-        // Make b1 courses fail
+        // force b1 courses fail
         RuntimeException fail = new RuntimeException("fail");
         when(b1CoursesCol.get()).thenReturn(Tasks.forException(fail));
 
@@ -167,8 +164,13 @@ public class DayOfWeekSearchStrategyTest
         }
     }
 
-    // ======= helpers =======
+    // helper functions
 
+    /**
+     * Create a course with a given day.
+     * @param day a given day.
+     * @return a new course occurs at that day.
+     */
     private static Course mkCourse(Day day) {
         Course c = new Course();
         Schedule s = new Schedule();
@@ -176,6 +178,12 @@ public class DayOfWeekSearchStrategyTest
         c.setSchedule(s);
         return c;
     }
+
+    /**
+     * Create a copy of a course.
+     * @param src the source course that will be copied.
+     * @return a new course with the same day as the source.
+     */
     private static Course copy(Course src) {
         Course c = new Course();
         if (src.getSchedule() != null) {
