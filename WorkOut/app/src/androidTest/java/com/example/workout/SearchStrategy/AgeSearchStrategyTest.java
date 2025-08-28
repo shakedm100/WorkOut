@@ -27,20 +27,18 @@ import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
 /**
- * Firestore-mocked tests for AgeRange search.
- * Mirrors the wiring used in NewSearchStrategyTestMock.
- *
- * Assumption: a course matches if its AgeRange fully covers the requested AgeRange:
- *   course.min <= wanted.min  AND  course.max >= wanted.max
- * Adjust the assertions if your production logic uses "overlap" instead of "contains".
+ * Firestore-mocked tests for AgeRange search strategy.
+ * ----------------------------------------------------
+ * A course matches if its AgeRange fully covers the requested AgeRange:
+ * course.min <= wanted.min  AND  course.max >= wanted.max
  */
 public class AgeSearchStrategyTest {
 
-    // === Firestore root ===
+    // root
     @Mock FirebaseFirestore db;
     @Mock CourseRepository mockCourseRepo;
 
-    // top-level "businesses" collection & snapshot
+    // businesses collection & snapshot
     @Mock CollectionReference businessesCol;
     @Mock QuerySnapshot businessesSnap;
 
@@ -48,13 +46,13 @@ public class AgeSearchStrategyTest {
     @Mock DocumentSnapshot bizDoc1;
     @Mock DocumentSnapshot bizDoc2;
 
-    // per-business doc refs & nested "courses"
+    // businesses doc refs & nested "courses"
     @Mock DocumentReference b1DocRef;
     @Mock DocumentReference b2DocRef;
     @Mock CollectionReference b1CoursesCol;
     @Mock CollectionReference b2CoursesCol;
 
-    // per-business courses snapshots
+    // businesses courses snapshots
     @Mock QuerySnapshot coursesSnapB1;
     @Mock QuerySnapshot coursesSnapB2;
 
@@ -64,34 +62,32 @@ public class AgeSearchStrategyTest {
     @Mock DocumentSnapshot b1c3Doc;
     @Mock DocumentSnapshot b2c1Doc;
 
-    //
 
-    // ---- collectionGroup("courses") chain ----
-    @Mock Query cg;          // db.collectionGroup("courses")
-    @Mock Query q1;          // cg.whereLessThanOrEqualTo("ageRange.minAge", wanted.max)
-    @Mock Query q2;          // q1.whereGreaterThanOrEqualTo("ageRange.maxAge", wanted.min)
-    @Mock QuerySnapshot cgSnap;
+    // collectionGroup("courses") chain
+    @Mock Query cg; // for db.collectionGroup("courses")
+    @Mock Query q1; // for cg.whereLessThanOrEqualTo("ageRange.minAge", wanted.max)
+    @Mock Query q2; // for q1.whereGreaterThanOrEqualTo("ageRange.maxAge", wanted.min)
+    @Mock QuerySnapshot cgSnap; // for empty snap
+    @Mock DocumentSnapshot cDoc1; // for empty success test
+    @Mock DocumentSnapshot cDoc2; // for empty success test
+    @Mock DocumentReference c1Ref; // c1 ref
+    @Mock DocumentReference c2Ref; // c2 ref
 
-    @Mock DocumentSnapshot cDoc1;
-    @Mock DocumentSnapshot cDoc2;
-
-    // If your code derives businessId via path parents:
-    @Mock DocumentReference c1Ref;
-    @Mock DocumentReference c2Ref;
+    // course & businesses collections refs
     @Mock CollectionReference c1CoursesColRef;
     @Mock CollectionReference c2CoursesColRef;
     @Mock DocumentReference c1BusinessDocRef;
     @Mock DocumentReference c2BusinessDocRef;
-    @Mock QuerySnapshot cgSnapEmpty;
-    @Mock QuerySnapshot cgSnapOnlyC1;
-
-    // class under test
-    private SearchStrategyInterface<AgeRange> ageRangeSearchStrategy;
+    @Mock QuerySnapshot cgSnapEmpty; // for empty success test
+    @Mock QuerySnapshot cgSnapOnlyC1; // for only 1 valid course
+    private SearchStrategyInterface<AgeRange> ageRangeSearchStrategy; // selected strategy
 
     @Before
     public void setUp()
     {
         MockitoAnnotations.openMocks(this);
+
+        // stub repository & necessary methods
         mockCourseRepo = mock(CourseRepository.class);
         ageRangeSearchStrategy = new SearchAgeStrategy(mockCourseRepo, db);
 
@@ -99,7 +95,7 @@ public class AgeSearchStrategyTest {
         when(db.collection("businesses")).thenReturn(businessesCol);
         when(businessesCol.get()).thenReturn(Tasks.forResult(businessesSnap));
 
-        // two businesses: b1, b2
+        // "create" two businesses: b1, b2
         when(bizDoc1.getId()).thenReturn("b1");
         when(bizDoc2.getId()).thenReturn("b2");
         when(businessesSnap.getDocuments()).thenReturn(Arrays.asList(bizDoc1, bizDoc2));
@@ -131,7 +127,7 @@ public class AgeSearchStrategyTest {
         when(coursesSnapB1.getDocuments()).thenReturn(Arrays.asList(b1c1Doc, b1c2Doc, b1c3Doc));
 
         // b2 has:
-        //   c1: 8-11   -> should NOT match (below requested)
+        // c1: 8-11 -> should NOT match
         Course b2c1 = mkCourse(8, 11);
         when(b2c1Doc.toObject(Course.class)).thenReturn(copy(b2c1));
         when(b2c1Doc.getId()).thenReturn("b2c1");
@@ -140,17 +136,15 @@ public class AgeSearchStrategyTest {
         // Start of collectionGroup chain
         when(db.collectionGroup("courses")).thenReturn(cg);
 
-// whereLessThanOrEqualTo("ageRange.minAge", wanted.max)
+        // stub chain filters
         when(cg.whereLessThanOrEqualTo(eq("ageRange.minAge"), anyInt())).thenReturn(q1);
-
-// whereGreaterThanOrEqualTo("ageRange.maxAge", wanted.min)
         when(q1.whereGreaterThanOrEqualTo(eq("ageRange.maxAge"), anyInt())).thenReturn(q2);
 
-// Final get()
+        // stub final get()
         when(q2.get()).thenReturn(Tasks.forResult(cgSnap));
 
         // Documents returned by the collectionGroup query
-        // c1: 10-16  (overlaps 12-14)  -> match
+        // c1: 10-16  (overlaps 12-14) -> match
         // c2: 15-17  (does NOT overlap 12-14) -> no match
         Course cgC1 = mkCourse(10, 16);
         Course cgC2 = mkCourse(15, 17);
@@ -161,7 +155,7 @@ public class AgeSearchStrategyTest {
         when(cDoc2.getId()).thenReturn("cg_c2");
         when(cgSnap.getDocuments()).thenReturn(Arrays.asList(cDoc1, cDoc2));
 
-// (Optional) if your prod code extracts businessId from the doc path
+        // extracts businessId from the doc path
         when(cDoc1.getReference()).thenReturn(c1Ref);
         when(cDoc2.getReference()).thenReturn(c2Ref);
 
@@ -179,14 +173,15 @@ public class AgeSearchStrategyTest {
     }
 
     @Test
-    public void searchAgeRange_success_overlapLogic() throws Exception {
-        AgeRange wanted = new AgeRange(12, 14);
+    public void searchAgeRange_success_overlapLogic() throws Exception
+    {
+        AgeRange wanted = new AgeRange(12, 14); // ages between 12 to 14 are "valid"
 
-        // Build the exact where-chain for this case
+        // build the exact where-chain for this case
         when(cg.whereLessThanOrEqualTo("ageRange.minAge", 14)).thenReturn(q1);
         when(q1.whereGreaterThanOrEqualTo("ageRange.maxAge", 12)).thenReturn(q2);
 
-        // Return ONLY cDoc1 for this query
+        // stub - return cDoc1 for this query
         when(cgSnapOnlyC1.getDocuments()).thenReturn(Collections.singletonList(cDoc1));
         when(q2.get()).thenReturn(Tasks.forResult(cgSnapOnlyC1));
 
@@ -197,10 +192,11 @@ public class AgeSearchStrategyTest {
     }
 
     @Test
-    public void searchAgeRange_success_noMatches() throws Exception {
-        AgeRange wanted = new AgeRange(12, 14);
+    public void searchAgeRange_success_noMatches() throws Exception
+    {
+        AgeRange wanted = new AgeRange(12, 14); // wanted age range
 
-        // Make the exact where-chain return the EMPTY snapshot for this case
+        // make the exact where filter chain return the empty snapshot for this case
         when(cg.whereLessThanOrEqualTo("ageRange.minAge", 14)).thenReturn(q1);
         when(q1.whereGreaterThanOrEqualTo("ageRange.maxAge", 12)).thenReturn(q2);
         when(q2.get()).thenReturn(Tasks.forResult(cgSnapEmpty)); // returns an empty list
@@ -210,26 +206,35 @@ public class AgeSearchStrategyTest {
     }
 
     @Test
-    public void searchAgeRange_failure() {
-        // Force the final q2.get() to fail
-        RuntimeException boom = new RuntimeException("cg boom");
-        when(q2.get()).thenReturn(Tasks.forException(boom));
+    public void searchAgeRange_failure()
+    {
+        // force to fail
+        RuntimeException fail = new RuntimeException("fail");
+        when(q2.get()).thenReturn(Tasks.forException(fail));
 
         Task<List<Course>> task = ageRangeSearchStrategy.searchCourses(new AgeRange(12, 14));
 
-        try {
+        try
+        {
             Tasks.await(task);
             fail("Expected ExecutionException");
-        } catch (ExecutionException e) {
-            assertSame(boom, e.getCause());
-        } catch (Exception e) {
+        } catch (ExecutionException e)
+        {
+            assertSame(fail, e.getCause());
+        } catch (Exception e)
+        {
             fail("Expected ExecutionException, got: " + e);
         }
     }
 
+    // helper functions
 
-    // ======= helpers =======
-
+    /**
+     * Create a course with a given age range.
+     * @param minAge minimum age for the course.
+     * @param maxAge maximum age for the course.
+     * @return a new course with that age range.
+     */
     private static Course mkCourse(int minAge, int maxAge) {
         Course c = new Course();
         AgeRange ar = new AgeRange(minAge, maxAge);
@@ -237,6 +242,11 @@ public class AgeSearchStrategyTest {
         return c;
     }
 
+    /**
+     * Create a copy of a course.
+     * @param src the source course that will be copied.
+     * @return a new course with the same age range as the source.
+     */
     private static Course copy(Course src) {
         Course c = new Course();
         if (src.getAgeRange() != null) {
