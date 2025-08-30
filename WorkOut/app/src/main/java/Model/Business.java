@@ -368,50 +368,6 @@ public class Business extends User implements Parcelable
     }
 
     /**
-     * Adds a follower to this business.
-     *
-     * @param follower the Client to add as a follower
-     * @return true if added, false otherwise
-     */
-    public boolean addFollower(Client follower)
-    {
-        if (followers == null)
-            followers = new ArrayList<>();
-        return followers.add(follower);
-    }
-
-    /**
-     * Removes a follower.
-     *
-     * @param follower the Client to remove
-     * @return true if removed, false otherwise
-     */
-    public boolean deleteFollower(Client follower)
-    {
-        return followers.remove(follower);
-    }
-
-    /**
-     * Updates an existing follower’s data.
-     *
-     * @param follower the updated Client
-     * @return true if updated, false otherwise
-     */
-    public boolean updateFollower(Client follower)
-    {
-        for (int i = 0; i < followers.size(); i++)
-        {
-            if (followers.get(i).getUsername().equals(follower.getUsername()))
-            {
-                followers.set(i, follower);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Two Business objects are equal if their core fields match.
      *
      * @param o the object to compare to
