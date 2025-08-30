@@ -521,7 +521,7 @@ public class SearchActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Permission denied?"); // TODO: Show error on screen
+            throw new RuntimeException("Permission denied?");
         }
     }
 
