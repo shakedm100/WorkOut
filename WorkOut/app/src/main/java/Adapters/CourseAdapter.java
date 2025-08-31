@@ -49,7 +49,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         int duration = course.getDuration();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(occurrence);
-        calendar.add(Calendar.HOUR, 2);
+        calendar.add(Calendar.HOUR, -2);
         Date startTime = calendar.getTime();
         calendar.add(Calendar.MINUTE, duration);
         Date endTime = calendar.getTime();
