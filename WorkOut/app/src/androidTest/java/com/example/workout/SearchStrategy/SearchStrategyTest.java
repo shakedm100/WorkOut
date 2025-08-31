@@ -1,16 +1,13 @@
-package com.example.workout;
+package com.example.workout.SearchStrategy;
 
 import static com.google.android.gms.tasks.Tasks.await;
 
 import static org.junit.Assert.*;
 
-import com.google.firebase.Timestamp;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -20,10 +17,12 @@ import Model.Business;
 import Model.Category;
 import Model.Course;
 import Model.CourseType;
+import Model.Day;
 import Model.Location;
 import Model.SearchStrategies.SearchAgeStrategy;
 import Model.SearchStrategies.SearchCategoryStrategy;
 import Model.SearchStrategies.SearchCourseTypeStrategy;
+import Model.SearchStrategies.SearchDayOfWeekStrategy;
 import Model.SearchStrategies.SearchRadiusStrategy;
 import Model.SearchStrategies.SearchStrategyInterface;
 
@@ -93,28 +92,51 @@ public class SearchStrategyTest
     }
 
     @Test
-    public void searchRadiusTest() throws ExecutionException, InterruptedException, TimeoutException
+    public void searchRadiusTest() throws Exception
     {
         searchStrategy = new SearchRadiusStrategy(10);
 
         @SuppressWarnings("unchecked")
-        ArrayList<Business> businesses = (ArrayList<Business>) await(searchStrategy
-                .searchBusinesses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+        List<Business> businesses =
+                (List<Business>) await(searchStrategy.searchBusinesses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+        assertNotNull(businesses);
+
+        @SuppressWarnings("unchecked")
+        List<Course> courses =
+                (List<Course>) await(searchStrategy.searchCourses(new Location(32.08, 34.7)), 10, TimeUnit.SECONDS);
+        assertNotNull(courses);
+    }
+
+
+    @Test
+    public void searchDayOfWeekTest() throws ExecutionException, InterruptedException, TimeoutException
+    {
+        searchStrategy = new SearchDayOfWeekStrategy();
+
+        @SuppressWarnings("unchecked")
+                ArrayList<Business> businesses = (ArrayList<Business>) await(
+                        searchStrategy.searchBusinesses(Day.Monday),10, TimeUnit.SECONDS);
 
         assertNotNull(businesses);
         assertFalse(businesses.isEmpty());
 
         @SuppressWarnings("unchecked")
-        ArrayList<Course> courses = (ArrayList<Course>) await(searchStrategy.searchCourses(new Location(32.08, 34.7))
-                , 10, TimeUnit.SECONDS);
+                ArrayList<Course> courses = (ArrayList<Course>) await(
+                        searchStrategy.searchCourses(Day.Monday), 10, TimeUnit.SECONDS);
 
         assertNotNull(courses);
         assertFalse(courses.isEmpty());
-    }
 
-    @Test
-    public void searchDayOfWeekTest() throws ExecutionException, InterruptedException, TimeoutException
-    {
-        // TODO: Implement day of week test
+        @SuppressWarnings("unchecked")
+        ArrayList<Business> businesses_null = (ArrayList<Business>) await(
+                searchStrategy.searchBusinesses(Day.Sunday),10, TimeUnit.SECONDS);
+
+        assertTrue(businesses_null.isEmpty());
+
+        @SuppressWarnings("unchecked")
+        ArrayList<Course> courses_null = (ArrayList<Course>) await(
+                searchStrategy.searchCourses(Day.Sunday), 10, TimeUnit.SECONDS);
+
+        assertTrue(courses_null.isEmpty());
     }
 }

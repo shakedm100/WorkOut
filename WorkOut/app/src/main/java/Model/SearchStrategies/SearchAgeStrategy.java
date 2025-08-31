@@ -4,6 +4,7 @@ import static com.google.android.gms.tasks.Tasks.await;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,6 +21,8 @@ import Model.AgeRange;
 import Model.Business;
 import Model.Course;
 import Model.Repository.CourseRepository;
+import Model.Repository.GeneralRepository;
+import okhttp3.OkHttpClient;
 
 /**
  * A {@link SearchStrategyInterface} implementation that finds
@@ -44,6 +47,18 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
     {
         db = FirebaseFirestore.getInstance();
         courseRepository = new CourseRepository();
+    }
+
+    /**
+     * Injection constructor for testing.
+     *
+     * @param courseRepository the CourseRepository to use
+     * @param db               FirebaseFirestore instance to use
+     */
+    public SearchAgeStrategy(CourseRepository courseRepository, FirebaseFirestore db)
+    {
+        this.courseRepository = courseRepository;
+        this.db = db;
     }
 
     /**
@@ -74,7 +89,7 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
                 .onSuccessTask(courseSnap ->
                 {
                     Set<DocumentReference> bizRefs = new HashSet<>();
-                    for (DocumentSnapshot cs : courseSnap)
+                    for (DocumentSnapshot cs : courseSnap.getDocuments()) // added getDocs
                     {
                         DocumentReference bizRef = cs.getReference()
                                 .getParent()    // “courses”
@@ -117,7 +132,12 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
                                     .continueWith(cTask ->
                                     {
                                         if (!cTask.isSuccessful()) throw cTask.getException();
-                                        b.setCourses((ArrayList<Course>) cTask.getResult());         // populate
+                                        List<Course> courseList = cTask.getResult();
+                                        ArrayList<Course> courseArrayList = new ArrayList<>();
+                                        for (Course course : courseList)
+                                            courseArrayList.add(course);
+
+                                        b.setCourses(courseArrayList);         // populate
                                         return b;                                // now a Task<Business>
                                     })
                             )
@@ -168,7 +188,7 @@ public class SearchAgeStrategy implements SearchStrategyInterface<AgeRange>
                     }
 
                     List<Course> results = new ArrayList<>();
-                    for (DocumentSnapshot ds : task.getResult())
+                    for (DocumentSnapshot ds : task.getResult().getDocuments()) // task.getResult()
                     {
                         Course course = ds.toObject(Course.class);
                         if (course == null) continue;

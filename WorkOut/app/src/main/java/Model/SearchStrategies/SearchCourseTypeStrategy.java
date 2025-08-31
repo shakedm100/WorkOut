@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import Model.Business;
 import Model.CourseType;
 import Model.Course;
+import Model.Repository.CourseRepository;
 
 /**
  * A {@link SearchStrategyInterface} implementation that finds
@@ -37,6 +38,16 @@ public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseT
     public SearchCourseTypeStrategy()
     {
         db = FirebaseFirestore.getInstance();
+    }
+
+    /**
+     * Injection constructor for testing.
+     *
+     * @param db FirebaseFirestore instance to use
+     */
+    public SearchCourseTypeStrategy(FirebaseFirestore db)
+    {
+        this.db = db;
     }
 
     /**
@@ -66,7 +77,7 @@ public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseT
                 {
                     // group courses by their parent business ref
                     Map<DocumentReference, List<Course>> coursesByBiz = new HashMap<>();
-                    for (DocumentSnapshot cs : querySnap)
+                    for (DocumentSnapshot cs : querySnap.getDocuments()) // added getDocs
                     {
                         Course c = cs.toObject(Course.class);
                         DocumentReference bizRef = cs.getReference()
@@ -149,7 +160,8 @@ public class SearchCourseTypeStrategy implements SearchStrategyInterface<CourseT
                     }
 
                     List<Course> results = new ArrayList<>();
-                    for (DocumentSnapshot cs : task.getResult()) {
+                    for (DocumentSnapshot cs : task.getResult().getDocuments()) // getDocuments
+                    {
                         // 1) Convert to Course
                         Course c = cs.toObject(Course.class);
                         if (c == null) continue;
