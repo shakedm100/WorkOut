@@ -291,6 +291,7 @@ public class AddOrEditClassViewModel  extends ViewModel
             courseRepository.deleteCourse(course, business)
                     .addOnSuccessListener(result -> {
                         addOrEditClassUiState.postValue(GenericUiState.success("Class deleted successfully!"));
+                        courseRepository.deleteEnrollmentByCourseID(course.getId());
                         taskCompletionSource.setResult(true);
                     })
                     .addOnFailureListener(insertException ->
