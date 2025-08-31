@@ -85,6 +85,8 @@ public class UpcomingEnrollmentsAdapter extends RecyclerView.Adapter<UpcomingEnr
         {
             Calendar cal = Calendar.getInstance();
             cal.setTime(start);
+            cal.add(Calendar.HOUR, -2);
+            start = cal.getTime();
 
             int durMin = (course != null ? course.getDuration() : 0);
             Date end = start;
