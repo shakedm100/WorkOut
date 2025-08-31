@@ -378,11 +378,9 @@ public class SearchActivity extends AppCompatActivity
             tasks.add(searchDayOfWeekByCourse());
         }
 
-
-        // If no filters, return empty immediately
         if (tasks.isEmpty())
         {
-            tasks.add(searchCourseRadius());
+            tasks.add(searchCourseAgeRange());
         }
 
         // Wait for all to finish successfully
@@ -433,7 +431,6 @@ public class SearchActivity extends AppCompatActivity
             tasks.add(searchDayOfWeekByBusiness());
         }
 
-        // If no filters, return empty immediately
         if (tasks.isEmpty())
         {
             tasks.add(searchBusinessRadius());
