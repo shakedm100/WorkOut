@@ -64,7 +64,7 @@ exports.notifyCourseDeleted = onDocumentDeleted(
             : `A course you were enrolled in has been cancelled.`,
         },
         token: clientData.fcmToken,
-      };
+    };
 
       promises.push(messaging.send(payload));
     }
@@ -72,6 +72,18 @@ exports.notifyCourseDeleted = onDocumentDeleted(
     // Send all notifications
     await Promise.all(promises);
     console.log("Delete notifications sent successfully.");
+
+    // delete all the enrollments 
+    const batchSize = 500;
+    let idx = 0;
+    while (idx < enrollmentsSnapshot.size) {
+      const batch = admin.firestore().batch();
+      for (let i = 0; i < batchSize && idx < enrollmentsSnapshot.size; i++, idx++) {
+        batch.delete(enrollmentsSnapshot.docs[idx].ref);
+      }
+      await batch.commit();
+    }
+    console.log(`Deleted ${enrollmentsSnapshot.size} enrollments for course ${courseId}.`);
   }
 );
 
@@ -137,10 +149,10 @@ exports.notifyCourseUpdated = onDocumentUpdated(
             body: `The course "${afterUpdatedCourse.name}" has been updated.`,
           },
           token: clientData.fcmToken,
-        };
+      };
 
-        promises.push(messaging.send(payload));
-      }
+      promises.push(messaging.send(payload));
+    }
 
       // Send all notifications
       await Promise.all(promises);
