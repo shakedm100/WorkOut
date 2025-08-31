@@ -1,0 +1,11 @@
+Adapters
+com.example.workout
+com.example.workout.Business
+com.example.workout.Client
+com.example.workout.espresso
+com.example.workout.SearchStrategy
+Model
+Model.Repository
+Model.SearchStrategies
+ViewModel
+ViewModel.Business
