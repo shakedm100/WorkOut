@@ -359,8 +359,8 @@ public class AddOrEditClassActivity extends AppCompatActivity
 
             if(schedule == null)
             {
-                schedule = currentCourse.getSchedule();
-                schedule.setDay(dayOfWeek); // ?
+                schedule = new Schedule(currentCourse.getSchedule().getDay(), currentCourse.getSchedule().getOccurrence());
+                schedule.setDay(dayOfWeek);
             }
 
             addOrEditClassViewModel.updateCourse(currentBusiness, courseName, schedule, capacity,
