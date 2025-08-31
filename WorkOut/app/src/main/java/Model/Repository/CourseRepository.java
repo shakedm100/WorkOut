@@ -554,21 +554,4 @@ public class CourseRepository
                     return list;
                 });
     }
-
-    /**
-     * Deletes an {@link Enrollment} document from Firestore.
-     * @param enrollment enrollment to delete.
-     * @return a Task completing with {@code true} if deletion succeeded.
-     */
-    public Task<Integer> deleteEnrollmentByCourseID(String courseID)
-    {
-        return db.collection(enrollmentCollection).whereEqualTo("course.id" ,courseID).get()
-                .onSuccessTask(querySnapshot -> {
-                    WriteBatch batch = db.batch();
-                    for (DocumentSnapshot d : querySnapshot.getDocuments()) {
-                        batch.delete(d.getReference());
-                    }
-                    return batch.commit().continueWith(task -> querySnapshot.size());
-                });
-    }
 }
