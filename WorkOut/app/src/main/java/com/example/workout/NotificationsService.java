@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 
@@ -41,6 +42,8 @@ public class NotificationsService extends FirebaseMessagingService
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle(title)
                 .setContentText(message)
+                .setSmallIcon(R.drawable.ic_push_notification)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(this);
