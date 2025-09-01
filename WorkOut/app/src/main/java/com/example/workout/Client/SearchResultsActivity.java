@@ -151,10 +151,12 @@ public class SearchResultsActivity extends AppCompatActivity
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
             timeFormat.setTimeZone(tz);
 
-            String startTime = timeFormat.format(occurrenceDate);
 
             Calendar calendar = Calendar.getInstance(tz);
             calendar.setTime(occurrenceDate);
+            calendar.add(Calendar.HOUR, -2);
+            occurrenceDate = calendar.getTime();
+            String startTime = timeFormat.format(occurrenceDate);
             calendar.add(Calendar.MINUTE, course.getDuration());
 
             String endTimeString = timeFormat.format(calendar.getTime());

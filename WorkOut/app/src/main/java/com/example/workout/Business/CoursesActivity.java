@@ -149,9 +149,12 @@ public class CoursesActivity extends AppCompatActivity
                 String dayString = schedule.getDay().toString();
                 // Show only time
                 Date occurrenceDate = schedule.getOccurrence().toDate();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(occurrenceDate);
+                calendar.add(Calendar.HOUR, -2);
+                occurrenceDate = calendar.getTime();
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeOnly = timeFormat.format(occurrenceDate);
-                Calendar calendar = Calendar.getInstance();
                 calendar.setTime(occurrenceDate);
                 calendar.add(Calendar.MINUTE, course.getDuration());
                 Date endDate = calendar.getTime();
